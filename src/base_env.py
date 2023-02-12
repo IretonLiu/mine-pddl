@@ -12,7 +12,7 @@ import minerl.herobraine.hero.handlers as handlers
 NAVIGATE_STEPS = 1000000
 
 
-class NicsENV(SimpleEmbodimentEnvSpec):
+class TestEnv(SimpleEmbodimentEnvSpec):
 
     def __init__(self, *args,
                 video_resolution=(600, 600),
