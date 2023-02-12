@@ -4,8 +4,6 @@ from minerl.herobraine.hero.handler import Handler
 import sys
 from typing import List
 import numpy as np
-from goal_location import get_goal_location
-
 import minerl.herobraine
 import minerl.herobraine.hero.handlers as handlers
 
