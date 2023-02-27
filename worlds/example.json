@@ -1,0 +1,21 @@
+{
+    "world_type":"default",
+    "world_name":"open-ended",
+    "blocks":[
+        {
+            "type":"obsidian",
+            "position":{
+                "x":"-260",
+                "y":"86",
+                "z":"175"
+            }
+        }
+    ],
+    "inventory":[
+        {
+            "name":"diamond",
+            "variant":null,
+            "quantity":"1"
+        }
+    ]
+}
