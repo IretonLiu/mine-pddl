@@ -1,4 +1,4 @@
-from base_pddl_types import *
+from .base_pddl_types import *
 
 
 class NamedItemType(ItemType):

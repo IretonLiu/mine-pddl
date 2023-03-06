@@ -1,7 +1,7 @@
 from typing import List
 
-from functions import *
-from predicates import Predicate
+from pddl.functions import *
+from pddl.predicates import Predicate
 
 
 class ObjectType:
@@ -14,14 +14,16 @@ class ObjectType:
 class LocatableType(ObjectType):
     def __init__(self):
         super().__init__()
-        self.name = 'locatable'
-        self.functions.append(PositionFunction())
+        self.type_name = 'locatable'
+        self.name = 'l'
+        self.functions.append(PositionFunction(self))
 
 
 class AgentType(LocatableType):
     def __init__(self):
         super().__init__()
-        self.name = 'agent'
+        self.type_name = 'agent'
+        self.name = 'ag'
         self.functions.append(InventoryFunction())
         self.predicates.append(Predicate('agent-alive', ["ag - agent"]))
 

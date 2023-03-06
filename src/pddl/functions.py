@@ -18,6 +18,11 @@ class PositionFunction(Function):
         self.parameter_name = object.name
         self.object_type = object.type_name
 
+        self.position = None
+
+    def set_position(self, position):
+        self.position = position
+
     def to_string(self):
         raise NotImplementedError()
 
