@@ -1,0 +1,35 @@
+# class TypeTreeNode:
+#     def __init__(self, name: str, parent: str = None, children: List[str] = []):
+#         assert name is not None, "Node name cannot be None"
+
+#         self.name = name
+#         self.parent = parent
+#         self.children = children
+
+#         self.functions = []
+#         self.predicates = []
+
+
+# class PDDLTypeTree:
+#     def __init__(self, root_name: str):
+#         self.root = root_name
+
+#         # use a dictionary to store the nodes for constant time lookup
+#         root_node = TypeTreeNode(name=root_name, children=[])
+#         self.dict = {root_name: root_node}
+
+#     def construct_tree(self, types_dict: dict):
+#         for key, value in types_dict.items():
+#             self.add_nodes(key, value)
+
+#     def add_nodes(self, name: str, children_name: List[str]):
+#         if (name not in self.dict):
+#             self.dict[name] = TypeTreeNode(
+#                 name=name, children=children_name)
+#         else:
+#             self.dict[name].children.extend(children_name)
+
+#         for child in children_name:
+#             if child not in self.dict:
+#                 self.dict[child] = TypeTreeNode(
+#                     name=child, parent=name, children=[])

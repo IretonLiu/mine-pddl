@@ -40,10 +40,10 @@ class EntityObservation(KeymapTranslationHandler):
             </ObservationFromNearbyEntities>"""
         )
 
-    def __init__(self, ranges=(1,1,1)):
-        self.xrange=ranges[0]
-        self.yrange=ranges[1]
-        self.zrange=ranges[2]
+    def __init__(self, ranges=(1, 1, 1)):
+        self.xrange = ranges[0]
+        self.yrange = ranges[1]
+        self.zrange = ranges[2]
 
         space = spaces.Dict(
             {
@@ -76,22 +76,24 @@ class EntityObservation(KeymapTranslationHandler):
             }
         )
         # gym.space.Dict will sort keys! So we keep the order by ourselves
-        self._key_list = [
-            "block_name",
-            "block_meta",
-            "is_collidable",
-            "is_tool_not_required",
-            "blocks_movement",
-            "is_liquid",
-            "is_solid",
-            "can_burn",
-            "blocks_light",
-            "cos_look_vec_angle",
-        ]
-        super().__init__(hero_keys=["entities"], univ_keys=["entities"], space=space)
+        # self._key_list = [
+        #     "block_name",
+        #     "block_meta",
+        #     "is_collidable",
+        #     "is_tool_not_required",
+        #     "blocks_movement",
+        #     "is_liquid",
+        #     "is_solid",
+        #     "can_burn",
+        #     "blocks_light",
+        #     "cos_look_vec_angle",
+        # ]
+        super().__init__(hero_keys=["entities"],
+                         univ_keys=["entities"], space=space)
 
     def from_hero(self, obs):
-        pass
+        # pass
+        return obs["entities"]
         # voxels_arr = obs[self.hero_keys[0]]
         # assert len(voxels_arr) == np.prod(self.grid_size) * len(
         #     self._key_list
