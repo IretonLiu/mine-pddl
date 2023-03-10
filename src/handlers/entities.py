@@ -88,8 +88,7 @@ class EntityObservation(KeymapTranslationHandler):
         #     "blocks_light",
         #     "cos_look_vec_angle",
         # ]
-        super().__init__(hero_keys=["entities"],
-                         univ_keys=["entities"], space=space)
+        super().__init__(hero_keys=["entities"], univ_keys=["entities"], space=space)
 
     def from_hero(self, obs):
         # pass

@@ -3,6 +3,7 @@ from typing import List
 from pddl.functions import *
 from pddl.predicates import Predicate
 
+# TODO: check if items despawn + how to turn off
 
 class ObjectType:
     def __init__(self):
@@ -61,3 +62,18 @@ class BedrockType(BlockType):
 # 	obsidian-block - destructible-block
 # 	wool diamond stick diamond-pickaxe apple potato rabbit orchid-flower daisy-flower flint coal iron-ore iron-ingot netherportal flint-and-steel - item
 # )
+
+"""
+(:action drop-diamond
+ :parameters (?ag - agent ?i - diamond)
+ :precondition (and (>= (agent-num-diamond ?ag) 1)
+                    (not (present ?i)))
+ :effect (and (present ?i)
+              (assign (x ?i) (x ?ag))
+              (assign (y ?i) (+ (y ?ag) 1))
+              (assign (z ?i) (z ?ag))
+              (decrease (agent-num-diamond ?ag) 1)
+         )
+)
+
+"""
