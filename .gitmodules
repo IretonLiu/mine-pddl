@@ -1,0 +1,3 @@
+[submodule "minedojo-pddl"]
+    path = MineDojo-PDDL  
+    url = git@github.com:IretonLiu/MineDojo-PDDL.git
