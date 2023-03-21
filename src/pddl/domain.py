@@ -28,6 +28,7 @@ class Domain:
         self.actions = []
         self.requirements = []
 
+    #TODO: sort the types in the correct order
     def construct_types(self, item_types, block_types):
         
         types_dict = defaultdict(list)
