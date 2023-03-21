@@ -6,54 +6,55 @@ from pddl.predicates import Predicate
 # TODO: check if items despawn + how to turn off
 
 class ObjectType:
+    type_name = 'object'
     def __init__(self):
-        self.name = 'object'
+        # self.type_name = 'object'
         self.functions = []
         self.predicates = []
 
 
 class LocatableType(ObjectType):
+    type_name='locatable'
     def __init__(self):
         super().__init__()
-        self.type_name = 'locatable'
         self.name = 'l'
         self.functions.append(PositionFunction(self))
 
 
 class AgentType(LocatableType):
+    type_name='agent'
     def __init__(self):
         super().__init__()
-        self.type_name = 'agent'
         self.name = 'ag'
-        self.functions.append(InventoryFunction())
+        self.functions.append(InventoryFunction(self))
         self.predicates.append(Predicate('agent-alive', ["ag - agent"]))
 
 
 class ItemType(LocatableType):
+    type_name = 'item'
     def __init__(self):
         super().__init__()
-        self.name = 'item'
         self.predicates.append(Predicate('present', ["i - item"]))
 
 
 class BlockType(LocatableType):
+    type_name = 'block'
     def __init__(self):
         super().__init__()
-        self.name = 'block'
         self.predicates.append(Predicate('block-present', ["b - block"]))
 
 
 class DestructibleBlockType(BlockType):
+    type_name = 'destructible-block'
     def __init__(self):
         super().__init__()
-        self.name = 'destructible-block'
-        self.functions.append(BlockHitsFunction())
+        self.functions.append(BlockHitsFunction(self))
 
 
 class BedrockType(BlockType):
+    type_name = 'bedrock'
     def __init__(self):
         super().__init__()
-        self.name = 'bedrock'
 
 # (:types
 # 	locatable - object
