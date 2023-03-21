@@ -52,10 +52,18 @@ class Domain:
 
         # convert types_dict to string
         types_str = '(types:\n'
-        for key in types_dict:
+
+        # use queue to enforce the order of the types
+        types_queue = [base_pddl_types.ObjectType.type_name]
+        while types_queue  != []:
+            key = types_queue.pop(0)
+            if key not in types_dict:
+                continue
             types_str+= f'\t'
             for value in types_dict[key]:
                 types_str += f'{value} '
+                types_queue.append(value)
+                
             types_str += f'- {key}\n'
         types_str += ')'
         print(types_str)
