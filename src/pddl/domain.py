@@ -1,6 +1,7 @@
 from typing import Dict
-from pddl.pddl_types.base_pddl_types import PDDLTypeTree
-
+import inspect
+import pddl.pddl_types.base_pddl_types as base_pddl_types
+from collections import defaultdict
 
 # (:types
 # 	locatable - object
@@ -17,38 +18,45 @@ from pddl.pddl_types.base_pddl_types import PDDLTypeTree
 # )
 
 class Domain:
-    def __init__(self, name, obs: Dict = None, actions=None):
-        self.name = name
-        self.obs = obs
-        self.types = []
+    def __init__(self):
+        # self.name = name
+        # self.obs = obs
+        self.types = None
         self.constants = []
         self.predicates = []
         self.functions = []
         self.actions = []
         self.requirements = []
 
-    # TODO: pddl functions can be a python class?
-    def functions_from_inventory(self, obs=None):
-        template = '(agent-num-{} ?ag - agent)'
+    def construct_types(self, item_types, block_types):
+        
+        types_dict = defaultdict(list)
+        # print all the classes in the pddl.pddl_types.base_pddl_types module without classes from their own imports
+        for name, cls in inspect.getmembers(base_pddl_types):
+            if inspect.isclass(cls) and cls.__module__ == base_pddl_types.__name__:
+                # get the parent class of the obj if it has one
+                parent = cls.__bases__[0] if cls.__bases__[0].__name__ != 'object' else None   
+                
+                if parent:
+                    types_dict[getattr(parent, "type_name", None)].append(getattr(cls, "type_name", None))
 
-        for item in obs['inventory']:
-            item_name = item['name'].replace(' ', '-')
-            self.functions.append(template.format(item_name))
+        for key in item_types:
+            types_dict['item'].append(key)
+        
 
-    def find_functions_from_type(self, type_name: str):
-        functions = []
-        for function in self.functions:
-            if function.object_type == type_name:
-                functions.append(function)
+        for key in block_types:
+            # TODO: check if block is destructible
 
-    def define_types_from_string(self, types_dict):
-        self.types = PDDLTypeTree('object')
-        self.types.construct_tree(types_dict)
+            types_dict[getattr(base_pddl_types.DestructibleBlockType, 'type_name')].append(key)
 
-        # {
-        #     object: [locatable],
-        #     locatable: [agent, item, block],
-        #     block: [bedrock, destructible-block],
-        #     destructible-block: [obsidian-block],
-        #     item: [wool, diamond, stick, diamond-pickaxe, apple, potato, rabbit, orchid-flower, daisy-flower, flint, coal, iron-ore, iron-ingot, netherportal, flint-and -steel]
-        # }
+        # convert types_dict to string
+        types_str = '(types:\n'
+        for key in types_dict:
+            types_str+= f'\t'
+            for value in types_dict[key]:
+                types_str += f'{value} '
+            types_str += f'- {key}\n'
+        types_str += ')'
+        print(types_str)
+        
+                
