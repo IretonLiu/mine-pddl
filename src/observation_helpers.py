@@ -29,6 +29,31 @@ def get_valid_inventory_types():
     return valid_inventory_types
 
 
+def get_invalid_inventory_types():
+    import xml.etree.ElementTree as ET
+
+    tree = ET.parse("src/Types.xsd")
+    root = tree.getroot()
+
+    # list of the types we are interested in for the inventory
+    invalid_parent_types = ["EntityTypes"]
+
+    # create a dictionary to store the parent types and their variations
+    invalid_inventory_types = dict.fromkeys(invalid_parent_types, [])
+
+    # loop through the high-level types
+    for child in root:
+        # if the parent type is of interest, carry on
+        if child.attrib["name"] in invalid_parent_types:
+            for c in child:
+                if "restriction" in c.tag:
+                    for enumeration in c:
+                        invalid_inventory_types[child.attrib["name"]].append(
+                            enumeration.attrib["value"]
+                        )
+
+    return invalid_inventory_types
+
 def extract_blocks(obs):
     """
     pass in the observation returned from minedojo
@@ -71,6 +96,7 @@ def extract_blocks(obs):
                 else:
                     blocks[block_name].append(named_block)
 
+    return blocks
 
 def extract_items(obs):
     """
@@ -79,7 +105,7 @@ def extract_items(obs):
     """
 
     # determine what corresponds to a valid inventory type
-    valid_inventory_types = get_valid_inventory_types()
+    invalid_inventory_types = get_invalid_inventory_types()
 
     entities = obs["entities"]
 
@@ -91,23 +117,25 @@ def extract_items(obs):
         #     continue
 
         # store the name and variation (if applicable)
-        named_item = NamedItemType(
-            name=entity["name"],
-            variation=entity["variation"],
-            quantity=entity["quantity"],
-        )
+        
+        if entity["name"] not in invalid_inventory_types["EntityTypes"] and entity["name"] != "MineDojoAgent0":
+            named_item = NamedItemType(
+                item_name=entity["name"],
+                variation= entity["variant"] if "variant" in entity else None,
+                quantity=entity["quantity"],
+            )
 
-        # set the position of the block
-        position = (int(entity["x"]), int(entity["y"]), int(entity["z"]))
-        for function in named_item.functions:
-            if isinstance(function, PositionFunction):
-                function.set_position(position)
-                break
+            # set the position of the block
+            position = (int(entity["x"]), int(entity["y"]), int(entity["z"]))
+            for function in named_item.functions:
+                if isinstance(function, PositionFunction):
+                    function.set_position(position)
+                    break
 
-        # store the items
-        if named_item.name not in items:
-            items[named_item.name] = [named_item]
-        else:
-            items[named_item.name].append(named_item)
+            # store the items
+            if named_item.name not in items:
+                items[named_item.item_name] = [named_item]
+            else:
+                items[named_item.item_name].append(named_item)
 
     return items
