@@ -54,6 +54,7 @@ def get_invalid_inventory_types():
 
     return invalid_inventory_types
 
+
 def extract_blocks(obs):
     """
     pass in the observation returned from minedojo
@@ -92,11 +93,12 @@ def extract_blocks(obs):
                         break
 
                 if block_name not in blocks:
-                    blocks[block_name] = [named_block]
+                    blocks[named_block.name] = [named_block]
                 else:
-                    blocks[block_name].append(named_block)
+                    blocks[named_block.name].append(named_block)
 
     return blocks
+
 
 def extract_items(obs):
     """
@@ -117,11 +119,14 @@ def extract_items(obs):
         #     continue
 
         # store the name and variation (if applicable)
-        
-        if entity["name"] not in invalid_inventory_types["EntityTypes"] and entity["name"] != "MineDojoAgent0":
+
+        if (
+            entity["name"] not in invalid_inventory_types["EntityTypes"]
+            and entity["name"] != "MineDojoAgent0"
+        ):
             named_item = NamedItemType(
                 item_name=entity["name"],
-                variation= entity["variant"] if "variant" in entity else None,
+                variation=entity["variant"] if "variant" in entity else None,
                 quantity=entity["quantity"],
             )
 
@@ -134,8 +139,8 @@ def extract_items(obs):
 
             # store the items
             if named_item.name not in items:
-                items[named_item.item_name] = [named_item]
+                items[named_item.name] = [named_item]
             else:
-                items[named_item.item_name].append(named_item)
+                items[named_item.name].append(named_item)
 
     return items

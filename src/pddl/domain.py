@@ -1,23 +1,9 @@
-from typing import List
+from typing import Dict
 import inspect
 import pddl.pddl_types.base_pddl_types as base_pddl_types
 import pddl.pddl_types.named_pddl_types as named_pddl_types
 from pddl.functions import InventoryFunction
 from collections import defaultdict
-
-# (:types
-# 	locatable - object
-# 	agent item block - locatable
-# 	bedrock destructible-block - block
-# 	obsidian-block - destructible-block
-# 	wool diamond stick diamond-pickaxe apple potato rabbit orchid-flower daisy-flower flint coal iron-ore iron-ingot netherportal flint-and-steel - item
-# )
-
-# (:predicates
-# 	 (present ?i - item)
-# 	 (block-present ?b - block)
-# 	 (agent-alive ?ag - agent)
-# )
 
 
 class Domain:
@@ -79,7 +65,7 @@ class Domain:
         self,
         module_name,
         return_predicates: bool,
-        items: List[named_pddl_types.NamedItemType] = None,
+        items: Dict[str, named_pddl_types.NamedItemType] = None,
     ):
         # return_predicates is true to return predicate strings and false to return function strings
         # items is only meaningful is we are processing functions
@@ -117,7 +103,7 @@ class Domain:
     def predicates_or_functions_helper(
         self,
         process_predicates: bool,
-        items: List[named_pddl_types.NamedItemType] = None,
+        items: Dict[str, named_pddl_types.NamedItemType] = None,
     ):
         # process_predicates is true to process predicate strings and false to process function strings
         # items is only meaningful if we are processing functions (i.e. process_predicates is false)
@@ -141,13 +127,13 @@ class Domain:
     def construct_predicates(self):
         return self.predicates_or_functions_helper(True)
 
-    def construct_functions(self, items: List[named_pddl_types.NamedItemType]):
+    def construct_functions(self, items: Dict[str, named_pddl_types.NamedItemType]):
         return self.predicates_or_functions_helper(False, items=items)
 
     def to_pddl(
         self,
-        items: List[named_pddl_types.NamedItemType],
-        blocks: List[named_pddl_types.NamedBlockType],
+        items: Dict[str, named_pddl_types.NamedItemType],
+        blocks: Dict[str, named_pddl_types.NamedBlockType],
     ):
         pddl = f"(define (domain {self.name})\n"
         pddl += "(:requirements :typing :fluents :negative-preconditions :universal-preconditions :existential-preconditions)\n"

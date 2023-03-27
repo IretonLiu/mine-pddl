@@ -7,6 +7,7 @@ from pddl.pddl_types.named_pddl_types import NamedBlockType, NamedItemType
 from pddl.functions import *
 from observation_helpers import extract_blocks, extract_items, get_valid_inventory_types
 from pddl.domain import Domain
+from pddl.problem import Problem
 
 
 # world_json = json_helper.load_json("worlds/example.json")
@@ -49,7 +50,10 @@ items = extract_items(obs)
 blocks = extract_blocks(obs)
 
 domain = Domain("first_world")
-print(domain.to_pddl(items, blocks))
+# print(domain.to_pddl(items, blocks))
+
+problem = Problem("problem", domain)
+print(problem.to_pddl(items, blocks))
 
 """
 entity simpleTypes of interest to use a s a filter (read from Types.xsd)
