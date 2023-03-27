@@ -48,8 +48,9 @@ file.close()
 items = extract_items(obs)
 blocks = extract_blocks(obs)
 
-domain = Domain()
-domain.construct_types(items, blocks)
+domain = Domain("first_world")
+print(domain.to_pddl(items, blocks))
+
 """
 entity simpleTypes of interest to use a s a filter (read from Types.xsd)
 
