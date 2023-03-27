@@ -140,5 +140,6 @@ class Domain:
         pddl += self.construct_types(items, blocks) + "\n"
         pddl += self.construct_predicates() + "\n"
         pddl += self.construct_functions(items) + "\n"
+        # todo: add actions
 
         return pddl + ")"

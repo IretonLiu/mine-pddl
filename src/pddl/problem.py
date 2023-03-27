@@ -1,6 +1,8 @@
 from typing import List, Dict
 from pddl.domain import Domain
 from pddl.pddl_types.named_pddl_types import NamedBlockType, NamedItemType
+from pddl.pddl_types.base_pddl_types import AgentType
+from pddl.functions import InventoryFunction
 
 # (define (problem <title>)
 #     (:domain <domain-name>)
@@ -37,9 +39,14 @@ class Problem:
             self.init.append(function.var_name)
 
     def construct_objects(
-        self, items: Dict[str, NamedItemType], blocks: Dict[str, NamedBlockType]
+        self,
+        agent: AgentType,
+        items: Dict[str, NamedItemType],
+        blocks: Dict[str, NamedBlockType],
     ):
         output = "(:objects\n"
+
+        output += f"\t{agent.name} - {agent.type_name}\n"
 
         # loop through the keys of items and blocks
         for d in [blocks, items]:
@@ -57,11 +64,70 @@ class Problem:
 
         return output + ")"
 
+    def construct_initial_state(
+        self,
+        agent: AgentType,
+        items: Dict[str, NamedItemType],
+        blocks: Dict[str, NamedBlockType],
+    ):
+        # for each state variable, loop through predicates and functions
+        output_list = []
+
+        # process agent
+        for predicate in agent.predicates:
+            output_list.append(predicate.to_pddl_with_values(agent.name))
+
+        for function in agent.functions:
+            # special case
+            if isinstance(function, InventoryFunction):
+                for item in items:
+                    # items is a dict, so item is the key
+                    output_list.append(
+                        function.to_pddl_with_values(agent.name, item, len(items[item]))
+                    )
+            else:
+                output_list.append(function.to_pddl_with_values(agent.name))
+
+        # process items, blocks
+        to_process = [items, blocks]
+        for proc in to_process:
+            for key in proc:
+                for i, value in enumerate(proc[key]):
+                    # process the predicates
+                    for predicate in value.predicates:
+                        output_list.append(
+                            predicate.to_pddl_with_values(f"{value.name}{i}")
+                        )
+
+                    # process the functions
+                    for function in value.functions:
+                        if isinstance(function, InventoryFunction):
+                            for item in items:
+                                # items is a dict, so item is the key
+                                output_list.append(
+                                    function.to_pddl_with_values(
+                                        f"{value.name}{i}", item, len(items[item])
+                                    )
+                                )
+                        else:
+                            output_list.append(
+                                function.to_pddl_with_values(f"{value.name}{i}")
+                            )
+
+        output = "(:init\n\t"
+        output += "\n\t".join(output_list)
+        output += "\n)"
+        return output
+
     def to_pddl(
-        self, items: Dict[str, NamedItemType], blocks: Dict[str, NamedBlockType]
+        self,
+        agent: AgentType,
+        items: Dict[str, NamedItemType],
+        blocks: Dict[str, NamedBlockType],
     ):
         pddl = f"(define (problem {self.name})\n"
         pddl += f"\t(:domain {self.domain.name})\n"
-        pddl += f"{self.construct_objects(items, blocks)}\n"
+        pddl += f"{self.construct_objects(agent, items, blocks)}\n"
+        pddl += f"{self.construct_initial_state(agent, items, blocks)}"
 
-        return pddl
+        return pddl + ")"
