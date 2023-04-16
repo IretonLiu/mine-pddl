@@ -4,6 +4,7 @@ import pddl.pddl_types.base_pddl_types as base_pddl_types
 import pddl.pddl_types.named_pddl_types as named_pddl_types
 from pddl.functions import InventoryFunction
 from collections import defaultdict
+from pddl.actions import *
 
 
 class Domain:
@@ -24,7 +25,8 @@ class Domain:
             if inspect.isclass(cls) and cls.__module__ == base_pddl_types.__name__:
                 # get the parent class of the obj if it has one
                 parent = (
-                    cls.__bases__[0] if cls.__bases__[0].__name__ != "object" else None
+                    cls.__bases__[0] if cls.__bases__[
+                        0].__name__ != "object" else None
                 )
 
                 if parent:
@@ -81,10 +83,10 @@ class Domain:
                 # get the predicate/function string
                 # handle duplicate predicates/functions existing across different classes - this is done later
                 if return_predicates:
-                    for predicate in obj.predicates:
-                        output.append(predicate.to_pddl())
+                    for predicate in obj.predicates.values():
+                        output.append(predicate.to_domain())
                 else:
-                    for function in obj.functions:
+                    for function in obj.functions.values():
                         # if the function is an Inventory, pass the items
                         """
                         todo: handling this special case may not be scalable
@@ -94,9 +96,9 @@ class Domain:
 
                         if isinstance(function, InventoryFunction):
                             for item in items:
-                                output.append(function.to_pddl(item))
+                                output.append(function.to_domain(label=item))
                         else:
-                            output.append(function.to_pddl())
+                            output.append(function.to_domain())
 
         return output
 
@@ -109,7 +111,8 @@ class Domain:
         # items is only meaningful if we are processing functions (i.e. process_predicates is false)
 
         # get the pddl representation for the types - is a list
-        pddl_strings = self.get_pddl_strings(base_pddl_types, process_predicates, items)
+        pddl_strings = self.get_pddl_strings(
+            base_pddl_types, process_predicates, items)
         pddl_strings.extend(
             self.get_pddl_strings(named_pddl_types, process_predicates, items)
         )
@@ -118,7 +121,8 @@ class Domain:
         pddl_string_set = set(pddl_strings)
 
         # build the string of predicates/functions
-        output = "(:{}\n\t".format("predicates" if process_predicates else "functions")
+        output = "(:{}\n\t".format(
+            "predicates" if process_predicates else "functions")
         output += "\n\t".join(pddl_string_set)
         output += "\n)"
 
@@ -130,6 +134,15 @@ class Domain:
     def construct_functions(self, items: Dict[str, named_pddl_types.NamedItemType]):
         return self.predicates_or_functions_helper(False, items=items)
 
+    def construct_actions(self):
+        self.actions = [Move("north"), Move("south"),
+                        Move("east"), Move("west")]
+
+        action_str = ""
+        for action in self.actions:
+            action_str += "\n" + action.to_pddl() + "\n"
+        return action_str
+
     def to_pddl(
         self,
         items: Dict[str, named_pddl_types.NamedItemType],
@@ -140,6 +153,6 @@ class Domain:
         pddl += self.construct_types(items, blocks) + "\n"
         pddl += self.construct_predicates() + "\n"
         pddl += self.construct_functions(items) + "\n"
-        # todo: add actions
+        pddl += self.construct_actions() + "\n"
 
         return pddl + ")"

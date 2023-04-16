@@ -1,6 +1,6 @@
 from pddl.pddl_types.named_pddl_types import NamedBlockType, NamedItemType
 from pddl.pddl_types.base_pddl_types import AgentType
-from pddl.functions import InventoryFunction, PositionFunction, BlockHitsFunction
+from pddl.functions import *
 import numpy as np
 
 
@@ -88,25 +88,24 @@ def extract_blocks(obs):
 
                 named_block = NamedBlockType(block_name)
 
-                for function in named_block.functions:
-                    if isinstance(function, PositionFunction):
-                        function.set_value(absolute_pos)
-                    elif isinstance(function, BlockHitsFunction):
-                        # todo: figure out how to get this info from the obs
-                        pass
-                    elif isinstance(function, InventoryFunction):
-                        # we do not need to process inventory now - that will be done when the PDDL is produced
-                        pass
+                named_block.functions[XPositionFunction].set_value(
+                    absolute_pos[0])
+                named_block.functions[YPositionFunction].set_value(
+                    absolute_pos[1])
+                named_block.functions[ZPositionFunction].set_value(
+                    absolute_pos[2])
+
+            #    elif isinstance(function, BlockHitsFunction):
+            #         # todo: figure out how to get this info from the obs
+            #         pass
+            #     elif isinstance(function, InventoryFunction):
+            #         # we do not need to process inventory now - that will be done when the PDDL is produced
+            #         pass
 
                 # assign value to the predicates
                 # we are reading these items/blocks/agent from the world, so they must exist
-                for predicate in named_block.predicates:
-                    if predicate.name == "agent-alive":
-                        predicate.set_value(True)
-                    elif predicate.name == "present":
-                        predicate.set_value(True)
-                    elif predicate.name == "block-present":
-                        predicate.set_value(True)
+                for predicate in named_block.predicates.values():
+                    predicate.set_value(True)
 
                 if block_name not in blocks:
                     blocks[named_block.name] = [named_block]
@@ -163,26 +162,25 @@ def extract_entities(obs):
             # create a reference so we don't duplicate code
             object_to_process = agent
 
-        for function in object_to_process.functions:
-            if isinstance(function, PositionFunction):
-                # set the position of the object
-                position = (int(entity["x"]), int(entity["y"]), int(entity["z"]))
-                function.set_value(position)
-            elif isinstance(function, BlockHitsFunction):
-                # will never have block_hits for an entity
-                pass
-            elif isinstance(function, InventoryFunction):
-                # we do not need to process inventory now - that will be done when the PDDL is produced
-                pass
+        # for function in object_to_process.functions:
+        #     if isinstance(function, PositionFunction):
+            # set the position of the object
+        position = (int(entity["x"]), int(
+            entity["y"]), int(entity["z"]))
+        object_to_process.functions[XPositionFunction].set_value(position[0])
+        object_to_process.functions[YPositionFunction].set_value(position[1])
+        object_to_process.functions[ZPositionFunction].set_value(position[2])
+
+        # elif isinstance(function, BlockHitsFunction):
+        #     # will never have block_hits for an entity
+        #     pass
+        # elif isinstance(function, InventoryFunction):
+        #     # we do not need to process inventory now - that will be done when the PDDL is produced
+        #     pass
 
         # assign value to the predicates
         # we are reading these items/blocks/agent from the world, so they must exist
-        for predicate in object_to_process.predicates:
-            if predicate.name == "agent-alive":
-                predicate.set_value(True)
-            elif predicate.name == "present":
-                predicate.set_value(True)
-            elif predicate.name == "block-present":
-                predicate.set_value(True)
+        for predicate in object_to_process.predicates.values():
+            predicate.set_value(True)
 
     return items, agent
