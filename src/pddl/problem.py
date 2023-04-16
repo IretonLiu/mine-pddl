@@ -74,45 +74,39 @@ class Problem:
         output_list = []
 
         # process agent
-        for predicate in agent.predicates:
-            output_list.append(predicate.to_pddl_with_values(agent.name))
+        for predicate in agent.predicates.values():
+            output_list.append(predicate.to_problem(agent.name))
 
-        for function in agent.functions:
+        for function in agent.functions.values():
             # special case
             if isinstance(function, InventoryFunction):
                 for item in items:
                     # items is a dict, so item is the key
                     output_list.append(
-                        function.to_pddl_with_values(agent.name, item, len(items[item]))
+                        function.to_problem(
+                            agent.name, label=item)
                     )
             else:
-                output_list.append(function.to_pddl_with_values(agent.name))
+                output_list.append(function.to_problem(agent.name))
 
         # process items, blocks
         to_process = [items, blocks]
         for proc in to_process:
             for key in proc:
-                for i, value in enumerate(proc[key]):
+                # entity is a NamedBlockType or NamedItemType
+                for i, entity in enumerate(proc[key]):
                     # process the predicates
-                    for predicate in value.predicates:
+                    for predicate in entity.predicates.values():
                         output_list.append(
-                            predicate.to_pddl_with_values(f"{value.name}{i}")
+                            predicate.to_problem(f"{entity.name}{i}")
                         )
 
                     # process the functions
-                    for function in value.functions:
-                        if isinstance(function, InventoryFunction):
-                            for item in items:
-                                # items is a dict, so item is the key
-                                output_list.append(
-                                    function.to_pddl_with_values(
-                                        f"{value.name}{i}", item, len(items[item])
-                                    )
-                                )
-                        else:
-                            output_list.append(
-                                function.to_pddl_with_values(f"{value.name}{i}")
-                            )
+                    for function in entity.functions.values():
+                        output_list.append(
+                            function.to_problem(
+                                f"{entity.name}{i}")
+                        )
 
         output = "(:init\n\t"
         output += "\n\t".join(output_list)
