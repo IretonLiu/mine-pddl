@@ -1,71 +1,81 @@
 from typing import List
-
+from pddl.pddl_types.types_names import TypeName
 from pddl.functions import *
-from pddl.predicates import Predicate
+from pddl.predicates import *
 
 # TODO: check if items despawn + how to turn off
+# TODO: pass in name instead of hardcoding
+name_dict = {"object": "object"}
 
 
 class ObjectType:
-    type_name = "object"
+    type_name = TypeName.OBJECT_TYPE_NAME.value
 
     def __init__(self):
         self.name = "obj"
-        self.functions = []
-        self.predicates = []
+        self.functions = {}  # TODO: Make functions a dictionary
+        self.predicates = {}
+
+    def to_string(self):
+        return f"{self.name} - {self.type_name}"
 
 
 class LocatableType(ObjectType):
-    type_name = "locatable"
+    type_name = TypeName.LOCATABLE_TYPE_NAME.value
 
     def __init__(self):
         super().__init__()
-        self.name = "l"
-        self.functions.append(PositionFunction(self, LocatableType.type_name))
+        self.var_name = "l"
+        self.functions[XPositionFunction] = XPositionFunction()
+        self.functions[YPositionFunction] = YPositionFunction()
+        self.functions[ZPositionFunction] = ZPositionFunction()
+
+        # self.functions.append(PositionFunction(self, LocatableType.type_name))
 
 
 class AgentType(LocatableType):
-    type_name = "agent"
+    type_name = TypeName.AGENT_TYPE_NAME.value
 
     def __init__(self):
         super().__init__()
-        self.name = "ag"
-        self.functions.append(InventoryFunction(self))
-        self.predicates.append(Predicate("agent-alive", ["ag - agent"]))
+        self.var_name = "ag"
+
+        self.functions[InventoryFunction] = InventoryFunction()
+        self.predicates[AgentAlivePredicate] = AgentAlivePredicate()
 
 
 class ItemType(LocatableType):
-    type_name = "item"
+    type_name = TypeName.ITEM_TYPE_NAME.value
 
     def __init__(self):
         super().__init__()
-        self.name = "itm"
-        self.predicates.append(Predicate("present", ["i - item"]))
+        self.var_name = "itm"
+        self.predicates[ItemPresentPredicate] = ItemPresentPredicate()
 
 
 class BlockType(LocatableType):
-    type_name = "block"
+    type_name = TypeName.BLOCK_TYPE_NAME.value
 
     def __init__(self):
         super().__init__()
-        self.name = "blk"
-        self.predicates.append(Predicate("block-present", ["b - block"]))
+        self.var_name = "blk"
+        self.predicates[BlockPresentPredicate] = BlockPresentPredicate()
 
 
 class DestructibleBlockType(BlockType):
-    type_name = "destructible-block"
+    type_name = TypeName.DESTRUCTIBLE_BLOCK_TYPE_NAME.value
 
     def __init__(self):
         super().__init__()
-        self.name = "dblk"
-        self.functions.append(BlockHitsFunction(self))
+        self.var_name = "dblk"
+        self.functions[BlockHitsFunction] = BlockHitsFunction()
 
 
 class BedrockType(BlockType):
-    type_name = "bedrock"
+    type_name = TypeName.BEDROCK_TYPE_NAME.value
 
     def __init__(self):
-        self.name = "bed"
+        self.var_name = "bed"
         super().__init__()
 
 

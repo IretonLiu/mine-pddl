@@ -11,6 +11,7 @@ from observation_helpers import (
 )
 from pddl.domain import Domain
 from pddl.problem import Problem
+from pddl.actions import *
 
 # todo: process the agent's inventory - will go into the items dict
 
@@ -59,6 +60,7 @@ print(domain.to_pddl(items, blocks))
 
 problem = Problem("problem", domain)
 print(problem.to_pddl(agent, items, blocks))
+
 
 """
 entity simpleTypes of interest to use a s a filter (read from Types.xsd)
