@@ -184,3 +184,25 @@ def extract_entities(obs):
             predicate.set_value(True)
 
     return items, agent
+
+
+def extract_inventory(obs, items):
+    """
+    pass in the inventory of the agent into the list of items
+    """
+    inventory = obs["inventory"]
+    for i, name in enumerate(inventory['name']):
+        named_item = NamedItemType(
+                item_name=name,
+                variation=inventory["variant"][i],
+                quantity=inventory["quantity"][i],
+                in_inventory=True
+            )
+        
+        # store the items
+        if named_item.name not in items:
+                items[named_item.name] = [named_item]
+        else:
+            items[named_item.name].append(named_item)
+
+        

@@ -52,6 +52,18 @@ class InventoryFunction(Function):
         self.arguments = {"?ag": TypeName.AGENT_TYPE_NAME.value}
         self.value = 0
 
+    def to_problem(self, parent_object_name: str, label=None, quantity=None):
+        full_var_name = ""
+        if not label is None:
+            full_var_name = self.var_name.format(label)
+        else:
+            full_var_name = self.var_name
+
+        return pddl_equal(
+            f"({full_var_name} {parent_object_name})", str(self.value))
+
+
+
 
 class PositionFunction(Function):
     def __init__(self):

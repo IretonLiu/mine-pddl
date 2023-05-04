@@ -6,13 +6,14 @@ class NamedItemType(ItemType):
     type_name = "named_item"
 
     def __init__(
-        self, item_name: str = "default", variation: str = None, quantity: int = None
+        self, item_name: str = "default", variation: str = None, quantity: int = None, in_inventory: bool = False
     ):
         super().__init__()
         self.name = f"{variation}-{item_name}" if variation else item_name
         self.name = self.name.replace(" ", "_")
         self.variation = variation
         self.quantity = quantity  # only used if Minecraft has grouped items together
+        self.in_inventory = in_inventory
 
 
 class NamedBlockType(DestructibleBlockType):

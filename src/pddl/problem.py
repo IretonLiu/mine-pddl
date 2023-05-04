@@ -82,10 +82,16 @@ class Problem:
             if isinstance(function, InventoryFunction):
                 for item in items:
                     # items is a dict, so item is the key
-                    output_list.append(
-                        function.to_problem(
-                            agent.name, label=item)
-                    )
+                    if item.in_inventory:
+                        output_list.append(
+                            function.to_problem(
+                                agent.name, label=item, quantity=item.quantity)
+                        )
+                    else:
+                        output_list.append(
+                            function.to_problem(
+                                agent.name, label=item, quantity=0)
+                        )
             else:
                 output_list.append(function.to_problem(agent.name))
 
