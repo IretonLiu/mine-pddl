@@ -34,6 +34,11 @@ def pddl_increase(*args):
 def pddl_decrease(*args):
     return f"(decrease {' '.join(args)})"
 
+def pddl_ge(*args):
+    return f"(>= {' '.join(args)})"
+
+def pddl_assign(*args):
+    return f"(assign {' '.join(args)})"
 
 # TODO: potentially change to this implementation
 # def pddl_precondition(*args, precondition):

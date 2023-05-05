@@ -80,18 +80,20 @@ class Problem:
         for function in agent.functions.values():
             # special case
             if isinstance(function, InventoryFunction):
-                for item in items:
+                for key in items:
                     # items is a dict, so item is the key
-                    if item.in_inventory:
-                        output_list.append(
-                            function.to_problem(
-                                agent.name, label=item, quantity=item.quantity)
-                        )
-                    else:
-                        output_list.append(
-                            function.to_problem(
-                                agent.name, label=item, quantity=0)
-                        )
+                    item = items[key]
+                    for i in item:
+                        if i.in_inventory:
+                            output_list.append(
+                                function.to_problem(
+                                    agent.name, label=key, quantity=i.quantity)
+                            )
+                        else:
+                            output_list.append(
+                                function.to_problem(
+                                    agent.name, label=key, quantity=0)
+                            )
             else:
                 output_list.append(function.to_problem(agent.name))
 

@@ -60,13 +60,14 @@ class InventoryFunction(Function):
             full_var_name = self.var_name
 
         return pddl_equal(
-            f"({full_var_name} {parent_object_name})", str(self.value))
+            f"({full_var_name} {parent_object_name})", str(quantity))
 
 
 
 
 class PositionFunction(Function):
     def __init__(self):
+        super().__init__()
         self.arguments = {"?l": TypeName.LOCATABLE_TYPE_NAME.value}
 
     def to_precondition(self):

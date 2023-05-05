@@ -134,9 +134,12 @@ class Domain:
     def construct_functions(self, items: Dict[str, named_pddl_types.NamedItemType]):
         return self.predicates_or_functions_helper(False, items=items)
 
-    def construct_actions(self):
+    def construct_actions(self, items: Dict[str, named_pddl_types.NamedItemType]):
         self.actions = [Move("north"), Move("south"),
                         Move("east"), Move("west")]
+        for item in items:
+            self.actions.append(Pickup(item))
+            self.actions.append(Drop(item))
 
         action_str = ""
         for action in self.actions:
@@ -153,6 +156,6 @@ class Domain:
         pddl += self.construct_types(items, blocks) + "\n"
         pddl += self.construct_predicates() + "\n"
         pddl += self.construct_functions(items) + "\n"
-        pddl += self.construct_actions() + "\n"
+        pddl += self.construct_actions(items) + "\n"
 
         return pddl + ")"

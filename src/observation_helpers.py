@@ -78,7 +78,8 @@ def extract_blocks(obs):
         for y in range(len(voxels[x])):
             for z in range(len(voxels[x][y])):
                 block_name = voxels[x][y][z]
-
+                if block_name == "air":
+                    continue
                 # Assume observation is centred at player
                 absolute_pos = (
                     np.array([x, y, z])
@@ -143,7 +144,7 @@ def extract_entities(obs):
             named_item = NamedItemType(
                 item_name=entity["name"],
                 variation=entity["variant"] if "variant" in entity else None,
-                quantity=entity["quantity"],
+                quantity=int(entity["quantity"]),
             )
 
             # store the items
@@ -192,10 +193,13 @@ def extract_inventory(obs, items):
     """
     inventory = obs["inventory"]
     for i, name in enumerate(inventory['name']):
+        # only consider valid types
+        if name == "air":
+            continue
         named_item = NamedItemType(
                 item_name=name,
                 variation=inventory["variant"][i],
-                quantity=inventory["quantity"][i],
+                quantity=int(inventory["quantity"][i]),
                 in_inventory=True
             )
         
