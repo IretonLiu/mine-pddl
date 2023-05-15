@@ -192,6 +192,8 @@ def extract_inventory(obs, items, agent):
     pass in the inventory of the agent into the list of items
     """
     inventory = obs["inventory"]
+    
+    out = np.empty(inventory.names.shape, dtype=NamedItemType)
     for i, name in enumerate(inventory['name']):
         # only consider valid types
         if name == "air":
@@ -203,6 +205,8 @@ def extract_inventory(obs, items, agent):
                 in_inventory=True
             )
         
+        
+        out[i] = named_item
         named_item.functions[XPositionFunction].set_value(agent.functions[XPositionFunction].value)
         named_item.functions[YPositionFunction].set_value(agent.functions[YPositionFunction].value)
         named_item.functions[ZPositionFunction].set_value(agent.functions[ZPositionFunction].value)
