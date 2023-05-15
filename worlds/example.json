@@ -16,11 +16,17 @@
             "name":"diamond",
             "variant":null,
             "quantity":"1"
-        },
-        {
-            "name":"stone",
-            "variant":"2",
-            "quantity":"1"
         }
-    ]
+
+    ],
+    "goal":{
+        "inventory":[
+            {
+                "name":"log",
+                "variant":"oak",
+                "quantity":"1"
+            }
+    
+        ]
+    }
 }

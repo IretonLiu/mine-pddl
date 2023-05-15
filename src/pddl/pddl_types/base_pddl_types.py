@@ -39,7 +39,7 @@ class AgentType(LocatableType):
     def __init__(self):
         super().__init__()
         self.var_name = "ag"
-
+        self.name = "steve"
         self.functions[InventoryFunction] = InventoryFunction()
         self.predicates[AgentAlivePredicate] = AgentAlivePredicate()
 

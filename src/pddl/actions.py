@@ -74,7 +74,7 @@ class Move(Action):
         self.construct_preconditions()
         self.construct_effects()
         out = f"(:action {self.action_name}\n"
-        out += f"\t:parameters ({' '.join([f'{v} {k}' for k, v in self.parameters.items()])})\n"
+        out += f"\t:parameters ({' '.join([f'{v} - {k}' for k, v in self.parameters.items()])})\n"
         out += f"\t:precondition {self.preconditions}\n"
         out += f"\t:effect {self.effects}\n"
         out += ")\n"
@@ -103,7 +103,7 @@ class Pickup(Action):
         self.construct_preconditions()
         self.construct_effects()
         out = f"(:action {self.action_name}\n"
-        out += f"\t:parameters ({' '.join([f'{v} {k}' for k, v in self.parameters.items()])})\n"
+        out += f"\t:parameters ({' '.join([f'{v} - {k}' for k, v in self.parameters.items()])})\n"
         out += f"\t:precondition {self.preconditions}\n"
         out += f"\t:effect {self.effects}\n"
         out += ")\n"
@@ -132,7 +132,7 @@ class Drop(Action):
         self.construct_preconditions()
         self.construct_effect()
         out = f"(:action {self.action_name}\n"
-        out += f"\t:parameters ({' '.join([f'{v} {k}' for k, v in self.parameters.items()])})\n"
+        out += f"\t:parameters ({' '.join([f'{v} - {k}' for k, v in self.parameters.items()])})\n"
         out += f"\t:precondition {self.preconditions}\n"
         out += f"\t:effect {self.effects}\n"
         out += ")\n"

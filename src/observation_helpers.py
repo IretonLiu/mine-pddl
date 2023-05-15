@@ -187,7 +187,7 @@ def extract_entities(obs):
     return items, agent
 
 
-def extract_inventory(obs, items):
+def extract_inventory(obs, items, agent):
     """
     pass in the inventory of the agent into the list of items
     """
@@ -202,6 +202,10 @@ def extract_inventory(obs, items):
                 quantity=int(inventory["quantity"][i]),
                 in_inventory=True
             )
+        
+        named_item.functions[XPositionFunction].set_value(agent.functions[XPositionFunction].value)
+        named_item.functions[YPositionFunction].set_value(agent.functions[YPositionFunction].value)
+        named_item.functions[ZPositionFunction].set_value(agent.functions[ZPositionFunction].value)
         
         # store the items
         if named_item.name not in items:

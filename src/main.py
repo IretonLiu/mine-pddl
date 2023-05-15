@@ -51,7 +51,7 @@ file.close()
 
 items, agent = extract_entities(obs)
 blocks = extract_blocks(obs)
-inventory = extract_inventory(obs, items)
+inventory = extract_inventory(obs, items, agent)
 
 
 domain = Domain("first_world")
