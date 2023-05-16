@@ -1,4 +1,3 @@
-Problem Solved
 0.0: (move-south steve )
 1.0: (drop-diamond steve diamond0 )
 2.0: (move-south steve )
