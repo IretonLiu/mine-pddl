@@ -3,3 +3,4 @@ __pycache__/
 env/
 py2pddl*/
 pyrightconfig.json
+.vscode
