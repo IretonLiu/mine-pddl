@@ -126,10 +126,16 @@ class Problem:
         agent: AgentType,
         items: Dict[str, NamedItemType],
         blocks: Dict[str, NamedBlockType],
+        goal_string: str,
+        file_path: str,
     ):
         pddl = f"(define (problem {self.name})\n"
         pddl += f"\t(:domain {self.domain.name})\n"
         pddl += f"{self.construct_objects(agent, items, blocks)}\n"
-        pddl += f"{self.construct_initial_state(agent, items, blocks)}"
-
-        return pddl + ")"
+        pddl += f"{self.construct_initial_state(agent, items, blocks)}\n"
+        pddl += goal_string
+        pddl += ")"
+        with open(file_path, "w") as file:
+            file.write(pddl)
+            
+        return pddl

@@ -6,8 +6,8 @@
             "type":"obsidian",
             "position":{
                 "x":"0",
-                "y":"4",
-                "z":"-2"
+                "y":"10",
+                "z":"10"
             }
         }
     ],
@@ -16,7 +16,7 @@
             "type": "log",
             "variant": null,
             "position": {
-                "x": "0",
+                "x": "5",
                 "y": "4",
                 "z": "5"
             },

@@ -150,6 +150,7 @@ class Domain:
         self,
         items: Dict[str, named_pddl_types.NamedItemType],
         blocks: Dict[str, named_pddl_types.NamedBlockType],
+        file_path: str,
     ):
         pddl = f"(define (domain {self.name})\n"
         pddl += "(:requirements :typing :fluents :negative-preconditions :universal-preconditions :existential-preconditions)\n"
@@ -157,5 +158,9 @@ class Domain:
         pddl += self.construct_predicates() + "\n"
         pddl += self.construct_functions(items) + "\n"
         pddl += self.construct_actions(items) + "\n"
+        pddl += ")"
 
-        return pddl + ")"
+        with open(file_path, "w") as f:
+            f.write(pddl)
+
+        return pddl
