@@ -1,32 +1,42 @@
 {
-    "world_type":"flat",
-    "world_name":"open-ended",
-    "blocks":[
+    "world_type": "flat",
+    "world_name": "open-ended",
+    "blocks": [
         {
-            "type":"obsidian",
-            "position":{
-                "x":"0",
-                "y":"4",
-                "z":"2"
+            "type": "obsidian",
+            "position": {
+                "x": "0",
+                "y": "4",
+                "z": "2"
             }
         }
     ],
-    "inventory":[
+    "items": [
         {
-            "name":"diamond",
-            "variant":null,
-            "quantity":"1"
+            "type": "log",
+            "variant": null,
+            "position": {
+                "x": "0",
+                "y": "4",
+                "z": "5"
+            },
+            "quantity": 1
         }
-
     ],
-    "goal":{
-        "inventory":[
+    "inventory": [
+        {
+            "name": "diamond",
+            "variant": null,
+            "quantity": "1"
+        }
+    ],
+    "goal": {
+        "inventory": [
             {
-                "name":"log",
-                "variant":"oak",
-                "quantity":"1"
+                "name": "log",
+                "variant": "oak",
+                "quantity": "1"
             }
-    
         ]
     }
 }
