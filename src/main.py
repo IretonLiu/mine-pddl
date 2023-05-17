@@ -1,15 +1,15 @@
-import minedojo
-from helpers import json_helper
-import handlers.entities as handlers
-from helpers import execution_helper
-import numpy as np
 import pickle
-from pddl.pddl_types.named_pddl_types import NamedBlockType, NamedItemType
-from pddl.functions import *
+
+import handlers.entities as handlers
+from helpers import execution_helper, json_helper
 from helpers.observation_helpers import *
-from pddl.domain import Domain
-from pddl.problem import Problem
+import minedojo
+import numpy as np
 from pddl.actions import *
+from pddl.domain import Domain
+from pddl.functions import *
+from pddl.pddl_types.named_pddl_types import NamedBlockType, NamedItemType
+from pddl.problem import Problem
 
 # todo: process the agent's inventory - will go into the items dict
 
@@ -44,13 +44,19 @@ inventory = obs["inventory"]
 
 done = False
 action_str = "move-north"
-while True:
-    # env.spawn_mobs("sheep", [1, 1, 1])
-    # action = env.action_space.no_op()    # 8-len vector
-    action = execution_helper.get_action_from_str(action_str)
+
+action_sequence = execution_helper.read_plan("./problems/our/plan.pddl") 
+for action_str in action_sequence:
+    action = execution_helper.get_action_from_str(action_str, inventory, env=env)
     obs, reward, done, info = env.step(action)
 
-    continue
+# while True:
+#     # env.spawn_mobs("sheep", [1, 1, 1])e
+#     # action = env.action_space.no_op()    # 8-len vector
+#     action = execution_helper.get_action_from_str(action_str, inventory, env=env)
+#     obs, reward, done, info = env.step(action)
+
+#     continue
 # file = open("obs.pkl", "rb")
 # obs = pickle.load(file)
 # file.close()

@@ -1,11 +1,24 @@
 import numpy as np
 
+def read_plan(plan_path: str):
+    """
+    Read the plan from the pddl file
+    Each line has the following format: <action no.>: (<action name> <action args>)
+    """
+    action_sequence = []
+    with open(plan_path, "r") as file:
+        for line in file:
+            if line[0] == ";":
+                continue
+            action_sequence.append(line.split(":")[1].strip().split(" ")[0].strip("("))
+    return action_sequence
 
-def get_action_from_str(action: str, inventory=None):
+
+def get_action_from_str(action: str, inventory, env):
     """
     Formulate the action vector from the pddl action string
     """
-    action_vector = np.zeros(8)
+    action_vector = env.action_space.no_op()
     # split by first hyphen
     action_name, action_args = action.split("-", 1)
     if action_name == "move":
