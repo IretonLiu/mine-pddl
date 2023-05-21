@@ -27,7 +27,7 @@ from pddl.problem import Problem
 world_json = json_helper.load_json("worlds/example.json")
 # print(world_json)
 # print(json_helper.json_blocks_to_xml_str(world_json["blocks"]))
-
+voxel_size = dict(xmin=-10, ymin=-2, zmin=-10, xmax=10, ymax=2, zmax=10)
 
 env = minedojo.make(
     "open-ended",
@@ -36,8 +36,8 @@ env = minedojo.make(
     start_position=dict(x=0, y=4, z=0, yaw=0, pitch=0),
     use_voxel=True,
     # spawn_mobs=False,
-    voxel_size=dict(xmin=-4, ymin=-1, zmin=-4, xmax=4, ymax=2, zmax=4),
-    # drawing_str=f"""{json_helper.json_blocks_to_xml_str(world_json["blocks"])}""",
+    voxel_size=voxel_size,
+    drawing_str=f"""{json_helper.json_blocks_to_xml_str(world_json["blocks"])}""",
     initial_inventory=json_helper.json_inventory_to_inventory_item(
         world_json["inventory"]
     ),
@@ -75,10 +75,19 @@ problem = Problem("problem", domain)
 goal_string = "(:goal (>= (agent-num-oak-log steve) 1))"
 print(problem.to_pddl(agent, items, blocks, goal_string=goal_string, file_path="./problems/our/problem3.pddl"))
 
-# action_sequence = execution_helper.read_plan("./problems/our/plan.pddl") 
-# for action_str in action_sequence:
-#     action = execution_helper.get_action_from_str(action_str, inventory, env=env)
-#     obs, reward, done, info = env.step(action)
+action_sequence = execution_helper.read_plan("./problems/our/plan.pddl") 
+for action_str in action_sequence:
+    action = execution_helper.get_action_from_str(action_str, inventory, env=env)
+    obs, reward, done, info = env.step(action)
+
+for i in range(3):
+    obs, reward, done, info = env.step(env.action_space.no_op())
+
+# items, agent = extract_entities(obs)
+# blocks = extract_blocks(obs)
+# inventory = extract_inventory(obs, items, agent)
+
+print("plan successful: ", execution_helper.check_goal_state(obs, voxel_size, world_json["goal"]))
 
 # while True:
 #     # env.spawn_mobs("sheep", [1, 1, 1])e

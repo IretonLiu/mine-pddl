@@ -71,5 +71,6 @@ def json_items_to_cmd(items: list[dict]) -> list:
 
     return commands
 
+    
 
 # TODO : error handling

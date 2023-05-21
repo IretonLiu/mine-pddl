@@ -5,20 +5,20 @@
 	agent block item - locatable
 	bedrock destructible-block - block
 	oak-log diamond - item
-	grass_block - destructible-block
+	dirt grass_block obsidian - destructible-block
 )
 (:predicates
 	(block-present ?b - block)
-	(agent-alive ?ag - agent)
 	(item-present ?i - item)
+	(agent-alive ?ag - agent)
 )
 (:functions
-	(block-hits ?b - destructible-block )
-	(agent-num-diamond ?ag - agent )
-	(y ?l - locatable )
 	(x ?l - locatable )
-	(z ?l - locatable )
 	(agent-num-oak-log ?ag - agent )
+	(y ?l - locatable )
+	(agent-num-diamond ?ag - agent )
+	(z ?l - locatable )
+	(block-hits ?b - destructible-block )
 )
 
 (:action move-north

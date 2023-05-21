@@ -6,8 +6,8 @@
             "type":"obsidian",
             "position":{
                 "x":"0",
-                "y":"10",
-                "z":"10"
+                "y":"4",
+                "z":"-4"
             }
         }
     ],
@@ -35,7 +35,18 @@
             {
                 "name": "log",
                 "variant": "oak",
+                "type":"oak-log",
                 "quantity": "1"
+            }
+        ],
+        "blocks": [
+            {
+                "type": "obsidian",
+                "position": {
+                    "x": "0",
+                    "y": "4",
+                    "z": "-4"
+                }
             }
         ]
     }
