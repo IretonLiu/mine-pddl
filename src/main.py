@@ -33,7 +33,7 @@ env = minedojo.make(
     "open-ended",
     image_size=(1024, 1024),
     world_seed="Enter the Nether",
-    start_position=dict(x=0, y=4, z=0, yaw=0, pitch=0),
+    start_position=dict(x=0.5, y=4, z=0.5, yaw=0, pitch=0),
     use_voxel=True,
     # spawn_mobs=False,
     voxel_size=voxel_size,
@@ -42,6 +42,8 @@ env = minedojo.make(
         world_json["inventory"]
     ),
     generate_world_type=world_json["world_type"],
+    break_speed_multiplier=1000,
+    allow_mob_spawn=False,
 )
 
 ranges = (10, 10, 10)
@@ -68,17 +70,17 @@ inventory = extract_inventory(obs, items, agent)
 
 
 domain = Domain("first_world")
-print(domain.to_pddl(items, blocks, file_path="./problems/our/domain3.pddl"))
+print(domain.to_pddl(items, blocks, file_path="./problems/our/domain4.pddl"))
 
-problem = Problem("problem", domain)
+problem = Problem("problem", domain, )
 
 goal_string = "(:goal (>= (agent-num-oak-log steve) 1))"
-print(problem.to_pddl(agent, items, blocks, goal_string=goal_string, file_path="./problems/our/problem3.pddl"))
+print(problem.to_pddl(agent, items, blocks, goal_json=world_json['goal'], file_path="./problems/our/problem4.pddl"))
 
-action_sequence = execution_helper.read_plan("./problems/our/plan.pddl") 
-for action_str in action_sequence:
-    action = execution_helper.get_action_from_str(action_str, inventory, env=env)
-    obs, reward, done, info = env.step(action)
+# action_sequence = execution_helper.read_plan("./problems/our/plan.pddl") 
+# for action_str in action_sequence:
+#     action = execution_helper.get_action_from_str(action_str, inventory, env=env)
+#     obs, reward, done, info = env.step(action)
 
 for i in range(3):
     obs, reward, done, info = env.step(env.action_space.no_op())
@@ -89,11 +91,13 @@ for i in range(3):
 
 print("plan successful: ", execution_helper.check_goal_state(obs, voxel_size, world_json["goal"]))
 
-# while True:
-#     # env.spawn_mobs("sheep", [1, 1, 1])e
-#     action = env.action_space.no_op()    # 8-len vector
-#     # action = execution_helper.get_action_from_str(action_str, inventory, env=env)
-#     obs, reward, done, info = env.step(action)
+while True:
+     # env.spawn_mobs("sheep", [1, 1, 1])
+     action = env.action_space.no_op()    # 8-len vector
+    #  act5ion[5] = 3
+     # action = execution_helper.get_action_from_str(action_str, inventory, env=env)
+
+     obs, reward, done, info = env.step(action)
 
 #     continue
 # file = open("obs.pkl", "rb")

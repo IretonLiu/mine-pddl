@@ -1,8 +1,11 @@
-from typing import List, Dict
+from typing import List, Dict, Any
 from pddl.domain import Domain
 from pddl.pddl_types.named_pddl_types import NamedBlockType, NamedItemType
 from pddl.pddl_types.base_pddl_types import AgentType
-from pddl.functions import InventoryFunction
+from pddl.functions import *
+from pddl.operators import *
+from pddl.pddl_types.types_names import TypeName
+from pddl.predicates import BlockPresentPredicate
 
 # (define (problem <title>)
 #     (:domain <domain-name>)
@@ -41,8 +44,8 @@ class Problem:
     def construct_objects(
         self,
         agent: AgentType,
-        items: Dict[str, NamedItemType],
-        blocks: Dict[str, NamedBlockType],
+        items: Dict[str, List[NamedItemType]],
+        blocks: Dict[str, List[NamedBlockType]],
     ):
         output = "(:objects\n"
 
@@ -67,8 +70,8 @@ class Problem:
     def construct_initial_state(
         self,
         agent: AgentType,
-        items: Dict[str, NamedItemType],
-        blocks: Dict[str, NamedBlockType],
+        items: Dict[str, List[NamedItemType]],
+        blocks: Dict[str, List[NamedBlockType]],
     ):
         # for each state variable, loop through predicates and functions
         output_list = []
@@ -121,19 +124,32 @@ class Problem:
         output += "\n)"
         return output
 
+    def construct_goal(self, goal_json: Dict[str, List[Dict[str, Any]]]):
+        # goal_json is a dict of lists of dicts
+        output = "(:goal" 
+        blocks = goal_json["blocks"]
+
+        blocks_string = ""
+        # loop through the blocks
+        for block in blocks:
+                   blocks_string+= "\n\t"
+                   blocks_string+= pddl_exists({block['type']: "?b"}, pddl_and(pddl_equal(f"({XPositionFunction.var_name} ?b)", block['position']['x']),
+                                                                   pddl_equal(f"({YPositionFunction.var_name} ?b)", block['position']['y']),
+                                                                   pddl_equal(f"({ZPositionFunction.var_name} ?b)", block['position']['z'])))
+        return output
     def to_pddl(
         self,
-        agent: AgentType,
-        items: Dict[str, NamedItemType],
-        blocks: Dict[str, NamedBlockType],
-        goal_string: str,
+        agent,
+        items: Dict[str, List[NamedItemType]],
+        blocks: Dict[str, List[NamedBlockType]],
+        goal_json: Dict[str, List[Dict[str, str]]],
         file_path: str,
     ):
         pddl = f"(define (problem {self.name})\n"
         pddl += f"\t(:domain {self.domain.name})\n"
         pddl += f"{self.construct_objects(agent, items, blocks)}\n"
         pddl += f"{self.construct_initial_state(agent, items, blocks)}\n"
-        pddl += goal_string
+        pddl += f"{self.construct_goal(goal_json)}\n" 
         pddl += ")"
         with open(file_path, "w") as file:
             file.write(pddl)

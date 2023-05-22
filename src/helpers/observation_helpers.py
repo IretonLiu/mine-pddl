@@ -166,6 +166,10 @@ def extract_entities(obs):
         # for function in object_to_process.functions:
         #     if isinstance(function, PositionFunction):
             # set the position of the object
+        if object_to_process is not None:
+            raise Exception("object_to_process is None")
+            
+
         position = (int(entity["x"]), int(
             entity["y"]), int(entity["z"]))
         object_to_process.functions[XPositionFunction].set_value(position[0])

@@ -7,7 +7,7 @@
 	obsidian0 - obsidian
 	wood0 - wood
 	oak-log0 - oak-log
-	diamond0 - diamond
+	log0 - log
 )
 (:init
 	(agent-alive steve)
@@ -15,15 +15,15 @@
 	(= (y steve) 4)
 	(= (z steve) 0)
 	(= (agent-num-oak-log steve) 0)
-	(= (agent-num-diamond steve) 1)
+	(= (agent-num-log steve) 64)
 	(item-present oak-log0)
 	(= (x oak-log0) 5)
 	(= (y oak-log0) 4)
 	(= (z oak-log0) 5)
-	(not (item-present diamond0))
-	(= (x diamond0) 0)
-	(= (y diamond0) 4)
-	(= (z diamond0) 0)
+	(not (item-present log0))
+	(= (x log0) 0)
+	(= (y log0) 4)
+	(= (z log0) 0)
 	(block-present dirt0)
 	(= (x dirt0) -9.5)
 	(= (y dirt0) 2.0)
@@ -2245,4 +2245,5 @@
 	(= (z wood0) 1.5)
 	(= (block-hits wood0) 0)
 )
-(:goal (>= (agent-num-oak-log steve) 1)))
+(:goal
+)

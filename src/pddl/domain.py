@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional
 import inspect
 import pddl.pddl_types.base_pddl_types as base_pddl_types
 import pddl.pddl_types.named_pddl_types as named_pddl_types
@@ -67,7 +67,7 @@ class Domain:
         self,
         module_name,
         return_predicates: bool,
-        items: Dict[str, named_pddl_types.NamedItemType] = None,
+        items: Optional[Dict[str, named_pddl_types.NamedItemType]] = None,
     ):
         # return_predicates is true to return predicate strings and false to return function strings
         # items is only meaningful is we are processing functions
@@ -95,6 +95,10 @@ class Domain:
                         """
 
                         if isinstance(function, InventoryFunction):
+                            if items is None:
+                                raise ValueError(
+                                    "Must pass items if there is an InventoryFunction"
+                                )
                             for item in items:
                                 output.append(function.to_domain(label=item))
                         else:
@@ -105,7 +109,7 @@ class Domain:
     def predicates_or_functions_helper(
         self,
         process_predicates: bool,
-        items: Dict[str, named_pddl_types.NamedItemType] = None,
+        items: Optional[Dict[str, named_pddl_types.NamedItemType]] = None,
     ):
         # process_predicates is true to process predicate strings and false to process function strings
         # items is only meaningful if we are processing functions (i.e. process_predicates is false)
@@ -134,12 +138,18 @@ class Domain:
     def construct_functions(self, items: Dict[str, named_pddl_types.NamedItemType]):
         return self.predicates_or_functions_helper(False, items=items)
 
-    def construct_actions(self, items: Dict[str, named_pddl_types.NamedItemType]):
-        self.actions = [Move("north"), Move("south"),
+    def construct_actions(self, items: Dict[str, named_pddl_types.NamedItemType], blocks: Dict[str, named_pddl_types.NamedBlockType]):
+        self.actions: List[Action] = [Move("north"), Move("south"),
                         Move("east"), Move("west")]
         for item in items:
             self.actions.append(Pickup(item))
             self.actions.append(Drop(item))
+
+        for block in blocks:
+            self.actions.append(Break(block))
+            self.actions.append(Place(block))
+
+        self.actions.append(JumpUp())
 
         action_str = ""
         for action in self.actions:
@@ -157,7 +167,7 @@ class Domain:
         pddl += self.construct_types(items, blocks) + "\n"
         pddl += self.construct_predicates() + "\n"
         pddl += self.construct_functions(items) + "\n"
-        pddl += self.construct_actions(items) + "\n"
+        pddl += self.construct_actions(items, blocks) + "\n"
         pddl += ")"
 
         with open(file_path, "w") as f:

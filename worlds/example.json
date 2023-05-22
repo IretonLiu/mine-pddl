@@ -3,11 +3,19 @@
     "world_name": "open-ended",
     "blocks": [
         {
-            "type":"obsidian",
-            "position":{
-                "x":"0",
-                "y":"4",
-                "z":"-4"
+            "type": "obsidian",
+            "position": {
+                "x": "0",
+                "y": "4",
+                "z": "-4"
+            }
+        },
+        {
+            "type": "log",
+            "position": {
+                "x": "0",
+                "y": "5",
+                "z": "1"
             }
         }
     ],
@@ -25,9 +33,9 @@
     ],
     "inventory": [
         {
-            "name": "diamond",
+            "name": "log",
             "variant": null,
-            "quantity": "1"
+            "quantity": "64"
         }
     ],
     "goal": {
@@ -35,7 +43,7 @@
             {
                 "name": "log",
                 "variant": "oak",
-                "type":"oak-log",
+                "type": "oak-log",
                 "quantity": "1"
             }
         ],

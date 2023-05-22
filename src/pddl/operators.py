@@ -40,6 +40,8 @@ def pddl_ge(*args):
 def pddl_assign(*args):
     return f"(assign {' '.join(args)})"
 
+def pddl_less(*args):
+    return f"(< {' '.join(args)})"
 # TODO: potentially change to this implementation
 # def pddl_precondition(*args, precondition):
 #     return f"({precondition} {' '.join(f'({args})')})"
