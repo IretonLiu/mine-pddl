@@ -3,6 +3,7 @@ from pddl.pddl_types.base_pddl_types import AgentType
 from pddl.functions import *
 import numpy as np
 
+rename = {"wood": "log"}
 
 def get_valid_inventory_types():
     import xml.etree.ElementTree as ET
@@ -81,6 +82,7 @@ def extract_blocks(obs):
                 if block_name == "air":
                     continue
                 # Assume observation is centred at player
+                block_name = rename[block_name] if block_name in rename else block_name
                 absolute_pos = (
                     np.array([x, y, z])
                     - np.array(voxels.shape) // 2
@@ -166,7 +168,7 @@ def extract_entities(obs):
         # for function in object_to_process.functions:
         #     if isinstance(function, PositionFunction):
             # set the position of the object
-        if object_to_process is not None:
+        if object_to_process is None:
             raise Exception("object_to_process is None")
             
 

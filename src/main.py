@@ -72,7 +72,7 @@ inventory = extract_inventory(obs, items, agent)
 domain = Domain("first_world")
 print(domain.to_pddl(items, blocks, file_path="./problems/our/domain4.pddl"))
 
-problem = Problem("problem", domain, )
+problem = Problem("first_world_problem", domain, )
 
 goal_string = "(:goal (>= (agent-num-oak-log steve) 1))"
 print(problem.to_pddl(agent, items, blocks, goal_json=world_json['goal'], file_path="./problems/our/problem4.pddl"))

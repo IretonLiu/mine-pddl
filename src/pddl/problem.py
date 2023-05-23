@@ -52,16 +52,19 @@ class Problem:
         output += f"\t{agent.name} - {agent.type_name}\n"
 
         # loop through the keys of items and blocks
-        for d in [blocks, items]:
+        for i, d in enumerate([blocks, items]):
             for key in d:
                 # loop through each of the values
                 temp = ""
-                for i, value in enumerate(d[key]):
+                for j, value in enumerate(d[key]):
                     # include a number in the name so we can uniquely identify the item/object
 
-                    temp += f"{value.name}{i} "
-                temp += f"- {key}"
+                    temp += f"{value.name}"
+                    temp += "-block" if i == 0 else ""
+                    temp += f"{j} "
 
+                temp += f"- {key}"
+                temp += "-block" if i == 0 else ""
                 # add the temp string to the object string
                 output += f"\t{temp}\n"
 
@@ -101,22 +104,23 @@ class Problem:
                 output_list.append(function.to_problem(agent.name))
 
         # process items, blocks
-        to_process = [items, blocks]
-        for proc in to_process:
+        to_process = [blocks,items]
+        for i, proc in enumerate(to_process):
             for key in proc:
                 # entity is a NamedBlockType or NamedItemType
-                for i, entity in enumerate(proc[key]):
+                for j, entity in enumerate(proc[key]):
+                    name = entity.name+"-block" if i == 0 else entity.name
                     # process the predicates
                     for predicate in entity.predicates.values():
                         output_list.append(
-                            predicate.to_problem(f"{entity.name}{i}")
+                            predicate.to_problem(f"{name}{j}")
                         )
 
                     # process the functions
                     for function in entity.functions.values():
                         output_list.append(
                             function.to_problem(
-                                f"{entity.name}{i}")
+                                f"{name}{j}")
                         )
 
         output = "(:init\n\t"
@@ -133,9 +137,11 @@ class Problem:
         # loop through the blocks
         for block in blocks:
                    blocks_string+= "\n\t"
-                   blocks_string+= pddl_exists({block['type']: "?b"}, pddl_and(pddl_equal(f"({XPositionFunction.var_name} ?b)", block['position']['x']),
+                   blocks_string+= pddl_exists({block['type']+"-block": "?b"}, pddl_and(pddl_equal(f"({XPositionFunction.var_name} ?b)", block['position']['x']),
                                                                    pddl_equal(f"({YPositionFunction.var_name} ?b)", block['position']['y']),
                                                                    pddl_equal(f"({ZPositionFunction.var_name} ?b)", block['position']['z'])))
+        output += blocks_string
+        output += "\n)"
         return output
     def to_pddl(
         self,

@@ -42,7 +42,7 @@ class Domain:
 
             types_dict[
                 getattr(base_pddl_types.DestructibleBlockType, "type_name")
-            ].append(key)
+            ].append(key+"-block")
 
         # convert types_dict to string
         types_str = "(:types\n"

@@ -144,9 +144,10 @@ class Drop(Action):
 class Break(Action):
     def __init__(self, block: str) -> None:
         super().__init__()
-        self.block = block
+        self.block = block+"-block"
+        self.item = block
         self.action_name = "break-" + block
-        self.parameters = {TypeName.AGENT_TYPE_NAME.value: "?ag", block: "?b"}
+        self.parameters = {TypeName.AGENT_TYPE_NAME.value: "?ag", self.block: "?b"}
 
     def construct_preconditions(self):
         self.preconditions = pddl_and(pddl_equal(f"({XPositionFunction.var_name} {self.parameters[self.block]})", f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})"),
@@ -155,7 +156,7 @@ class Break(Action):
                                       f"({BlockPresentPredicate.var_name} {self.parameters[self.block]})")
 
     def construct_effects(self):
-        self.effects = pddl_and(pddl_not(f"({BlockPresentPredicate.var_name} {self.parameters[self.block]})"), pddl_increase(f"({InventoryFunction.var_name.format(self.block)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})", "1"))
+        self.effects = pddl_and(pddl_not(f"({BlockPresentPredicate.var_name} {self.parameters[self.block]})"), pddl_increase(f"({InventoryFunction.var_name.format(self.item)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})", "1"))
 
     def to_pddl(self):
         self.construct_preconditions()
@@ -170,9 +171,11 @@ class Break(Action):
 class Place(Action):
     def __init__(self, block: str) -> None:
         super().__init__()
-        self.block = block
+        # separate the names of blocks and items in pddl
+        self.block = block+"-block"
+        self.item = block
         self.action_name = "place-" + block
-        self.parameters = {TypeName.AGENT_TYPE_NAME.value: "?ag", block: "?b"}
+        self.parameters = {TypeName.AGENT_TYPE_NAME.value: "?ag", self.block: "?b"}
 
     def construct_preconditions(self):
         self.preconditions = pddl_and(pddl_exists({TypeName.BLOCK_TYPE_NAME.value: "?bl"}, pddl_and(pddl_equal(f"({XPositionFunction.var_name} {self.parameters[self.block]})", f"({XPositionFunction.var_name} ?bl)"), # There must be a block underneath
@@ -189,7 +192,7 @@ class Place(Action):
                                 pddl_assign(f"({XPositionFunction.var_name} {self.parameters[self.block]})", f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})"),
                                 pddl_assign(f"({YPositionFunction.var_name} {self.parameters[self.block]})", pddl_add(f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})","1")),
                                 pddl_assign(f"({ZPositionFunction.var_name} {self.parameters[self.block]})", pddl_add(f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})", "-1")),
-                                pddl_decrease(f"({InventoryFunction.var_name.format(self.block)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})", "1"))
+                                pddl_decrease(f"({InventoryFunction.var_name.format(self.item)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})", "1"))
 
     def to_pddl(self):
         self.construct_preconditions()

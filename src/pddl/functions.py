@@ -35,10 +35,10 @@ class Function:
 
         if (len(self.arguments) == 1):
             return pddl_equal(
-                f"({full_var_name} {parent_object_name})", str(self.value))
+                f"({full_var_name} {parent_object_name})", str(int(self.value)))
         else:
             # if there are multple arguments, we need to create a conjunction of equalities
-            return pddl_and([pddl_equal(f"({full_var_name} {parent_object_name} {arg})", str(self.value[arg])) for arg in self.arguments])
+            return pddl_and([pddl_equal(f"({full_var_name} {parent_object_name} {arg})", str(int(self.value[arg]))) for arg in self.arguments])
 
 
 class InventoryFunction(Function):
