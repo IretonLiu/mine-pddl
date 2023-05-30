@@ -8,17 +8,18 @@
 	dirt-block grass_block-block obsidian-block log-block - destructible-block
 )
 (:predicates
+	(block-present ?b - block)
 	(agent-alive ?ag - agent)
 	(item-present ?i - item)
-	(block-present ?b - block)
+	(goal-achieved ?ag - agent)
 )
 (:functions
 	(x ?l - locatable )
-	(agent-num-log ?ag - agent )
 	(agent-num-diamond ?ag - agent )
-	(block-hits ?b - destructible-block )
-	(y ?l - locatable )
 	(z ?l - locatable )
+	(block-hits ?b - destructible-block )
+	(agent-num-log ?ag - agent )
+	(y ?l - locatable )
 )
 
 (:action move-north
@@ -86,7 +87,7 @@
 
 (:action place-dirt
 	:parameters (?ag - agent ?b - dirt-block)
-	:precondition (and (exists (?bl - block) (and (= (x ?b) (x ?bl)) (= (y ?b) (+ (y ?bl) 1)) (= (z ?b) (z ?bl)))) (not (exists (?bl - block) (and (= (x ?b) (x ?bl)) (= (y ?b) (y ?bl)) (= (z ?b) (z ?bl))))) (and (= (x ?b) (x ?ag)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (+ (z ?ag) -1))))
+	:precondition (and (exists (?bl - block) (and (= (x ?ag) (x ?bl)) (= (y ?ag) (+ (y ?bl) 1)) (= (z ?ag) (+ (z ?bl) 1)))) (not (exists (?bl - block) (and (= (x ?ag) (x ?bl)) (= (y ?ag) (y ?bl)) (= (z ?ag) (+ (z ?bl) 1))))))
 	:effect (and (block-present ?b) (assign (x ?b) (x ?ag)) (assign (y ?b) (+ (y ?ag) 1)) (assign (z ?b) (+ (z ?ag) -1)) (decrease (agent-num-dirt ?ag) 1))
 )
 
@@ -100,7 +101,7 @@
 
 (:action place-grass_block
 	:parameters (?ag - agent ?b - grass_block-block)
-	:precondition (and (exists (?bl - block) (and (= (x ?b) (x ?bl)) (= (y ?b) (+ (y ?bl) 1)) (= (z ?b) (z ?bl)))) (not (exists (?bl - block) (and (= (x ?b) (x ?bl)) (= (y ?b) (y ?bl)) (= (z ?b) (z ?bl))))) (and (= (x ?b) (x ?ag)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (+ (z ?ag) -1))))
+	:precondition (and (exists (?bl - block) (and (= (x ?ag) (x ?bl)) (= (y ?ag) (+ (y ?bl) 1)) (= (z ?ag) (+ (z ?bl) 1)))) (not (exists (?bl - block) (and (= (x ?ag) (x ?bl)) (= (y ?ag) (y ?bl)) (= (z ?ag) (+ (z ?bl) 1))))))
 	:effect (and (block-present ?b) (assign (x ?b) (x ?ag)) (assign (y ?b) (+ (y ?ag) 1)) (assign (z ?b) (+ (z ?ag) -1)) (decrease (agent-num-grass_block ?ag) 1))
 )
 
@@ -114,7 +115,7 @@
 
 (:action place-obsidian
 	:parameters (?ag - agent ?b - obsidian-block)
-	:precondition (and (exists (?bl - block) (and (= (x ?b) (x ?bl)) (= (y ?b) (+ (y ?bl) 1)) (= (z ?b) (z ?bl)))) (not (exists (?bl - block) (and (= (x ?b) (x ?bl)) (= (y ?b) (y ?bl)) (= (z ?b) (z ?bl))))) (and (= (x ?b) (x ?ag)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (+ (z ?ag) -1))))
+	:precondition (and (exists (?bl - block) (and (= (x ?ag) (x ?bl)) (= (y ?ag) (+ (y ?bl) 1)) (= (z ?ag) (+ (z ?bl) 1)))) (not (exists (?bl - block) (and (= (x ?ag) (x ?bl)) (= (y ?ag) (y ?bl)) (= (z ?ag) (+ (z ?bl) 1))))))
 	:effect (and (block-present ?b) (assign (x ?b) (x ?ag)) (assign (y ?b) (+ (y ?ag) 1)) (assign (z ?b) (+ (z ?ag) -1)) (decrease (agent-num-obsidian ?ag) 1))
 )
 
@@ -128,8 +129,8 @@
 
 (:action place-log
 	:parameters (?ag - agent ?b - log-block)
-	:precondition (and (exists (?bl - block) (and (= (x ?b) (x ?bl)) (= (y ?b) (+ (y ?bl) 1)) (= (z ?b) (z ?bl)))) (not (exists (?bl - block) (and (= (x ?b) (x ?bl)) (= (y ?b) (y ?bl)) (= (z ?b) (z ?bl))))) (and (= (x ?b) (x ?ag)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (+ (z ?ag) -1))))
-	:effect (and (block-present ?b) (assign (x ?b) (x ?ag)) (assign (y ?b) (+ (y ?ag) 1)) (assign (z ?b) (+ (z ?ag) -1)) (decrease (agent-num-log ?ag) 1))
+	:precondition (and (exists (?bl - block) (and (= (x ?ag) (x ?bl)) (= (y ?ag) (+ (y ?bl) 1)) (= (z ?ag) (+ (z ?bl) 1)))) (not (exists (?bl - block) (and (= (x ?ag) (x ?bl)) (= (y ?ag) (y ?bl)) (= (z ?ag) (+ (z ?bl) 1))))))
+	:effect (and (block-present ?b) (assign (x ?b) (x ?ag)) (assign (y ?b) (y ?ag)) (assign (z ?b) (+ (z ?ag) -1)) (decrease (agent-num-log ?ag) 1))
 )
 
 
@@ -137,6 +138,14 @@
 	:parameters (?ag - agent)
 	:precondition (and (exists (?bl - block) (and (= (x ?bl) (x ?ag)) (= (y ?bl) (y ?ag)) (= (z ?bl) (+ (z ?ag) -1)))))
 	:effect (and (assign (z ?ag) (+ (z ?ag) -1)) (assign (y ?ag) (+ (y ?ag) 1)))
+)
+
+
+(:action check-goal
+	:parameters (?ag - agent)
+	:precondition (exists (?b - log-block) (and (= (x ?b) 0) (= (y ?b) 4) (= (z ?b) -2)))
+	
+	:effect (and (goal-achieved ?ag))
 )
 
 

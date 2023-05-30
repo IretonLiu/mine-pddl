@@ -49,11 +49,11 @@
         ],
         "blocks": [
             {
-                "type": "log-block",
+                "type": "log",
                 "position": {
                     "x": "0",
-                    "y": "6",
-                    "z": "-4"
+                    "y": "4",
+                    "z": "-2"
                 }
             }
         ]

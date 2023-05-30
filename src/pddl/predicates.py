@@ -4,6 +4,7 @@ from pddl.pddl_types.types_names import TypeName
 
 
 class Predicate:
+    var_name = "predicate"
     def __init__(self):
         # self.parameter_name = object.name
         # self.object_type = object.type_name
@@ -68,3 +69,14 @@ class AgentAlivePredicate(Predicate):
 
     def to_precondition(self):
         return f"({self.var_name} ?ag)"
+
+class GoalAchievedPredicate(Predicate):
+    var_name = "goal-achieved"
+
+    def __init__(self):
+        super().__init__()
+        self.arguments = {"?ag": TypeName.AGENT_TYPE_NAME.value}
+        self.value = False
+
+    def to_precondition(self):
+        return f"({self.var_name} ?g)"

@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Dict, Optional, Any
 import inspect
 import pddl.pddl_types.base_pddl_types as base_pddl_types
 import pddl.pddl_types.named_pddl_types as named_pddl_types
@@ -138,7 +138,7 @@ class Domain:
     def construct_functions(self, items: Dict[str, named_pddl_types.NamedItemType]):
         return self.predicates_or_functions_helper(False, items=items)
 
-    def construct_actions(self, items: Dict[str, named_pddl_types.NamedItemType], blocks: Dict[str, named_pddl_types.NamedBlockType]):
+    def construct_actions(self, items: Dict[str, named_pddl_types.NamedItemType], blocks: Dict[str, named_pddl_types.NamedBlockType], goal:Dict[str, List[Dict[str, Any]]]):
         self.actions: List[Action] = [Move("north"), Move("south"),
                         Move("east"), Move("west")]
         for item in items:
@@ -150,7 +150,7 @@ class Domain:
             self.actions.append(Place(block))
 
         self.actions.append(JumpUp())
-
+        self.actions.append(CheckGoal(goal))
         action_str = ""
         for action in self.actions:
             action_str += "\n" + action.to_pddl() + "\n"
@@ -160,6 +160,7 @@ class Domain:
         self,
         items: Dict[str, named_pddl_types.NamedItemType],
         blocks: Dict[str, named_pddl_types.NamedBlockType],
+        goal: Dict[str, List[Dict[str, Any]]],
         file_path: str,
     ):
         pddl = f"(define (domain {self.name})\n"
@@ -167,7 +168,7 @@ class Domain:
         pddl += self.construct_types(items, blocks) + "\n"
         pddl += self.construct_predicates() + "\n"
         pddl += self.construct_functions(items) + "\n"
-        pddl += self.construct_actions(items, blocks) + "\n"
+        pddl += self.construct_actions(items, blocks, goal) + "\n"
         pddl += ")"
 
         with open(file_path, "w") as f:

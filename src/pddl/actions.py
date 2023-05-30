@@ -178,19 +178,17 @@ class Place(Action):
         self.parameters = {TypeName.AGENT_TYPE_NAME.value: "?ag", self.block: "?b"}
 
     def construct_preconditions(self):
-        self.preconditions = pddl_and(pddl_exists({TypeName.BLOCK_TYPE_NAME.value: "?bl"}, pddl_and(pddl_equal(f"({XPositionFunction.var_name} {self.parameters[self.block]})", f"({XPositionFunction.var_name} ?bl)"), # There must be a block underneath
-                                                                                                    pddl_equal(f"({YPositionFunction.var_name} {self.parameters[self.block]})", pddl_add(f"({YPositionFunction.var_name} ?bl)", "1")),
-                                                                                                    pddl_equal(f"({ZPositionFunction.var_name} {self.parameters[self.block]})", f"({ZPositionFunction.var_name} ?bl)"))), # There mustn't be a block at the same location
-                                      pddl_not(pddl_exists({TypeName.BLOCK_TYPE_NAME.value: "?bl"}, pddl_and(pddl_equal(f"({XPositionFunction.var_name} {self.parameters[self.block]})", f"({XPositionFunction.var_name} ?bl)"),
-                                                                                                             pddl_equal(f"({YPositionFunction.var_name} {self.parameters[self.block]})", f"({YPositionFunction.var_name} ?bl)"),
-                                                                                                             pddl_equal(f"({ZPositionFunction.var_name} {self.parameters[self.block]})", f"({ZPositionFunction.var_name} ?bl)")))),
-                                      pddl_and(pddl_equal(f"({XPositionFunction.var_name} {self.parameters[self.block]})", f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})"), # The player must be direction facing and standing next to the location
-                                               pddl_equal(f"({YPositionFunction.var_name} {self.parameters[self.block]})", pddl_add(f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})", "1")),
-                                               pddl_equal(f"({ZPositionFunction.var_name} {self.parameters[self.block]})", pddl_add(f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})", "-1"))))
+        self.preconditions = pddl_and(pddl_exists({TypeName.BLOCK_TYPE_NAME.value: "?bl"}, pddl_and(pddl_equal(f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})", f"({XPositionFunction.var_name} ?bl)"), # There must be a block underneath
+                                                                                                    pddl_equal(f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})", pddl_add(f"({YPositionFunction.var_name} ?bl)", "1")),
+                                                                                                    pddl_equal(f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})", pddl_add(f"({ZPositionFunction.var_name} ?bl)", "1")))), # There mustn't be a block at the same location
+
+                                      pddl_not(pddl_exists({TypeName.BLOCK_TYPE_NAME.value: "?bl"}, pddl_and(pddl_equal(f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})", f"({XPositionFunction.var_name} ?bl)"),
+                                                                                                             pddl_equal(f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})", f"({YPositionFunction.var_name} ?bl)"),
+                                                                                                             pddl_equal(f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})", pddl_add(f"({ZPositionFunction.var_name} ?bl)", "1"))))))
     def construct_effects(self):
         self.effects = pddl_and(f"({BlockPresentPredicate.var_name} {self.parameters[self.block]})", 
                                 pddl_assign(f"({XPositionFunction.var_name} {self.parameters[self.block]})", f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})"),
-                                pddl_assign(f"({YPositionFunction.var_name} {self.parameters[self.block]})", pddl_add(f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})","1")),
+                                pddl_assign(f"({YPositionFunction.var_name} {self.parameters[self.block]})", f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})"),
                                 pddl_assign(f"({ZPositionFunction.var_name} {self.parameters[self.block]})", pddl_add(f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})", "-1")),
                                 pddl_decrease(f"({InventoryFunction.var_name.format(self.item)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})", "1"))
 
@@ -230,3 +228,33 @@ class JumpUp(Action):
         out += ")\n"
         return out
 
+class CheckGoal(Action):
+    # checks the goal achieved predicate of the agent
+    def __init__(self, goal) -> None:
+        self.action_name = "check-goal"
+        self.parameters = {TypeName.AGENT_TYPE_NAME.value: "?ag"}
+        self.goal = goal
+        
+
+    def construct_preconditions(self):
+        blocks = self.goal["blocks"]
+        self.preconditions = ""
+
+        for block in blocks:
+            self.preconditions += pddl_exists({block['type']+"-block": "?b"}, pddl_and(pddl_equal(f"({XPositionFunction.var_name} ?b)", block['position']['x']),
+                                                                   pddl_equal(f"({YPositionFunction.var_name} ?b)", block['position']['y']),
+                                                                   pddl_equal(f"({ZPositionFunction.var_name} ?b)", block['position']['z'])))
+            self.preconditions += "\n\t"
+
+    def construct_effects(self):
+        self.effects = pddl_and(f"({GoalAchievedPredicate.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})")
+
+    def to_pddl(self):
+        self.construct_preconditions()
+        self.construct_effects()
+        out = f"(:action {self.action_name}\n"
+        out += f"\t:parameters ({' '.join([f'{v} - {k}' for k, v in self.parameters.items()])})\n"
+        out += f"\t:precondition {self.preconditions}\n"
+        out += f"\t:effect {self.effects}\n"
+        out += ")\n"
+        return out

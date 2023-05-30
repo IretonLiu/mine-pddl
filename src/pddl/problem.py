@@ -5,7 +5,7 @@ from pddl.pddl_types.base_pddl_types import AgentType
 from pddl.functions import *
 from pddl.operators import *
 from pddl.pddl_types.types_names import TypeName
-from pddl.predicates import BlockPresentPredicate
+from pddl.predicates import BlockPresentPredicate, GoalAchievedPredicate
 
 # (define (problem <title>)
 #     (:domain <domain-name>)
@@ -131,18 +131,10 @@ class Problem:
     def construct_goal(self, goal_json: Dict[str, List[Dict[str, Any]]]):
         # goal_json is a dict of lists of dicts
         output = "(:goal" 
-        blocks = goal_json["blocks"]
-
-        blocks_string = ""
-        # loop through the blocks
-        for block in blocks:
-                   blocks_string+= "\n\t"
-                   blocks_string+= pddl_exists({block['type']+"-block": "?b"}, pddl_and(pddl_equal(f"({XPositionFunction.var_name} ?b)", block['position']['x']),
-                                                                   pddl_equal(f"({YPositionFunction.var_name} ?b)", block['position']['y']),
-                                                                   pddl_equal(f"({ZPositionFunction.var_name} ?b)", block['position']['z'])))
-        output += blocks_string
-        output += "\n)"
+        output += f"\n\t(and ({GoalAchievedPredicate.var_name} steve)\n\t\t"
+        output += "\n))"
         return output
+
     def to_pddl(
         self,
         agent,

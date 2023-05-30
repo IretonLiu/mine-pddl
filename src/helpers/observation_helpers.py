@@ -3,6 +3,8 @@ from pddl.pddl_types.base_pddl_types import AgentType
 from pddl.functions import *
 import numpy as np
 
+from pddl.predicates import *
+
 rename = {"wood": "log"}
 
 def get_valid_inventory_types():
@@ -110,7 +112,7 @@ def extract_blocks(obs):
                 for predicate in named_block.predicates.values():
                     predicate.set_value(True)
 
-                if block_name not in blocks:
+                if named_block.name not in blocks:
                     blocks[named_block.name] = [named_block]
                 else:
                     blocks[named_block.name].append(named_block)
@@ -145,7 +147,7 @@ def extract_entities(obs):
         ):
             named_item = NamedItemType(
                 item_name=entity["name"],
-                variation=entity["variant"] if "variant" in entity else None,
+                variation=entity["variant"] if "variant" in entity else "",
                 quantity=int(entity["quantity"]),
             )
 
@@ -158,9 +160,16 @@ def extract_entities(obs):
             # create a reference so we don't duplicate code
             object_to_process = named_item
 
+            # assign value to the predicates
+            # we are reading these items/blocks/agent from the world, so they must exist
+            for predicate in object_to_process.predicates.values():
+                predicate.set_value(True)
+
         elif entity["name"] == "MineDojoAgent0":
             # we are working with the agent now
             agent = AgentType()
+            agent.predicates[AgentAlivePredicate].set_value(True)
+            agent.predicates[GoalAchievedPredicate].set_value(False)
 
             # create a reference so we don't duplicate code
             object_to_process = agent
@@ -185,10 +194,6 @@ def extract_entities(obs):
         #     # we do not need to process inventory now - that will be done when the PDDL is produced
         #     pass
 
-        # assign value to the predicates
-        # we are reading these items/blocks/agent from the world, so they must exist
-        for predicate in object_to_process.predicates.values():
-            predicate.set_value(True)
 
     return items, agent
 

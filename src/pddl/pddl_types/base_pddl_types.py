@@ -42,6 +42,7 @@ class AgentType(LocatableType):
         self.name = "steve"
         self.functions[InventoryFunction] = InventoryFunction()
         self.predicates[AgentAlivePredicate] = AgentAlivePredicate()
+        self.predicates[GoalAchievedPredicate] = GoalAchievedPredicate()
 
 
 class ItemType(LocatableType):

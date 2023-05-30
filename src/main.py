@@ -27,7 +27,7 @@ from pddl.problem import Problem
 world_json = json_helper.load_json("worlds/example.json")
 # print(world_json)
 # print(json_helper.json_blocks_to_xml_str(world_json["blocks"]))
-voxel_size = dict(xmin=-10, ymin=-2, zmin=-10, xmax=10, ymax=2, zmax=10)
+voxel_size = dict(xmin=-4, ymin=-2, zmin=-4, xmax=4, ymax=2, zmax=4)
 
 env = minedojo.make(
     "open-ended",
@@ -70,7 +70,7 @@ inventory = extract_inventory(obs, items, agent)
 
 
 domain = Domain("first_world")
-print(domain.to_pddl(items, blocks, file_path="./problems/our/domain4.pddl"))
+print(domain.to_pddl(items, blocks, file_path="./problems/our/domain4.pddl", goal = world_json['goal']))
 
 problem = Problem("first_world_problem", domain, )
 
