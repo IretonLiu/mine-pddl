@@ -19,6 +19,11 @@ from pddl.problem import Problem
 - some final confidition to check to see if the plan is successful
 - if something went wrong, give idea what went wrong
 - collect extra information like number of steps taken to reach success (as json obj)
+
+- get camera angle correct
+- create the move and pickup actions
+- remove the pickup and drop (only) actions
+- 
 """
 
 
@@ -27,7 +32,8 @@ from pddl.problem import Problem
 world_json = json_helper.load_json("worlds/example.json")
 # print(world_json)
 # print(json_helper.json_blocks_to_xml_str(world_json["blocks"]))
-voxel_size = dict(xmin=-4, ymin=-2, zmin=-4, xmax=4, ymax=2, zmax=4)
+ranges = (8, 4, 8)
+voxel_size = dict(xmin=-ranges[0]//2, ymin=-ranges[1]//2, zmin=-ranges[2]//2, xmax=ranges[0]//2, ymax=ranges[1]//2, zmax=ranges[2]//2)
 
 env = minedojo.make(
     "open-ended",
@@ -46,7 +52,7 @@ env = minedojo.make(
     allow_mob_spawn=False,
 )
 
-ranges = (10, 10, 10)
+
 env.env.env.env.env._sim_spec._obs_handlers.append(handlers.EntityObservation(ranges))
 
 # create the items in the world
@@ -74,13 +80,29 @@ print(domain.to_pddl(items, blocks, file_path="./problems/our/domain4.pddl", goa
 
 problem = Problem("first_world_problem", domain, )
 
-goal_string = "(:goal (>= (agent-num-oak-log steve) 1))"
 print(problem.to_pddl(agent, items, blocks, goal_json=world_json['goal'], file_path="./problems/our/problem4.pddl"))
 
 # action_sequence = execution_helper.read_plan("./problems/our/plan.pddl") 
-# for action_str in action_sequence:
-#     action = execution_helper.get_action_from_str(action_str, inventory, env=env)
-#     obs, reward, done, info = env.step(action)
+action_sequence = [
+    "move-north",
+    "move-north",
+    "move-north",
+    "move-north",
+    "place-obsidian",
+    "move-south",
+    "move-south",
+    "move-south",
+    "move-south"
+]
+for action_str in action_sequence:
+    # get the action vector
+    action = execution_helper.get_action_from_str(action_str, inventory=inventory, agent=agent, env=env)
+    obs, reward, done, info = env.step(action)
+
+    # update the observations we are working with
+    items, agent = extract_entities(obs)
+    blocks = extract_blocks(obs)
+    inventory = extract_inventory(obs, items, agent)
 
 for i in range(3):
     obs, reward, done, info = env.step(env.action_space.no_op())

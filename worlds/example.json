@@ -24,7 +24,7 @@
             "type": "diamond",
             "variant": null,
             "position": {
-                "x": "5",
+                "x": "500",
                 "y": "4",
                 "z": "5"
             },
@@ -34,6 +34,11 @@
     "inventory": [
         {
             "name": "log",
+            "variant": "0",
+            "quantity": "64"
+        },
+        {
+            "name": "obsidian",
             "variant": "0",
             "quantity": "64"
         }

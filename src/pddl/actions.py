@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from pddl.pddl_types.types_names import TypeName
 from pddl.pddl_types.named_pddl_types import NamedBlockType, NamedItemType
 from pddl.operators import *
@@ -22,7 +22,8 @@ class Move(Action):
     def __init__(self, dir: str) -> None:
         super().__init__()
         self.dir = dir
-        self.action_name = "move-" + dir
+        # self.item_to_pickup = item_to_pickup
+        self.action_name = "move-" + dir #+ "-only" if item_to_pickup is None else "-and-pickup-" + self.item_to_pickup.name
         self.parameters = {TypeName.AGENT_TYPE_NAME.value: "?ag"}
 
     def construct_preconditions(self):

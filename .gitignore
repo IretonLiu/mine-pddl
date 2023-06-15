@@ -4,3 +4,4 @@ env/
 py2pddl*/
 pyrightconfig.json
 .vscode
+.java-version
