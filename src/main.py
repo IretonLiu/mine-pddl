@@ -92,20 +92,28 @@ action_sequence = [
     "move-south",
     "move-south",
     "move-south",
-    "move-south"
+    "move-south",
+    # "move-north",
+    # "move-north",
+    # "move-north",
+    # "move-north",
+    # "break-obsidian",
+
 ]
 for action_str in action_sequence:
+
+    
     # get the action vector
     action = execution_helper.get_action_from_str(action_str, inventory=inventory, agent=agent, env=env)
     obs, reward, done, info = env.step(action)
+    for i in range(5):
+        obs, reward, done, info = env.step(env.action_space.no_op())
 
     # update the observations we are working with
     items, agent = extract_entities(obs)
     blocks = extract_blocks(obs)
     inventory = extract_inventory(obs, items, agent)
-
-for i in range(3):
-    obs, reward, done, info = env.step(env.action_space.no_op())
+    
 
 # items, agent = extract_entities(obs)
 # blocks = extract_blocks(obs)

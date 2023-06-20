@@ -5,21 +5,21 @@
 	agent block item - locatable
 	bedrock destructible-block - block
 	log obsidian - item
-	dirt-block grass_block-block obsidian-block log-block - destructible-block
+	dirt-block grass_block-block - destructible-block
 )
 (:predicates
-	(item-present ?i - item)
-	(agent-alive ?ag - agent)
 	(goal-achieved ?ag - agent)
+	(agent-alive ?ag - agent)
+	(item-present ?i - item)
 	(block-present ?b - block)
 )
 (:functions
+	(x ?l - locatable )
+	(block-hits ?b - destructible-block )
 	(agent-num-obsidian ?ag - agent )
 	(z ?l - locatable )
-	(block-hits ?b - destructible-block )
-	(agent-num-log ?ag - agent )
 	(y ?l - locatable )
-	(x ?l - locatable )
+	(agent-num-log ?ag - agent )
 )
 
 (:action move-north
@@ -80,7 +80,7 @@
 
 (:action break-dirt
 	:parameters (?ag - agent ?b - dirt-block)
-	:precondition (and (= (x ?b) (x ?ag)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (+ (z ?ag) -1)) (block-present ?b))
+	:precondition (and (= (x ?b) (x ?ag)) (= (y ?b) (y ?ag)) (= (z ?b) (+ (z ?ag) -1)) (block-present ?b))
 	:effect (and (not (block-present ?b)) (increase (agent-num-dirt ?ag) 1))
 )
 
@@ -94,7 +94,7 @@
 
 (:action break-grass_block
 	:parameters (?ag - agent ?b - grass_block-block)
-	:precondition (and (= (x ?b) (x ?ag)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (+ (z ?ag) -1)) (block-present ?b))
+	:precondition (and (= (x ?b) (x ?ag)) (= (y ?b) (y ?ag)) (= (z ?b) (+ (z ?ag) -1)) (block-present ?b))
 	:effect (and (not (block-present ?b)) (increase (agent-num-grass_block ?ag) 1))
 )
 
@@ -103,34 +103,6 @@
 	:parameters (?ag - agent ?b - grass_block-block)
 	:precondition (and (exists (?bl - block) (and (= (x ?ag) (x ?bl)) (= (y ?ag) (+ (y ?bl) 1)) (= (z ?ag) (+ (z ?bl) 1)))) (not (exists (?bl - block) (and (= (x ?ag) (x ?bl)) (= (y ?ag) (y ?bl)) (= (z ?ag) (+ (z ?bl) 1))))))
 	:effect (and (block-present ?b) (assign (x ?b) (x ?ag)) (assign (y ?b) (y ?ag)) (assign (z ?b) (+ (z ?ag) -1)) (decrease (agent-num-grass_block ?ag) 1))
-)
-
-
-(:action break-obsidian
-	:parameters (?ag - agent ?b - obsidian-block)
-	:precondition (and (= (x ?b) (x ?ag)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (+ (z ?ag) -1)) (block-present ?b))
-	:effect (and (not (block-present ?b)) (increase (agent-num-obsidian ?ag) 1))
-)
-
-
-(:action place-obsidian
-	:parameters (?ag - agent ?b - obsidian-block)
-	:precondition (and (exists (?bl - block) (and (= (x ?ag) (x ?bl)) (= (y ?ag) (+ (y ?bl) 1)) (= (z ?ag) (+ (z ?bl) 1)))) (not (exists (?bl - block) (and (= (x ?ag) (x ?bl)) (= (y ?ag) (y ?bl)) (= (z ?ag) (+ (z ?bl) 1))))))
-	:effect (and (block-present ?b) (assign (x ?b) (x ?ag)) (assign (y ?b) (y ?ag)) (assign (z ?b) (+ (z ?ag) -1)) (decrease (agent-num-obsidian ?ag) 1))
-)
-
-
-(:action break-log
-	:parameters (?ag - agent ?b - log-block)
-	:precondition (and (= (x ?b) (x ?ag)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (+ (z ?ag) -1)) (block-present ?b))
-	:effect (and (not (block-present ?b)) (increase (agent-num-log ?ag) 1))
-)
-
-
-(:action place-log
-	:parameters (?ag - agent ?b - log-block)
-	:precondition (and (exists (?bl - block) (and (= (x ?ag) (x ?bl)) (= (y ?ag) (+ (y ?bl) 1)) (= (z ?ag) (+ (z ?bl) 1)))) (not (exists (?bl - block) (and (= (x ?ag) (x ?bl)) (= (y ?ag) (y ?bl)) (= (z ?ag) (+ (z ?bl) 1))))))
-	:effect (and (block-present ?b) (assign (x ?b) (x ?ag)) (assign (y ?b) (y ?ag)) (assign (z ?b) (+ (z ?ag) -1)) (decrease (agent-num-log ?ag) 1))
 )
 
 

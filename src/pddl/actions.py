@@ -152,7 +152,7 @@ class Break(Action):
 
     def construct_preconditions(self):
         self.preconditions = pddl_and(pddl_equal(f"({XPositionFunction.var_name} {self.parameters[self.block]})", f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})"),
-                                     pddl_equal(f"({YPositionFunction.var_name} {self.parameters[self.block]})", pddl_add(f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})", "1")),
+                                     pddl_equal(f"({YPositionFunction.var_name} {self.parameters[self.block]})", f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})"),
                                      pddl_equal(f"({ZPositionFunction.var_name} {self.parameters[self.block]})", pddl_add(f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})", "-1")), 
                                       f"({BlockPresentPredicate.var_name} {self.parameters[self.block]})")
 

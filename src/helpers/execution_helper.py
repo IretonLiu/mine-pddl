@@ -3,32 +3,69 @@ from pddl.pddl_types.base_pddl_types import AgentType
 from pddl.functions import XPositionFunction, YPositionFunction, ZPositionFunction
 
 
+
 def read_plan(plan_path: str):
+
     """
     Read the plan from the pddl file
     Each line has the following format: <action no.>: (<action name> <action args>)
     """
+
     action_sequence = []
     with open(plan_path, "r") as file:
+
         for line in file:
+
             if line[0] == ";":
+
                 continue
-            action_sequence.append(line.split(":")[1].strip().split(" ")[0].strip("("))
+
+            action_sequence.append(line.split(":")[1].strip().split(" ")[0].strip("(")) #)
+
+
+
+
     return action_sequence
 
 
-def move_command(env, direction: str):
+def move_command(env, direction: str, agent: AgentType):
+
     """
     Move the agent in the environment by using teleport command
     """
+
+    # command = "/tp @p {} {} {}".format(
+    #     agent.functions[XPositionFunction].value,
+    #     agent.functions[YPositionFunction].value,
+    #     agent.functions[ZPositionFunction].value + 1,
+    # )
+    command = ""
     if direction == "south":
-        env.execute_cmd("/tp @p ~ ~ ~1")
+        command = "/tp @p {} {} {}".format(
+            agent.functions[XPositionFunction].value,
+            agent.functions[YPositionFunction].value,
+            agent.functions[ZPositionFunction].value + 1,
+        )
     elif direction == "north":
-        env.execute_cmd("/tp @p ~ ~ ~-1")
+        command = "/tp @p {} {} {}".format(
+            agent.functions[XPositionFunction].value,
+            agent.functions[YPositionFunction].value,
+            agent.functions[ZPositionFunction].value - 1,
+        )
     elif direction == "east":
-        env.execute_cmd("/tp @p ~1 ~ ~")
+        command = "/tp @p {} {} {}".format(
+        agent.functions[XPositionFunction].value+1,
+        agent.functions[YPositionFunction].value,
+        agent.functions[ZPositionFunction].value,
+        )
     elif direction == "west":
-        env.execute_cmd("/tp @p ~-1 ~ ~")
+        command = "/tp @p {} {} {}".format(
+        agent.functions[XPositionFunction].value-1,
+        agent.functions[YPositionFunction].value,
+        agent.functions[ZPositionFunction].value,
+        )
+
+    env.execute_cmd(command)
 
 
 def place_block(env, block_name: str, agent: AgentType) -> None:
@@ -53,6 +90,28 @@ def place_block(env, block_name: str, agent: AgentType) -> None:
     command = f"/clear @a {block_name} 0 1"
     env.execute_cmd(command)
 
+    
+
+def break_block(env, block_name: str, agent: AgentType) -> None:
+    """
+    break a block in front of the agent
+    """
+
+    command = "/setblock {} {} {} {} destroy".format(
+        agent.functions[XPositionFunction].value,
+        agent.functions[YPositionFunction].value,
+        agent.functions[ZPositionFunction].value + 1,
+        "air",
+    )
+    env.execute_cmd(command)
+
+    # decrement this block from the agent's inventory
+    # https://www.digminecraft.com/game_commands/clear_command.php
+    # example command: /clear [targets] [item] [data - variant] [maxCount] [dataTag]
+    # example: /clear @a tnt 0 10
+    command = f"/give @p {block_name}"
+    env.execute_cmd(command)
+
 
 def get_action_from_str(action: str, inventory=None, agent=None, env=None):
     """
@@ -62,11 +121,14 @@ def get_action_from_str(action: str, inventory=None, agent=None, env=None):
     # split by first hyphen
     action_name, action_args = action.split("-", 1)
     if action_name == "move":
-        move_command(env, action_args)
+        move_command(env, action_args, agent)
     elif action_name == "place":
         # eg action is "place-obsidian"
         # action_args will be "obsidian"
         place_block(env, action_args, agent)
+    elif action_name == "break":
+        break_block(env, action_args, agent)
+
     elif action_name == "drop":
         action_vector[5] = 2
         for i, name in enumerate(inventory["name"]):

@@ -181,8 +181,8 @@ def extract_entities(obs):
             raise Exception("object_to_process is None")
             
 
-        position = (int(entity["x"]), int(
-            entity["y"]), int(entity["z"]))
+        position = ((entity["x"]), (
+            entity["y"]), (entity["z"]))
         object_to_process.functions[XPositionFunction].set_value(position[0])
         object_to_process.functions[YPositionFunction].set_value(position[1])
         object_to_process.functions[ZPositionFunction].set_value(position[2])
