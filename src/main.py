@@ -33,7 +33,14 @@ world_json = json_helper.load_json("worlds/example.json")
 # print(world_json)
 # print(json_helper.json_blocks_to_xml_str(world_json["blocks"]))
 ranges = (8, 4, 8)
-voxel_size = dict(xmin=-ranges[0]//2, ymin=-ranges[1]//2, zmin=-ranges[2]//2, xmax=ranges[0]//2, ymax=ranges[1]//2, zmax=ranges[2]//2)
+voxel_size = dict(
+    xmin=-ranges[0] // 2,
+    ymin=-ranges[1] // 2,
+    zmin=-ranges[2] // 2,
+    xmax=ranges[0] // 2,
+    ymax=ranges[1] // 2,
+    zmax=ranges[2] // 2,
+)
 
 env = minedojo.make(
     "open-ended",
@@ -58,7 +65,6 @@ env.env.env.env.env._sim_spec._obs_handlers.append(handlers.EntityObservation(ra
 # create the items in the world
 
 
-
 obs = env.reset()
 item_commands = json_helper.json_items_to_cmd(world_json["items"])
 for cmd in item_commands:
@@ -76,13 +82,28 @@ inventory = extract_inventory(obs, items, agent)
 
 
 domain = Domain("first_world")
-print(domain.to_pddl(items, blocks, file_path="./problems/our/domain4.pddl", goal = world_json['goal']))
+print(
+    domain.to_pddl(
+        items, blocks, file_path="./problems/our/domain4.pddl", goal=world_json["goal"]
+    )
+)
 
-problem = Problem("first_world_problem", domain, )
+problem = Problem(
+    "first_world_problem",
+    domain,
+)
 
-print(problem.to_pddl(agent, items, blocks, goal_json=world_json['goal'], file_path="./problems/our/problem4.pddl"))
+print(
+    problem.to_pddl(
+        agent,
+        items,
+        blocks,
+        goal_json=world_json["goal"],
+        file_path="./problems/our/problem4.pddl",
+    )
+)
 
-# action_sequence = execution_helper.read_plan("./problems/our/plan.pddl") 
+# action_sequence = execution_helper.read_plan("./problems/our/plan.pddl")
 action_sequence = [
     "move-north",
     "move-north",
@@ -93,18 +114,17 @@ action_sequence = [
     "move-south",
     "move-south",
     "move-south",
-    # "move-north",
-    # "move-north",
-    # "move-north",
-    # "move-north",
-    # "break-obsidian",
-
+    "move-north",
+    "move-north",
+    "move-north",
+    "move-north",
+    "break-obsidian",
 ]
 for action_str in action_sequence:
-
-    
     # get the action vector
-    action = execution_helper.get_action_from_str(action_str, inventory=inventory, agent=agent, env=env)
+    action = execution_helper.get_action_from_str(
+        action_str, inventory=inventory, agent=agent, env=env
+    )
     obs, reward, done, info = env.step(action)
     for i in range(5):
         obs, reward, done, info = env.step(env.action_space.no_op())
@@ -113,27 +133,28 @@ for action_str in action_sequence:
     items, agent = extract_entities(obs)
     blocks = extract_blocks(obs)
     inventory = extract_inventory(obs, items, agent)
-    
 
 # items, agent = extract_entities(obs)
 # blocks = extract_blocks(obs)
 # inventory = extract_inventory(obs, items, agent)
 
-print("plan successful: ", execution_helper.check_goal_state(obs, voxel_size, world_json["goal"]))
+print(
+    "plan successful: ",
+    execution_helper.check_goal_state(obs, voxel_size, world_json["goal"]),
+)
 
 while True:
-     # env.spawn_mobs("sheep", [1, 1, 1])
-     action = env.action_space.no_op()    # 8-len vector
+    # env.spawn_mobs("sheep", [1, 1, 1])
+    action = env.action_space.no_op()  # 8-len vector
     #  act5ion[5] = 3
-     # action = execution_helper.get_action_from_str(action_str, inventory, env=env)
+    # action = execution_helper.get_action_from_str(action_str, inventory, env=env)
 
-     obs, reward, done, info = env.step(action)
+    obs, reward, done, info = env.step(action)
 
 #     continue
 # file = open("obs.pkl", "rb")
 # obs = pickle.load(file)
 # file.close()
-
 
 
 """

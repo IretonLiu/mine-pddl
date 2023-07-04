@@ -3,9 +3,7 @@ from pddl.pddl_types.base_pddl_types import AgentType
 from pddl.functions import XPositionFunction, YPositionFunction, ZPositionFunction
 
 
-
 def read_plan(plan_path: str):
-
     """
     Read the plan from the pddl file
     Each line has the following format: <action no.>: (<action name> <action args>)
@@ -13,23 +11,18 @@ def read_plan(plan_path: str):
 
     action_sequence = []
     with open(plan_path, "r") as file:
-
         for line in file:
-
             if line[0] == ";":
-
                 continue
 
-            action_sequence.append(line.split(":")[1].strip().split(" ")[0].strip("(")) #)
-
-
-
+            action_sequence.append(
+                line.split(":")[1].strip().split(" ")[0].strip("(")
+            )  # )
 
     return action_sequence
 
 
 def move_command(env, direction: str, agent: AgentType):
-
     """
     Move the agent in the environment by using teleport command
     """
@@ -54,15 +47,15 @@ def move_command(env, direction: str, agent: AgentType):
         )
     elif direction == "east":
         command = "/tp @p {} {} {}".format(
-        agent.functions[XPositionFunction].value+1,
-        agent.functions[YPositionFunction].value,
-        agent.functions[ZPositionFunction].value,
+            agent.functions[XPositionFunction].value + 1,
+            agent.functions[YPositionFunction].value,
+            agent.functions[ZPositionFunction].value,
         )
     elif direction == "west":
         command = "/tp @p {} {} {}".format(
-        agent.functions[XPositionFunction].value-1,
-        agent.functions[YPositionFunction].value,
-        agent.functions[ZPositionFunction].value,
+            agent.functions[XPositionFunction].value - 1,
+            agent.functions[YPositionFunction].value,
+            agent.functions[ZPositionFunction].value,
         )
 
     env.execute_cmd(command)
@@ -78,7 +71,7 @@ def place_block(env, block_name: str, agent: AgentType) -> None:
     command = "/setblock {} {} {} {}".format(
         agent.functions[XPositionFunction].value,
         agent.functions[YPositionFunction].value,
-        agent.functions[ZPositionFunction].value + 1,
+        agent.functions[ZPositionFunction].value - 1,
         block_name,
     )
     env.execute_cmd(command)
@@ -90,7 +83,6 @@ def place_block(env, block_name: str, agent: AgentType) -> None:
     command = f"/clear @a {block_name} 0 1"
     env.execute_cmd(command)
 
-    
 
 def break_block(env, block_name: str, agent: AgentType) -> None:
     """
