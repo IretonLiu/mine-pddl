@@ -89,10 +89,11 @@ def break_block(env, block_name: str, agent: AgentType) -> None:
     break a block in front of the agent
     """
 
-    command = "/setblock {} {} {} {} destroy".format(
+    # https://www.digminecraft.com/game_commands/setblock_command.php
+    command = "/setblock {} {} {} {}".format(
         agent.functions[XPositionFunction].value,
         agent.functions[YPositionFunction].value,
-        agent.functions[ZPositionFunction].value + 1,
+        agent.functions[ZPositionFunction].value - 1,
         "air",
     )
     env.execute_cmd(command)
