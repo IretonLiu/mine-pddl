@@ -56,6 +56,7 @@ def json_items_to_cmd(items: list[dict]) -> list:
     take in a list of json item objects and returns a list of strings, which are the minecraft commands for generating them in the world
     """
 
+    # https://www.digminecraft.com/game_commands/summon_command.php
     # /summon Item ~ ~ ~ {Item:{id:"minecraft:diamond",Count:1}}
 
     commands = []
@@ -71,6 +72,5 @@ def json_items_to_cmd(items: list[dict]) -> list:
 
     return commands
 
-    
 
 # TODO : error handling

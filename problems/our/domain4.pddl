@@ -9,17 +9,17 @@
 )
 (:predicates
 	(goal-achieved ?ag - agent)
-	(item-present ?i - item)
 	(agent-alive ?ag - agent)
 	(block-present ?b - block)
+	(item-present ?i - item)
 )
 (:functions
 	(z ?l - locatable )
-	(x ?l - locatable )
 	(y ?l - locatable )
-	(block-hits ?b - destructible-block )
+	(x ?l - locatable )
 	(agent-num-log ?ag - agent )
 	(agent-num-obsidian ?ag - agent )
+	(block-hits ?b - destructible-block )
 )
 
 (:action move-north
@@ -110,6 +110,13 @@
 	:parameters (?ag - agent)
 	:precondition (and (exists (?bl - block) (and (= (x ?bl) (x ?ag)) (= (y ?bl) (y ?ag)) (= (z ?bl) (+ (z ?ag) -1)))))
 	:effect (and (assign (z ?ag) (+ (z ?ag) -1)) (assign (y ?ag) (+ (y ?ag) 1)))
+)
+
+
+(:action jump-down
+	:parameters (?ag - agent)
+	:precondition (and (not (exists (?bl - block) (and (= (x ?bl) (x ?ag)) (= (y ?bl) (+ (y ?ag) -1)) (= (z ?bl) (+ (z ?ag) 1))))))
+	:effect (and (assign (z ?ag) (+ (z ?ag) 1)) (assign (y ?ag) (+ (y ?ag) -1)))
 )
 
 

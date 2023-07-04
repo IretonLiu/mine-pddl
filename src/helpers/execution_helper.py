@@ -106,6 +106,43 @@ def break_block(env, block_name: str, agent: AgentType) -> None:
     env.execute_cmd(command)
 
 
+def jump(env, direction, agent):
+    """
+    direction up = tp one up and one in front
+    direction down = tp one behind and one down
+    """
+
+    if direction == "up":
+        command = "/tp @p {} {} {}".format(
+            agent.functions[XPositionFunction].value,
+            agent.functions[YPositionFunction].value + 1,
+            agent.functions[ZPositionFunction].value - 1,
+        )
+    elif direction == "down":
+        command = "/tp @p {} {} {}".format(
+            agent.functions[XPositionFunction].value,
+            agent.functions[YPositionFunction].value - 1,
+            agent.functions[ZPositionFunction].value + 1,
+        )
+    env.execute_cmd(command)
+
+
+# def drop(env, item_name, inventory, action_vector):
+#     """
+#     remove the item from the agent's inventory and spawn the item into the world
+#     """
+
+#     # equip the relevant inventory slot
+#     action_vector[5] = 5
+#     for i, name in enumerate(inventory["name"]):
+#         if name == item_name:
+#             action_vector[7] = i
+#             break
+#     env.step(action_vector)
+#     action_vector[5] = 2
+#     return action_vector
+
+
 def get_action_from_str(action: str, inventory=None, agent=None, env=None):
     """
     Formulate the action vector from the pddl action string
@@ -121,7 +158,8 @@ def get_action_from_str(action: str, inventory=None, agent=None, env=None):
         place_block(env, action_args, agent)
     elif action_name == "break":
         break_block(env, action_args, agent)
-
+    elif action_name == "jump":
+        jump(env, action_args, agent)
     elif action_name == "drop":
         action_vector[5] = 2
         for i, name in enumerate(inventory["name"]):

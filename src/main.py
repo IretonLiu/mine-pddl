@@ -107,18 +107,14 @@ print(
 action_sequence = [
     "move-north",
     "move-north",
-    "move-north",
-    "move-north",
     "place-obsidian",
     "move-south",
     "move-south",
-    "move-south",
-    "move-south",
-    "move-north",
-    "move-north",
     "move-north",
     "move-north",
     "break-obsidian",
+    "drop-log",
+    "drop-obsidian",
 ]
 for action_str in action_sequence:
     # get the action vector
