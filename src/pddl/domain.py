@@ -25,8 +25,7 @@ class Domain:
             if inspect.isclass(cls) and cls.__module__ == base_pddl_types.__name__:
                 # get the parent class of the obj if it has one
                 parent = (
-                    cls.__bases__[0] if cls.__bases__[
-                        0].__name__ != "object" else None
+                    cls.__bases__[0] if cls.__bases__[0].__name__ != "object" else None
                 )
 
                 if parent:
@@ -42,7 +41,7 @@ class Domain:
 
             types_dict[
                 getattr(base_pddl_types.DestructibleBlockType, "type_name")
-            ].append(key+"-block")
+            ].append(key + "-block")
 
         # convert types_dict to string
         types_str = "(:types\n"
@@ -115,8 +114,7 @@ class Domain:
         # items is only meaningful if we are processing functions (i.e. process_predicates is false)
 
         # get the pddl representation for the types - is a list
-        pddl_strings = self.get_pddl_strings(
-            base_pddl_types, process_predicates, items)
+        pddl_strings = self.get_pddl_strings(base_pddl_types, process_predicates, items)
         pddl_strings.extend(
             self.get_pddl_strings(named_pddl_types, process_predicates, items)
         )
@@ -125,8 +123,7 @@ class Domain:
         pddl_string_set = set(pddl_strings)
 
         # build the string of predicates/functions
-        output = "(:{}\n\t".format(
-            "predicates" if process_predicates else "functions")
+        output = "(:{}\n\t".format("predicates" if process_predicates else "functions")
         output += "\n\t".join(pddl_string_set)
         output += "\n)"
 
@@ -138,9 +135,18 @@ class Domain:
     def construct_functions(self, items: Dict[str, named_pddl_types.NamedItemType]):
         return self.predicates_or_functions_helper(False, items=items)
 
-    def construct_actions(self, items: Dict[str, named_pddl_types.NamedItemType], blocks: Dict[str, named_pddl_types.NamedBlockType], goal:Dict[str, List[Dict[str, Any]]]):
-        self.actions: List[Action] = [Move("north"), Move("south"),
-                        Move("east"), Move("west")]
+    def construct_actions(
+        self,
+        items: Dict[str, named_pddl_types.NamedItemType],
+        blocks: Dict[str, named_pddl_types.NamedBlockType],
+        goal: Dict[str, List[Dict[str, Any]]],
+    ):
+        self.actions: List[Action] = [
+            Move("north"),
+            Move("south"),
+            Move("east"),
+            Move("west"),
+        ]
         for item in items:
             self.actions.append(Pickup(item))
             self.actions.append(Drop(item))
@@ -150,6 +156,7 @@ class Domain:
             self.actions.append(Place(block))
 
         self.actions.append(JumpUp())
+        self.actions.append(JumpDown())
         self.actions.append(CheckGoal(goal))
         action_str = ""
         for action in self.actions:

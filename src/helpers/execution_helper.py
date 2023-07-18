@@ -3,9 +3,7 @@ from pddl.pddl_types.base_pddl_types import AgentType
 from pddl.functions import XPositionFunction, YPositionFunction, ZPositionFunction
 
 
-
 def read_plan(plan_path: str):
-
     """
     Read the plan from the pddl file
     Each line has the following format: <action no.>: (<action name> <action args>)
@@ -13,23 +11,18 @@ def read_plan(plan_path: str):
 
     action_sequence = []
     with open(plan_path, "r") as file:
-
         for line in file:
-
             if line[0] == ";":
-
                 continue
 
-            action_sequence.append(line.split(":")[1].strip().split(" ")[0].strip("(")) #)
-
-
-
+            action_sequence.append(
+                line.split(":")[1].strip().split(" ")[0].strip("(")
+            )  # )
 
     return action_sequence
 
 
 def move_command(env, direction: str, agent: AgentType):
-
     """
     Move the agent in the environment by using teleport command
     """
@@ -54,15 +47,15 @@ def move_command(env, direction: str, agent: AgentType):
         )
     elif direction == "east":
         command = "/tp @p {} {} {}".format(
-        agent.functions[XPositionFunction].value+1,
-        agent.functions[YPositionFunction].value,
-        agent.functions[ZPositionFunction].value,
+            agent.functions[XPositionFunction].value + 1,
+            agent.functions[YPositionFunction].value,
+            agent.functions[ZPositionFunction].value,
         )
     elif direction == "west":
         command = "/tp @p {} {} {}".format(
-        agent.functions[XPositionFunction].value-1,
-        agent.functions[YPositionFunction].value,
-        agent.functions[ZPositionFunction].value,
+            agent.functions[XPositionFunction].value - 1,
+            agent.functions[YPositionFunction].value,
+            agent.functions[ZPositionFunction].value,
         )
 
     env.execute_cmd(command)
@@ -78,7 +71,7 @@ def place_block(env, block_name: str, agent: AgentType) -> None:
     command = "/setblock {} {} {} {}".format(
         agent.functions[XPositionFunction].value,
         agent.functions[YPositionFunction].value,
-        agent.functions[ZPositionFunction].value + 1,
+        agent.functions[ZPositionFunction].value - 1,
         block_name,
     )
     env.execute_cmd(command)
@@ -90,17 +83,17 @@ def place_block(env, block_name: str, agent: AgentType) -> None:
     command = f"/clear @a {block_name} 0 1"
     env.execute_cmd(command)
 
-    
 
 def break_block(env, block_name: str, agent: AgentType) -> None:
     """
     break a block in front of the agent
     """
 
-    command = "/setblock {} {} {} {} destroy".format(
+    # https://www.digminecraft.com/game_commands/setblock_command.php
+    command = "/setblock {} {} {} {}".format(
         agent.functions[XPositionFunction].value,
         agent.functions[YPositionFunction].value,
-        agent.functions[ZPositionFunction].value + 1,
+        agent.functions[ZPositionFunction].value - 1,
         "air",
     )
     env.execute_cmd(command)
@@ -111,6 +104,43 @@ def break_block(env, block_name: str, agent: AgentType) -> None:
     # example: /clear @a tnt 0 10
     command = f"/give @p {block_name}"
     env.execute_cmd(command)
+
+
+def jump(env, direction, agent):
+    """
+    direction up = tp one up and one in front
+    direction down = tp one behind and one down
+    """
+
+    if direction == "up":
+        command = "/tp @p {} {} {}".format(
+            agent.functions[XPositionFunction].value,
+            agent.functions[YPositionFunction].value + 1,
+            agent.functions[ZPositionFunction].value - 1,
+        )
+    elif direction == "down":
+        command = "/tp @p {} {} {}".format(
+            agent.functions[XPositionFunction].value,
+            agent.functions[YPositionFunction].value - 1,
+            agent.functions[ZPositionFunction].value + 1,
+        )
+    env.execute_cmd(command)
+
+
+# def drop(env, item_name, inventory, action_vector):
+#     """
+#     remove the item from the agent's inventory and spawn the item into the world
+#     """
+
+#     # equip the relevant inventory slot
+#     action_vector[5] = 5
+#     for i, name in enumerate(inventory["name"]):
+#         if name == item_name:
+#             action_vector[7] = i
+#             break
+#     env.step(action_vector)
+#     action_vector[5] = 2
+#     return action_vector
 
 
 def get_action_from_str(action: str, inventory=None, agent=None, env=None):
@@ -128,7 +158,8 @@ def get_action_from_str(action: str, inventory=None, agent=None, env=None):
         place_block(env, action_args, agent)
     elif action_name == "break":
         break_block(env, action_args, agent)
-
+    elif action_name == "jump":
+        jump(env, action_args, agent)
     elif action_name == "drop":
         action_vector[5] = 2
         for i, name in enumerate(inventory["name"]):
