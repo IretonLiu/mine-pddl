@@ -3,6 +3,7 @@ import pickle
 import handlers.entities as handlers
 from helpers import execution_helper, json_helper
 from helpers.observation_helpers import *
+from helpers.video_helper import VideoHelper
 import minedojo
 import numpy as np
 from pddl.actions import *
@@ -64,6 +65,7 @@ env.env.env.env.env._sim_spec._obs_handlers.append(handlers.EntityObservation(ra
 
 # create the items in the world
 
+video_helper = VideoHelper(world_json["video_save_path"])
 
 obs = env.reset()
 item_commands = json_helper.json_items_to_cmd(world_json["items"])
@@ -76,6 +78,7 @@ for i in range(10):
 # entities = obs["entities"]
 # inventory = obs["inventory"]
 
+video_helper.save_image(obs["rgb"])
 items, agent = extract_entities(obs)
 blocks = extract_blocks(obs)
 inventory = extract_inventory(obs, items, agent)
@@ -105,16 +108,22 @@ print(
 
 # action_sequence = execution_helper.read_plan("./problems/our/plan.pddl")
 action_sequence = [
-    "move-north",
-    "move-north",
+    "move-south",
+    "move-south",
     "place-obsidian",
-    "move-south",
-    "move-south",
     "move-north",
     "move-north",
+    "move-north",
+    "move-north",
+    "move-south",
+    "move-south",
+    "move-south",
+    "move-south",
     "break-obsidian",
-    "drop-log",
-    "drop-obsidian",
+    "move-north",
+    "move-north",
+    "move-north",
+    "move-north",
 ]
 for action_str in action_sequence:
     # get the action vector
@@ -126,6 +135,7 @@ for action_str in action_sequence:
         obs, reward, done, info = env.step(env.action_space.no_op())
 
     # update the observations we are working with
+    video_helper.save_image(obs["rgb"])
     items, agent = extract_entities(obs)
     blocks = extract_blocks(obs)
     inventory = extract_inventory(obs, items, agent)
@@ -139,15 +149,14 @@ print(
     execution_helper.check_goal_state(obs, voxel_size, world_json["goal"]),
 )
 
-while True:
-    # env.spawn_mobs("sheep", [1, 1, 1])
-    action = env.action_space.no_op()  # 8-len vector
-    #  act5ion[5] = 3
-    # action = execution_helper.get_action_from_str(action_str, inventory, env=env)
+print("Generating Video...")
 
-    obs, reward, done, info = env.step(action)
-
-#     continue
+video_name = str(world_json["video_name"])
+first = video_name.find(".")
+first = first if first != -1 else len(video_name)
+video_helper.generate_video(video_name[:first] + ".mp4")
+print("Cleaning up...")
+video_helper.clean_up()
 # file = open("obs.pkl", "rb")
 # obs = pickle.load(file)
 # file.close()

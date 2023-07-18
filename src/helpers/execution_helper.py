@@ -71,7 +71,7 @@ def place_block(env, block_name: str, agent: AgentType) -> None:
     command = "/setblock {} {} {} {}".format(
         agent.functions[XPositionFunction].value,
         agent.functions[YPositionFunction].value,
-        agent.functions[ZPositionFunction].value - 1,
+        agent.functions[ZPositionFunction].value + 1,
         block_name,
     )
     env.execute_cmd(command)
@@ -93,7 +93,7 @@ def break_block(env, block_name: str, agent: AgentType) -> None:
     command = "/setblock {} {} {} {}".format(
         agent.functions[XPositionFunction].value,
         agent.functions[YPositionFunction].value,
-        agent.functions[ZPositionFunction].value - 1,
+        agent.functions[ZPositionFunction].value + 1,
         "air",
     )
     env.execute_cmd(command)

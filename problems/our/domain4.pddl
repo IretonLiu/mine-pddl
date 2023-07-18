@@ -10,16 +10,16 @@
 (:predicates
 	(goal-achieved ?ag - agent)
 	(agent-alive ?ag - agent)
-	(block-present ?b - block)
 	(item-present ?i - item)
+	(block-present ?b - block)
 )
 (:functions
-	(z ?l - locatable )
 	(y ?l - locatable )
-	(x ?l - locatable )
 	(agent-num-log ?ag - agent )
-	(agent-num-obsidian ?ag - agent )
+	(x ?l - locatable )
 	(block-hits ?b - destructible-block )
+	(agent-num-obsidian ?ag - agent )
+	(z ?l - locatable )
 )
 
 (:action move-north

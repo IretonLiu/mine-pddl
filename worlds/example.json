@@ -1,6 +1,8 @@
 {
     "world_type": "flat",
     "world_name": "open-ended",
+    "video_save_path": "problems/our/images",
+    "video_name": "plan_video",
     "blocks": [
         {
             "type": "obsidian",
