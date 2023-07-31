@@ -5,6 +5,8 @@ from typing import List, Tuple, Dict
 def pddl_and(*args):
     return f"(and {' '.join(args)})"
 
+def pddl_or(*args):
+    return f"(or {' '.join(args)})"
 
 def pddl_exists(arguments: Dict, *args):
     out = f"(exists ("

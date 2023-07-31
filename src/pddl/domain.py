@@ -149,13 +149,15 @@ class Domain:
         blocks: Dict[str, List[named_pddl_types.NamedBlockType]],
         goal: Dict[str, List[Dict[str, Any]]],
     ):
-        self.actions: List[Action] = [
-            Move("north"),
-            Move("south"),
-            Move("east"),
-            Move("west"),
-        ]
+        directions = ["north", "south", "east", "west"]
+        
+        for dir in directions:
+            self.actions.append(Move(dir))
+
         for item in items:
+            for dir in directions:
+                self.actions.append(MoveAndPickup(dir, item))
+
             self.actions.append(Pickup(item))
             self.actions.append(Drop(item))
 
