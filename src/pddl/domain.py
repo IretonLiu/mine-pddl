@@ -19,13 +19,21 @@ class Domain:
         self.actions = []
         self.requirements = []
 
-    def construct_types(self, item_types, block_types, int_types: Dict[str, List[special_pddl_types.IntType]]):
+    def construct_types(
+        self,
+        item_types,
+        block_types,
+        int_types: Dict[str, List[special_pddl_types.IntType]],
+    ):
         types_dict = defaultdict(list)
         all_pddl_types = inspect.getmembers(base_pddl_types)
         all_pddl_types.extend(inspect.getmembers(special_pddl_types))
         # print all the classes in the pddl.pddl_types.base_pddl_types module without classes from their own imports
         for name, cls in all_pddl_types:
-            if inspect.isclass(cls) and (cls.__module__ == base_pddl_types.__name__ or cls.__module__ == special_pddl_types.__name__):
+            if inspect.isclass(cls) and (
+                cls.__module__ == base_pddl_types.__name__
+                or cls.__module__ == special_pddl_types.__name__
+            ):
                 # get the parent class of the obj if it has one
                 parent = (
                     cls.__bases__[0] if cls.__bases__[0].__name__ != "object" else None
@@ -48,8 +56,7 @@ class Domain:
 
         # add the special types to the dictionary
         for key in int_types:
-            types_dict["int"].append(key)            
-
+            types_dict["int"].append(key)
 
         # convert types_dict to string
         types_str = "(:types\n"
@@ -140,7 +147,9 @@ class Domain:
     def construct_predicates(self):
         return self.predicates_or_functions_helper(True)
 
-    def construct_functions(self, items: Dict[str, List[named_pddl_types.NamedItemType]]):
+    def construct_functions(
+        self, items: Dict[str, List[named_pddl_types.NamedItemType]]
+    ):
         return self.predicates_or_functions_helper(False, items=items)
 
     def construct_actions(
@@ -150,7 +159,7 @@ class Domain:
         goal: Dict[str, List[Dict[str, Any]]],
     ):
         directions = ["north", "south", "east", "west"]
-        
+
         for dir in directions:
             self.actions.append(Move(dir))
 
@@ -158,8 +167,8 @@ class Domain:
             for dir in directions:
                 self.actions.append(MoveAndPickup(dir, item))
 
-            self.actions.append(Pickup(item))
-            self.actions.append(Drop(item))
+            # self.actions.append(Pickup(item))
+            # self.actions.append(Drop(item))
 
         for block in blocks:
             self.actions.append(Break(block))
@@ -168,6 +177,7 @@ class Domain:
         self.actions.append(JumpUp())
         self.actions.append(JumpDown())
         self.actions.append(CheckGoal(goal))
+
         action_str = ""
         for action in self.actions:
             action_str += "\n" + action.to_pddl() + "\n"
@@ -177,11 +187,10 @@ class Domain:
         self,
         items: Dict[str, List[named_pddl_types.NamedItemType]],
         blocks: Dict[str, List[named_pddl_types.NamedBlockType]],
-        int_types: Dict[str, List[special_pddl_types.IntType]], 
+        int_types: Dict[str, List[special_pddl_types.IntType]],
         goal: Dict[str, List[Dict[str, Any]]],
         file_path: str,
     ):
-
         pddl = f"(define (domain {self.name})\n"
         pddl += "(:requirements :typing :fluents :negative-preconditions :universal-preconditions :existential-preconditions)\n"
         pddl += self.construct_types(items, blocks, int_types) + "\n"

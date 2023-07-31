@@ -52,7 +52,7 @@ class Move(Action):
                 ),
             )
         else:
-            z_equality = lambda x : pddl_equal(
+            z_equality = lambda x: pddl_equal(
                 f"({ZPositionFunction.var_name} ?{x})",
                 f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
             )
@@ -72,25 +72,29 @@ class Move(Action):
                                         f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
                                         "1",
                                     ),
-                                ),pddl_equal(
+                                ),
+                                pddl_equal(
                                     f"({YPositionFunction.var_name} ?b)",
                                     f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                                    )
+                                ),
                             ),
                             z_equality("b"),
                         ),
                     )
-                ), 
+                ),
                 pddl_not(
-                    pddl_exists({TypeName.ITEM_TYPE_NAME.value: "?i"}, pddl_and(
-                        x_equality("i"),
-                        pddl_equal(
-                            f"({YPositionFunction.var_name} ?i)",
+                    pddl_exists(
+                        {TypeName.ITEM_TYPE_NAME.value: "?i"},
+                        pddl_and(
+                            x_equality("i"),
+                            pddl_equal(
+                                f"({YPositionFunction.var_name} ?i)",
                                 f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                            ),
+                            z_equality("i"),
                         ),
-                        z_equality("i"),)
                     )
-                )
+                ),
             ),
         )
 
@@ -171,7 +175,7 @@ class Pickup(Action):
         out += f"\t:effect {self.effects}\n"
         out += ")\n"
         return out
-        
+
 
 class MoveAndPickup(Action):
     def __init__(self, dir, item) -> None:
@@ -206,7 +210,7 @@ class MoveAndPickup(Action):
                 ),
             )
         else:
-            z_equality = lambda x : pddl_equal(
+            z_equality = lambda x: pddl_equal(
                 f"({ZPositionFunction.var_name} ?{x})",
                 f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
             )
@@ -228,24 +232,28 @@ class MoveAndPickup(Action):
                     pddl_add(
                         f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
                         "-1",
-                    )
+                    ),
                 ),
             ),
             # preconditions for movement
             pddl_not(
-                pddl_and(
+                pddl_exists(
+                    {TypeName.BLOCK_TYPE_NAME.value: "?b"},
+                    pddl_and(
                         x_equality("b"),
-                            pddl_equal(
-                                f"({YPositionFunction.var_name} ?b)",
-                                pddl_add(
-                                    f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                                    "1",
-                                ),
+                        pddl_equal(
+                            f"({YPositionFunction.var_name} ?b)",
+                            pddl_add(
+                                f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                                "1",
+                            ),
+                        ),
                         z_equality("b"),
                     ),
-                )
-            )
+                ),
+            ),
         )
+
     def construct_effects(self):
         move_effect = ""
         if self.dir == "north":
@@ -288,9 +296,7 @@ class MoveAndPickup(Action):
         return out
 
 
-
 class Drop(Action):
-
     def __init__(self, item: str) -> None:
         super().__init__()
         self.item = item

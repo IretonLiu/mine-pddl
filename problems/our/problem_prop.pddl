@@ -4,6 +4,7 @@
 	steve - agent
 	dirt-block0 dirt-block1 dirt-block2 dirt-block3 dirt-block4 dirt-block5 dirt-block6 dirt-block7 dirt-block8 dirt-block9 dirt-block10 dirt-block11 dirt-block12 dirt-block13 dirt-block14 dirt-block15 dirt-block16 dirt-block17 dirt-block18 dirt-block19 dirt-block20 dirt-block21 dirt-block22 dirt-block23 dirt-block24 dirt-block25 dirt-block26 dirt-block27 dirt-block28 dirt-block29 dirt-block30 dirt-block31 dirt-block32 dirt-block33 dirt-block34 dirt-block35 dirt-block36 dirt-block37 dirt-block38 dirt-block39 dirt-block40 dirt-block41 dirt-block42 dirt-block43 dirt-block44 dirt-block45 dirt-block46 dirt-block47 dirt-block48 dirt-block49 dirt-block50 dirt-block51 dirt-block52 dirt-block53 dirt-block54 dirt-block55 dirt-block56 dirt-block57 dirt-block58 dirt-block59 dirt-block60 dirt-block61 dirt-block62 dirt-block63 dirt-block64 dirt-block65 dirt-block66 dirt-block67 dirt-block68 dirt-block69 dirt-block70 dirt-block71 dirt-block72 dirt-block73 dirt-block74 dirt-block75 dirt-block76 dirt-block77 dirt-block78 dirt-block79 dirt-block80 - dirt-block
 	grass_block-block0 grass_block-block1 grass_block-block2 grass_block-block3 grass_block-block4 grass_block-block5 grass_block-block6 grass_block-block7 grass_block-block8 grass_block-block9 grass_block-block10 grass_block-block11 grass_block-block12 grass_block-block13 grass_block-block14 grass_block-block15 grass_block-block16 grass_block-block17 grass_block-block18 grass_block-block19 grass_block-block20 grass_block-block21 grass_block-block22 grass_block-block23 grass_block-block24 grass_block-block25 grass_block-block26 grass_block-block27 grass_block-block28 grass_block-block29 grass_block-block30 grass_block-block31 grass_block-block32 grass_block-block33 grass_block-block34 grass_block-block35 grass_block-block36 grass_block-block37 grass_block-block38 grass_block-block39 grass_block-block40 grass_block-block41 grass_block-block42 grass_block-block43 grass_block-block44 grass_block-block45 grass_block-block46 grass_block-block47 grass_block-block48 grass_block-block49 grass_block-block50 grass_block-block51 grass_block-block52 grass_block-block53 grass_block-block54 grass_block-block55 grass_block-block56 grass_block-block57 grass_block-block58 grass_block-block59 grass_block-block60 grass_block-block61 grass_block-block62 grass_block-block63 grass_block-block64 grass_block-block65 grass_block-block66 grass_block-block67 grass_block-block68 grass_block-block69 grass_block-block70 grass_block-block71 grass_block-block72 grass_block-block73 grass_block-block74 grass_block-block75 grass_block-block76 grass_block-block77 grass_block-block78 grass_block-block79 grass_block-block80 - grass_block-block
+	log-block0 - log-block
 	log0 - log
 	obsidian0 - obsidian
 )
@@ -825,6 +826,11 @@
 	(= (y grass_block-block80) 3)
 	(= (z grass_block-block80) 4)
 	(= (block-hits grass_block-block80) 0)
+	(block-present log-block0)
+	(= (x log-block0) 4)
+	(= (y log-block0) 5)
+	(= (z log-block0) -3)
+	(= (block-hits log-block0) 0)
 	(not (item-present log0))
 	(= (x log0) 0)
 	(= (y log0) 4)
