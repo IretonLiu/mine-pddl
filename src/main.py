@@ -4,6 +4,7 @@ import handlers.entities as handlers
 from helpers import execution_helper, json_helper
 from helpers.observation_helpers import *
 from helpers.video_helper import VideoHelper
+from helpers.prop_helper import create_int_pddl_types 
 import minedojo
 import numpy as np
 from pddl.actions import *
@@ -82,12 +83,12 @@ video_helper.save_image(obs["rgb"])
 items, agent = extract_entities(obs)
 blocks = extract_blocks(obs)
 inventory = extract_inventory(obs, items, agent)
-
-
 domain = Domain("first_world")
+int_types = create_int_pddl_types(["count", "position"], ranges)
+
 print(
     domain.to_pddl(
-        items, blocks, file_path="./problems/our/domain4.pddl", goal=world_json["goal"]
+        items, blocks, int_types, file_path="./problems/our/domain_prop.pddl", goal=world_json["goal"]
     )
 )
 
@@ -102,7 +103,7 @@ print(
         items,
         blocks,
         goal_json=world_json["goal"],
-        file_path="./problems/our/problem4.pddl",
+        file_path="./problems/our/problem_prop.pddl",
     )
 )
 

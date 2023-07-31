@@ -1,6 +1,7 @@
 from typing import Dict, Optional, Any
 import inspect
 import pddl.pddl_types.base_pddl_types as base_pddl_types
+import pddl.pddl_types.special_pddl_types as special_pddl_types
 import pddl.pddl_types.named_pddl_types as named_pddl_types
 from pddl.functions import InventoryFunction
 from collections import defaultdict
@@ -18,11 +19,13 @@ class Domain:
         self.actions = []
         self.requirements = []
 
-    def construct_types(self, item_types, block_types):
+    def construct_types(self, item_types, block_types, int_types: Dict[str, List[special_pddl_types.IntType]]):
         types_dict = defaultdict(list)
+        all_pddl_types = inspect.getmembers(base_pddl_types)
+        all_pddl_types.extend(inspect.getmembers(special_pddl_types))
         # print all the classes in the pddl.pddl_types.base_pddl_types module without classes from their own imports
-        for name, cls in inspect.getmembers(base_pddl_types):
-            if inspect.isclass(cls) and cls.__module__ == base_pddl_types.__name__:
+        for name, cls in all_pddl_types:
+            if inspect.isclass(cls) and (cls.__module__ == base_pddl_types.__name__ or cls.__module__ == special_pddl_types.__name__):
                 # get the parent class of the obj if it has one
                 parent = (
                     cls.__bases__[0] if cls.__bases__[0].__name__ != "object" else None
@@ -42,6 +45,11 @@ class Domain:
             types_dict[
                 getattr(base_pddl_types.DestructibleBlockType, "type_name")
             ].append(key + "-block")
+
+        # add the special types to the dictionary
+        for key in int_types:
+            types_dict["int"].append(key)            
+
 
         # convert types_dict to string
         types_str = "(:types\n"
@@ -66,7 +74,7 @@ class Domain:
         self,
         module_name,
         return_predicates: bool,
-        items: Optional[Dict[str, named_pddl_types.NamedItemType]] = None,
+        items: Optional[Dict[str, List[named_pddl_types.NamedItemType]]] = None,
     ):
         # return_predicates is true to return predicate strings and false to return function strings
         # items is only meaningful is we are processing functions
@@ -108,7 +116,7 @@ class Domain:
     def predicates_or_functions_helper(
         self,
         process_predicates: bool,
-        items: Optional[Dict[str, named_pddl_types.NamedItemType]] = None,
+        items: Optional[Dict[str, List[named_pddl_types.NamedItemType]]] = None,
     ):
         # process_predicates is true to process predicate strings and false to process function strings
         # items is only meaningful if we are processing functions (i.e. process_predicates is false)
@@ -132,13 +140,13 @@ class Domain:
     def construct_predicates(self):
         return self.predicates_or_functions_helper(True)
 
-    def construct_functions(self, items: Dict[str, named_pddl_types.NamedItemType]):
+    def construct_functions(self, items: Dict[str, List[named_pddl_types.NamedItemType]]):
         return self.predicates_or_functions_helper(False, items=items)
 
     def construct_actions(
         self,
-        items: Dict[str, named_pddl_types.NamedItemType],
-        blocks: Dict[str, named_pddl_types.NamedBlockType],
+        items: Dict[str, List[named_pddl_types.NamedItemType]],
+        blocks: Dict[str, List[named_pddl_types.NamedBlockType]],
         goal: Dict[str, List[Dict[str, Any]]],
     ):
         self.actions: List[Action] = [
@@ -165,14 +173,16 @@ class Domain:
 
     def to_pddl(
         self,
-        items: Dict[str, named_pddl_types.NamedItemType],
-        blocks: Dict[str, named_pddl_types.NamedBlockType],
+        items: Dict[str, List[named_pddl_types.NamedItemType]],
+        blocks: Dict[str, List[named_pddl_types.NamedBlockType]],
+        int_types: Dict[str, List[special_pddl_types.IntType]], 
         goal: Dict[str, List[Dict[str, Any]]],
         file_path: str,
     ):
+
         pddl = f"(define (domain {self.name})\n"
         pddl += "(:requirements :typing :fluents :negative-preconditions :universal-preconditions :existential-preconditions)\n"
-        pddl += self.construct_types(items, blocks) + "\n"
+        pddl += self.construct_types(items, blocks, int_types) + "\n"
         pddl += self.construct_predicates() + "\n"
         pddl += self.construct_functions(items) + "\n"
         pddl += self.construct_actions(items, blocks, goal) + "\n"
