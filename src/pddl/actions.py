@@ -615,10 +615,13 @@ class CheckGoal(Action):
 
     def construct_preconditions(self):
         blocks = self.goal["blocks"]
-        self.preconditions = ""
+        inventory = self.goal["inventory"]
+
+        block_pddl = ""
+        item_pddl = ""
 
         for block in blocks:
-            self.preconditions += pddl_exists(
+            block_pddl += pddl_exists(
                 {block["type"] + "-block": "?b"},
                 pddl_and(
                     pddl_equal(
@@ -632,7 +635,16 @@ class CheckGoal(Action):
                     ),
                 ),
             )
-            self.preconditions += "\n\t"
+            block_pddl += "\n\t"
+
+        for item in inventory:
+            # each item in the inventory needs to have at least the specified quantity
+            item_pddl += pddl_ge(
+                f"({InventoryFunction.var_name.format(item['name'])} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                str(item["quantity"]),
+            )
+
+        self.preconditions = pddl_and(block_pddl, item_pddl)
 
     def construct_effects(self):
         self.effects = pddl_and(

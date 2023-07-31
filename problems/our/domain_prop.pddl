@@ -9,18 +9,18 @@
 	dirt-block grass_block-block log-block - destructible-block
 )
 (:predicates
-	(goal-achieved ?ag - agent)
 	(agent-alive ?ag - agent)
+	(goal-achieved ?ag - agent)
 	(block-present ?b - block)
 	(item-present ?i - item)
 )
 (:functions
-	(y ?l - locatable )
-	(agent-num-obsidian ?ag - agent )
 	(x ?l - locatable )
-	(z ?l - locatable )
+	(y ?l - locatable )
 	(block-hits ?b - destructible-block )
+	(z ?l - locatable )
 	(agent-num-log ?ag - agent )
+	(agent-num-obsidian ?ag - agent )
 )
 
 (:action move-north
@@ -165,8 +165,8 @@
 
 (:action check-goal
 	:parameters (?ag - agent)
-	:precondition (exists (?b - log-block) (and (= (x ?b) 0) (= (y ?b) 4) (= (z ?b) -2)))
-	
+	:precondition (and (exists (?b - log-block) (and (= (x ?b) 0) (= (y ?b) 4) (= (z ?b) -2)))
+	 (>= (agent-num-log ?ag) 1))
 	:effect (and (goal-achieved ?ag))
 )
 
