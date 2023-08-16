@@ -1,5 +1,4 @@
-from .base_pddl_types import *
-
+from pddl.pddl_types.base_pddl_types import *
 
 # todo: formalise the convention of having self.name for both of these types
 class NamedItemType(ItemType):
@@ -21,3 +20,5 @@ class NamedBlockType(DestructibleBlockType):
         super().__init__()
         self.name = block_name
         self.name = self.name.replace(" ", "_")
+
+

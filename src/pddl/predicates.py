@@ -80,3 +80,37 @@ class GoalAchievedPredicate(Predicate):
 
     def to_precondition(self):
         return f"({self.var_name} ?g)"
+
+# for propositional logic
+class AreSequentialPredicate(Predicate):
+    var_name = "are-seq"
+
+    def __init__(self):
+        super().__init__()
+        self.arguments = {"?x1": TypeName.INTEGER_TYPE_NAME.value, "?x2": TypeName.INTEGER_TYPE_NAME.value}
+
+class NotEqualPredicate(Predicate):
+    var_name = "not-equal"
+
+    def __init__(self):
+        super().__init__()
+        self.arguments = {"?x1": TypeName.INTEGER_TYPE_NAME.value, "?x2": TypeName.INTEGER_TYPE_NAME.value}
+
+class AgentHasNItemsPredicate(Predicate):
+    var_name = "agent-has-n-{}"
+
+    def __init__(self, item_name: str):
+        super().__init__()
+        self.var_name = self.var_name.format(item_name)
+        self.arguments = {"?ag": TypeName.AGENT_TYPE_NAME.value, "?n": TypeName.COUNT_TYPE_NAME.value}
+
+class AtLocationPredicate(Predicate):
+    var_name = "at-{}"
+
+    def __init__(self, location: str):
+        super().__init__()
+        self.var_name = self.var_name.format(location)
+        location_arg = "?" + location
+        self.arguments = {"?l": TypeName.LOCATABLE_TYPE_NAME.value, location_arg: TypeName.POSITION_TYPE_NAME.value}
+
+
