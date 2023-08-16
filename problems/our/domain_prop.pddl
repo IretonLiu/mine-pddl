@@ -3,24 +3,24 @@
 (:types
 	locatable int - object
 	agent block item - locatable
-	count position - int
+	count position count position - int
 	bedrock destructible-block - block
 	log obsidian - item
 	dirt-block grass_block-block log-block - destructible-block
 )
 (:predicates
 	(agent-alive ?ag - agent)
-	(goal-achieved ?ag - agent)
 	(block-present ?b - block)
+	(goal-achieved ?ag - agent)
 	(item-present ?i - item)
 )
 (:functions
-	(x ?l - locatable )
+	(agent-num-obsidian ?ag - agent )
 	(y ?l - locatable )
+	(agent-num-log ?ag - agent )
 	(block-hits ?b - destructible-block )
 	(z ?l - locatable )
-	(agent-num-log ?ag - agent )
-	(agent-num-obsidian ?ag - agent )
+	(x ?l - locatable )
 )
 
 (:action move-north
