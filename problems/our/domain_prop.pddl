@@ -9,18 +9,23 @@
 	dirt-block grass_block-block log-block - destructible-block
 )
 (:predicates
-	(agent-alive ?ag - agent)
-	(block-present ?b - block)
 	(goal-achieved ?ag - agent)
+	(at-x ?l - locatable x - position)
 	(item-present ?i - item)
+	(agent-has-n-log ?ag - agent ?n - count)
+	(agent-alive ?ag - agent)
+	(at-z ?l - locatable z - position)
+	(at-y ?l - locatable y - position)
+	(agent-has-n-obsidian ?ag - agent ?n - count)
+	(block-present ?b - block)
 )
 (:functions
 	(agent-num-obsidian ?ag - agent )
+	(x ?l - locatable )
 	(y ?l - locatable )
 	(agent-num-log ?ag - agent )
-	(block-hits ?b - destructible-block )
 	(z ?l - locatable )
-	(x ?l - locatable )
+	(block-hits ?b - destructible-block )
 )
 
 (:action move-north

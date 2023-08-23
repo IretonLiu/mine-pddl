@@ -88,7 +88,7 @@ class Domain:
 
         output = []
         # loop through the classes
-        for name, cls in inspect.getmembers(module_name):
+        for _, cls in inspect.getmembers(module_name):
             # don't do recursive imports
             if inspect.isclass(cls) and cls.__module__ == module_name.__name__:
                 # create the object
@@ -98,7 +98,15 @@ class Domain:
                 # handle duplicate predicates/functions existing across different classes - this is done later
                 if return_predicates:
                     for predicate in obj.predicates.values():
-                        output.append(predicate.to_domain())
+                        if isinstance(predicate, AgentHasNItemsPredicate):
+                            if items is None:
+                                raise ValueError(
+                                    "Must pass items if there is an AgentHasNItemsPredicate"
+                                )
+                            for item in items:
+                                output.append(predicate.to_domain(item))
+                        else:
+                            output.append(predicate.to_domain())
                 else:
                     for function in obj.functions.values():
                         # if the function is an Inventory, pass the items
@@ -144,8 +152,8 @@ class Domain:
 
         return output
 
-    def construct_predicates(self):
-        return self.predicates_or_functions_helper(True)
+    def construct_predicates(self, items: Dict[str, List[named_pddl_types.NamedItemType]]):
+        return self.predicates_or_functions_helper(True, items=items)
 
     def construct_functions(
         self, items: Dict[str, List[named_pddl_types.NamedItemType]]
@@ -194,7 +202,7 @@ class Domain:
         pddl = f"(define (domain {self.name})\n"
         pddl += "(:requirements :typing :fluents :negative-preconditions :universal-preconditions :existential-preconditions)\n"
         pddl += self.construct_types(items, blocks, int_types) + "\n"
-        pddl += self.construct_predicates() + "\n"
+        pddl += self.construct_predicates(items) + "\n"
         pddl += self.construct_functions(items) + "\n"
         pddl += self.construct_actions(items, blocks, goal) + "\n"
         pddl += ")"

@@ -3,6 +3,7 @@ from pddl.pddl_types.types_names import TypeName
 from pddl.functions import *
 from pddl.predicates import *
 
+
 # TODO: check if items despawn + how to turn off
 # TODO: pass in name instead of hardcoding
 name_dict = {"object": "object"}
@@ -30,6 +31,9 @@ class LocatableType(ObjectType):
         self.functions[YPositionFunction] = YPositionFunction()
         self.functions[ZPositionFunction] = ZPositionFunction()
 
+        self.predicates[AtXLocationPredicate] = AtXLocationPredicate()
+        self.predicates[AtYLocationPredicate] = AtYLocationPredicate()
+        self.predicates[AtZLocationPredicate] = AtZLocationPredicate()
         # self.functions.append(PositionFunction(self, LocatableType.type_name))
 
 
@@ -41,8 +45,10 @@ class AgentType(LocatableType):
         self.var_name = "ag"
         self.name = "steve"
         self.functions[InventoryFunction] = InventoryFunction()
-        self.predicates[AgentAlivePredicate] = AgentAlivePredicate()
+        self.predicates[AgentAlivePredicate] = AgentAlivePredicate() 
         self.predicates[GoalAchievedPredicate] = GoalAchievedPredicate()
+        self.predicates[AgentHasNItemsPredicate] = AgentHasNItemsPredicate()
+
 
 
 class ItemType(LocatableType):

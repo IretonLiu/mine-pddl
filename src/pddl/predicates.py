@@ -99,18 +99,41 @@ class NotEqualPredicate(Predicate):
 class AgentHasNItemsPredicate(Predicate):
     var_name = "agent-has-n-{}"
 
-    def __init__(self, item_name: str):
+    def __init__(self):
         super().__init__()
-        self.var_name = self.var_name.format(item_name)
         self.arguments = {"?ag": TypeName.AGENT_TYPE_NAME.value, "?n": TypeName.COUNT_TYPE_NAME.value}
+    
+    def to_domain(self, item_type: str):
+        full_var_name = self.var_name.format(item_type)
+        out = f"({full_var_name}"
+        for arg in self.arguments:
+            out += f" {arg} - {self.arguments[arg]}"
+        out += ")"
+        return out
+
 
 class AtLocationPredicate(Predicate):
-    var_name = "at-{}"
-
-    def __init__(self, location: str):
+    def __init__(self):
         super().__init__()
-        self.var_name = self.var_name.format(location)
-        location_arg = "?" + location
-        self.arguments = {"?l": TypeName.LOCATABLE_TYPE_NAME.value, location_arg: TypeName.POSITION_TYPE_NAME.value}
+        self.arguments = {"?l": TypeName.LOCATABLE_TYPE_NAME.value}
+
+
+class AtXLocationPredicate(AtLocationPredicate):
+    var_name = "at-x"
+    def __init__(self):
+        super().__init__()
+        self.arguments['x'] = TypeName.POSITION_TYPE_NAME.value
+
+class AtYLocationPredicate(AtLocationPredicate):
+    var_name = "at-y"
+    def __init__(self):
+        super().__init__()
+        self.arguments['y'] = TypeName.POSITION_TYPE_NAME.value
+
+class AtZLocationPredicate(AtLocationPredicate):
+    var_name = "at-z"
+    def __init__(self):
+        super().__init__()
+        self.arguments['z'] = TypeName.POSITION_TYPE_NAME.value
 
 
