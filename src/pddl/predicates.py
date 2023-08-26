@@ -116,7 +116,7 @@ class AtLocationPredicate(Predicate):
     def __init__(self):
         super().__init__()
         self.arguments = {"?l": TypeName.LOCATABLE_TYPE_NAME.value}
-
+    
 
 class AtXLocationPredicate(AtLocationPredicate):
     var_name = "at-x"
@@ -124,11 +124,21 @@ class AtXLocationPredicate(AtLocationPredicate):
         super().__init__()
         self.arguments['?x'] = TypeName.POSITION_TYPE_NAME.value
 
+    @staticmethod
+    def to_precondition(first_arg: str, second_arg: str):
+        return f"(at-x {first_arg} {second_arg})"
+
+
+
 class AtYLocationPredicate(AtLocationPredicate):
     var_name = "at-y"
     def __init__(self):
         super().__init__()
         self.arguments['?y'] = TypeName.POSITION_TYPE_NAME.value
+
+    @staticmethod
+    def to_precondition(first_arg: str, second_arg: str):
+        return f"(at-y {first_arg} {second_arg})"
 
 class AtZLocationPredicate(AtLocationPredicate):
     var_name = "at-z"
@@ -136,4 +146,7 @@ class AtZLocationPredicate(AtLocationPredicate):
         super().__init__()
         self.arguments['?z'] = TypeName.POSITION_TYPE_NAME.value
 
+    @staticmethod
+    def to_precondition(first_arg: str, second_arg: str):
+        return f"(at-z {first_arg} {second_arg})"
 
