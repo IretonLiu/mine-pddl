@@ -122,18 +122,18 @@ class AtXLocationPredicate(AtLocationPredicate):
     var_name = "at-x"
     def __init__(self):
         super().__init__()
-        self.arguments['x'] = TypeName.POSITION_TYPE_NAME.value
+        self.arguments['?x'] = TypeName.POSITION_TYPE_NAME.value
 
 class AtYLocationPredicate(AtLocationPredicate):
     var_name = "at-y"
     def __init__(self):
         super().__init__()
-        self.arguments['y'] = TypeName.POSITION_TYPE_NAME.value
+        self.arguments['?y'] = TypeName.POSITION_TYPE_NAME.value
 
 class AtZLocationPredicate(AtLocationPredicate):
     var_name = "at-z"
     def __init__(self):
         super().__init__()
-        self.arguments['z'] = TypeName.POSITION_TYPE_NAME.value
+        self.arguments['?z'] = TypeName.POSITION_TYPE_NAME.value
 
 

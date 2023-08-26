@@ -3,29 +3,31 @@
 (:types
 	locatable int - object
 	agent block item - locatable
-	count position count position - int
+	count position - int
 	bedrock destructible-block - block
 	log obsidian - item
 	dirt-block grass_block-block log-block - destructible-block
 )
 (:predicates
-	(goal-achieved ?ag - agent)
-	(at-x ?l - locatable x - position)
-	(item-present ?i - item)
-	(agent-has-n-log ?ag - agent ?n - count)
-	(agent-alive ?ag - agent)
-	(at-z ?l - locatable z - position)
-	(at-y ?l - locatable y - position)
-	(agent-has-n-obsidian ?ag - agent ?n - count)
 	(block-present ?b - block)
+	(goal-achieved ?ag - agent)
+	(agent-has-n-log ?ag - agent ?n - count)
+	(at-y ?l - locatable ?y - position)
+	(item-present ?i - item)
+	(at-z ?l - locatable ?z - position)
+	(agent-has-n-obsidian ?ag - agent ?n - count)
+	(are-seq ?x1 - int ?x2 - int)
+	(at-x ?l - locatable ?x - position)
+	(not-equal ?x1 - int ?x2 - int)
+	(agent-alive ?ag - agent)
 )
 (:functions
-	(agent-num-obsidian ?ag - agent )
 	(x ?l - locatable )
-	(y ?l - locatable )
-	(agent-num-log ?ag - agent )
+	(agent-num-obsidian ?ag - agent )
 	(z ?l - locatable )
+	(y ?l - locatable )
 	(block-hits ?b - destructible-block )
+	(agent-num-log ?ag - agent )
 )
 
 (:action move-north

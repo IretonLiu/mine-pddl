@@ -23,7 +23,6 @@ class Domain:
         self,
         item_types,
         block_types,
-        int_types: Dict[str, List[special_pddl_types.IntType]],
     ):
         types_dict = defaultdict(list)
         all_pddl_types = inspect.getmembers(base_pddl_types)
@@ -54,10 +53,6 @@ class Domain:
                 getattr(base_pddl_types.DestructibleBlockType, "type_name")
             ].append(key + "-block")
 
-        # add the special types to the dictionary
-        for key in int_types:
-            types_dict["int"].append(key)
-
         # convert types_dict to string
         types_str = "(:types\n"
 
@@ -79,7 +74,7 @@ class Domain:
     # loop through all the classes, instantiate the object and return a list of strings
     def get_pddl_strings(
         self,
-        module_name,
+        modules,
         return_predicates: bool,
         items: Optional[Dict[str, List[named_pddl_types.NamedItemType]]] = None,
     ):
@@ -87,10 +82,14 @@ class Domain:
         # items is only meaningful is we are processing functions
 
         output = []
+        all_classes = []
+        for module in modules:
+            all_classes.extend(inspect.getmembers(module))
+        module_names = [module.__name__ for module in modules]
         # loop through the classes
-        for _, cls in inspect.getmembers(module_name):
+        for _, cls in all_classes:
             # don't do recursive imports
-            if inspect.isclass(cls) and cls.__module__ == module_name.__name__:
+            if inspect.isclass(cls) and cls.__module__ in module_names:
                 # create the object
                 obj = cls()
 
@@ -137,9 +136,9 @@ class Domain:
         # items is only meaningful if we are processing functions (i.e. process_predicates is false)
 
         # get the pddl representation for the types - is a list
-        pddl_strings = self.get_pddl_strings(base_pddl_types, process_predicates, items)
+        pddl_strings = self.get_pddl_strings([base_pddl_types, special_pddl_types], process_predicates, items)
         pddl_strings.extend(
-            self.get_pddl_strings(named_pddl_types, process_predicates, items)
+            self.get_pddl_strings([named_pddl_types], process_predicates, items)
         )
 
         # use a set to remove duplicate occurrences (e.g. if there is a common parent)
@@ -195,13 +194,12 @@ class Domain:
         self,
         items: Dict[str, List[named_pddl_types.NamedItemType]],
         blocks: Dict[str, List[named_pddl_types.NamedBlockType]],
-        int_types: Dict[str, List[special_pddl_types.IntType]],
         goal: Dict[str, List[Dict[str, Any]]],
         file_path: str,
     ):
         pddl = f"(define (domain {self.name})\n"
         pddl += "(:requirements :typing :fluents :negative-preconditions :universal-preconditions :existential-preconditions)\n"
-        pddl += self.construct_types(items, blocks, int_types) + "\n"
+        pddl += self.construct_types(items, blocks) + "\n"
         pddl += self.construct_predicates(items) + "\n"
         pddl += self.construct_functions(items) + "\n"
         pddl += self.construct_actions(items, blocks, goal) + "\n"

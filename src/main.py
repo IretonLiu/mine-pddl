@@ -84,11 +84,11 @@ items, agent = extract_entities(obs)
 blocks = extract_blocks(obs)
 inventory = extract_inventory(obs, items, agent)
 domain = Domain("first_world")
-int_types = create_int_pddl_types(["count", "position"], ranges)
+# int_types = create_int_pddl_types(["count", "position"], ranges)
 
 print(
     domain.to_pddl(
-        items, blocks, int_types, file_path="./problems/our/domain_prop.pddl", goal=world_json["goal"]
+        items, blocks, file_path="./problems/our/domain_prop.pddl", goal=world_json["goal"]
     )
 )
 
@@ -158,6 +158,7 @@ first = first if first != -1 else len(video_name)
 video_helper.generate_video(video_name[:first] + ".mp4")
 print("Cleaning up...")
 video_helper.clean_up()
+
 # file = open("obs.pkl", "rb")
 # obs = pickle.load(file)
 # file.close()
