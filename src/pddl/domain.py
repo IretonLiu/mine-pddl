@@ -1,11 +1,14 @@
-from typing import Dict, Optional, Any
+from typing import Dict, List, Optional, Any
 import inspect
 import pddl.pddl_types.base_pddl_types as base_pddl_types
 import pddl.pddl_types.special_pddl_types as special_pddl_types
 import pddl.pddl_types.named_pddl_types as named_pddl_types
 from pddl.functions import InventoryFunction
 from collections import defaultdict
-from pddl.actions import *
+
+# from pddl.actions.actions_num import *
+from pddl.predicates import AgentHasNItemsPredicate
+from pddl.actions.actions_prop import Move
 
 
 class Domain:
@@ -136,7 +139,9 @@ class Domain:
         # items is only meaningful if we are processing functions (i.e. process_predicates is false)
 
         # get the pddl representation for the types - is a list
-        pddl_strings = self.get_pddl_strings([base_pddl_types, special_pddl_types], process_predicates, items)
+        pddl_strings = self.get_pddl_strings(
+            [base_pddl_types, special_pddl_types], process_predicates, items
+        )
         pddl_strings.extend(
             self.get_pddl_strings([named_pddl_types], process_predicates, items)
         )
@@ -151,7 +156,9 @@ class Domain:
 
         return output
 
-    def construct_predicates(self, items: Dict[str, List[named_pddl_types.NamedItemType]]):
+    def construct_predicates(
+        self, items: Dict[str, List[named_pddl_types.NamedItemType]]
+    ):
         return self.predicates_or_functions_helper(True, items=items)
 
     def construct_functions(
@@ -170,20 +177,17 @@ class Domain:
         for dir in directions:
             self.actions.append(Move(dir))
 
-        for item in items:
-            for dir in directions:
-                self.actions.append(MoveAndPickup(dir, item))
+        # for item in items:
+        #     for dir in directions:
+        #         self.actions.append(MoveAndPickup(dir, item))
 
-            # self.actions.append(Pickup(item))
-            # self.actions.append(Drop(item))
+        # for block in blocks:
+        #     self.actions.append(Break(block))
+        #     self.actions.append(Place(block))
 
-        for block in blocks:
-            self.actions.append(Break(block))
-            self.actions.append(Place(block))
-
-        self.actions.append(JumpUp())
-        self.actions.append(JumpDown())
-        self.actions.append(CheckGoal(goal))
+        # self.actions.append(JumpUp())
+        # self.actions.append(JumpDown())
+        # self.actions.append(CheckGoal(goal))
 
         action_str = ""
         for action in self.actions:

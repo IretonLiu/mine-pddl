@@ -1,10 +1,12 @@
 from typing import List
 from pddl.pddl_types.types_names import TypeName
+
 # TODO : add more ?
 
 
 class Predicate:
     var_name = "predicate"
+
     def __init__(self):
         # self.parameter_name = object.name
         # self.object_type = object.type_name
@@ -24,8 +26,7 @@ class Predicate:
 
     # TODO: add support for multiple parameters, have no idea how to do that
     def to_precondition(self):
-        raise NotImplementedError(
-            "to_precondition not implemented for this predicate")
+        raise NotImplementedError("to_precondition not implemented for this predicate")
 
     # todo: handle multiple parameters
 
@@ -56,6 +57,7 @@ class BlockPresentPredicate(Predicate):
         super().__init__()
         self.arguments = {"?b": TypeName.BLOCK_TYPE_NAME.value}
 
+    # todo: should probably make this a static method - won't do it now because I don't what it will break
     def to_precondition(self):
         return f"({self.var_name} ?b)"
 
@@ -70,6 +72,7 @@ class AgentAlivePredicate(Predicate):
     def to_precondition(self):
         return f"({self.var_name} ?ag)"
 
+
 class GoalAchievedPredicate(Predicate):
     var_name = "goal-achieved"
 
@@ -81,28 +84,44 @@ class GoalAchievedPredicate(Predicate):
     def to_precondition(self):
         return f"({self.var_name} ?g)"
 
+
 # for propositional logic
 class AreSequentialPredicate(Predicate):
     var_name = "are-seq"
 
     def __init__(self):
         super().__init__()
-        self.arguments = {"?x1": TypeName.INTEGER_TYPE_NAME.value, "?x2": TypeName.INTEGER_TYPE_NAME.value}
+        self.arguments = {
+            "?x1": TypeName.INTEGER_TYPE_NAME.value,
+            "?x2": TypeName.INTEGER_TYPE_NAME.value,
+        }
+
+    @staticmethod
+    def to_precondition(x1: str, x2: str):
+        return f"({AreSequentialPredicate.var_name} {x1} {x2})"
+
 
 class NotEqualPredicate(Predicate):
     var_name = "not-equal"
 
     def __init__(self):
         super().__init__()
-        self.arguments = {"?x1": TypeName.INTEGER_TYPE_NAME.value, "?x2": TypeName.INTEGER_TYPE_NAME.value}
+        self.arguments = {
+            "?x1": TypeName.INTEGER_TYPE_NAME.value,
+            "?x2": TypeName.INTEGER_TYPE_NAME.value,
+        }
+
 
 class AgentHasNItemsPredicate(Predicate):
     var_name = "agent-has-n-{}"
 
     def __init__(self):
         super().__init__()
-        self.arguments = {"?ag": TypeName.AGENT_TYPE_NAME.value, "?n": TypeName.COUNT_TYPE_NAME.value}
-    
+        self.arguments = {
+            "?ag": TypeName.AGENT_TYPE_NAME.value,
+            "?n": TypeName.COUNT_TYPE_NAME.value,
+        }
+
     def to_domain(self, item_type: str):
         full_var_name = self.var_name.format(item_type)
         out = f"({full_var_name}"
@@ -116,37 +135,39 @@ class AtLocationPredicate(Predicate):
     def __init__(self):
         super().__init__()
         self.arguments = {"?l": TypeName.LOCATABLE_TYPE_NAME.value}
-    
+
 
 class AtXLocationPredicate(AtLocationPredicate):
     var_name = "at-x"
+
     def __init__(self):
         super().__init__()
-        self.arguments['?x'] = TypeName.POSITION_TYPE_NAME.value
+        self.arguments["?x"] = TypeName.POSITION_TYPE_NAME.value
 
     @staticmethod
-    def to_precondition(first_arg: str, second_arg: str):
-        return f"(at-x {first_arg} {second_arg})"
-
+    def to_precondition(object: str, location: str):
+        return f"({AtXLocationPredicate.var_name} {object} {location})"
 
 
 class AtYLocationPredicate(AtLocationPredicate):
     var_name = "at-y"
+
     def __init__(self):
         super().__init__()
-        self.arguments['?y'] = TypeName.POSITION_TYPE_NAME.value
+        self.arguments["?y"] = TypeName.POSITION_TYPE_NAME.value
 
     @staticmethod
-    def to_precondition(first_arg: str, second_arg: str):
-        return f"(at-y {first_arg} {second_arg})"
+    def to_precondition(object: str, location: str):
+        return f"({AtYLocationPredicate.var_name} {object} {location})"
+
 
 class AtZLocationPredicate(AtLocationPredicate):
     var_name = "at-z"
+
     def __init__(self):
         super().__init__()
-        self.arguments['?z'] = TypeName.POSITION_TYPE_NAME.value
+        self.arguments["?z"] = TypeName.POSITION_TYPE_NAME.value
 
     @staticmethod
-    def to_precondition(first_arg: str, second_arg: str):
-        return f"(at-z {first_arg} {second_arg})"
-
+    def to_precondition(object: str, location: str):
+        return f"({AtZLocationPredicate.var_name} {object} {location})"
