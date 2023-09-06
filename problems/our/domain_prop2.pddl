@@ -9,24 +9,24 @@
 	dirt-block grass_block-block log-block - destructible-block
 )
 (:predicates
-	(agent-alive ?ag - agent)
-	(agent-has-n-log ?ag - agent ?n - count)
+	(not-equal ?x1 - int ?x2 - int)
 	(at-x ?l - locatable ?x - position)
+	(agent-has-n-log ?ag - agent ?n - count)
+	(block-present ?b - block)
+	(agent-has-n-obsidian ?ag - agent ?n - count)
+	(at-z ?l - locatable ?z - position)
+	(goal-achieved ?ag - agent)
 	(at-y ?l - locatable ?y - position)
 	(item-present ?i - item)
 	(are-seq ?x1 - int ?x2 - int)
-	(at-z ?l - locatable ?z - position)
-	(not-equal ?x1 - int ?x2 - int)
-	(agent-has-n-obsidian ?ag - agent ?n - count)
-	(block-present ?b - block)
-	(goal-achieved ?ag - agent)
+	(agent-alive ?ag - agent)
 )
 (:functions
-	(x ?l - locatable )
 	(z ?l - locatable )
+	(block-hits ?b - destructible-block )
+	(x ?l - locatable )
 	(y ?l - locatable )
 	(agent-num-log ?ag - agent )
-	(block-hits ?b - destructible-block )
 	(agent-num-obsidian ?ag - agent )
 )
 
@@ -91,6 +91,44 @@
 ) (at-z ?ag ?z_end)
  (not (at-y ?ag ?y_down)
 ) (at-y ?ag ?y_up)
+)
+)
+
+
+(:action jumpdown-north
+	:parameters (?ag - agent ?x - position ?y_up - position ?y_down - position ?y_2_down - position ?y_3_down - position ?z_start - position ?z_end - position)
+	:precondition (and 
+(agent-alive ?ag)
+ (at-x ?ag ?x)
+ (at-y ?ag ?y_down)
+ (at-z ?ag ?z_start)
+ (are-seq ?z_end ?z_start)
+ (are-seq ?y_3_down ?y_2_down)
+ (are-seq ?y_2_down ?y_down)
+ (are-seq ?y_down ?y_up)
+ (not (exists (?b - block) (and 
+(block-present ?b)
+ (at-x ?b ?x)
+ (or (at-y ?b ?y_up)
+ (at-y ?b ?y_down)
+ (at-y ?b ?y_2_down)
+) (at-z ?b ?z_end)
+))) (exists (?b - block) (and 
+(block-present ?b)
+ (at-x ?b ?x)
+ (at-y ?b ?y_3_down)
+ (at-z ?b ?z_end)
+)) (not (exists (?i - item) (and 
+(item-present ?i)
+ (at-x ?i ?x)
+ (or (at-y ?i ?y_2_down)
+) (at-z ?i ?z_end)
+))))
+	:effect (and 
+(not (at-z ?ag ?z_start)
+) (at-z ?ag ?z_end)
+ (not (at-y ?ag ?y_down)
+) (at-y ?ag ?y_2_down)
 )
 )
 
@@ -160,6 +198,44 @@
 )
 
 
+(:action jumpdown-south
+	:parameters (?ag - agent ?x - position ?y_up - position ?y_down - position ?y_2_down - position ?y_3_down - position ?z_start - position ?z_end - position)
+	:precondition (and 
+(agent-alive ?ag)
+ (at-x ?ag ?x)
+ (at-y ?ag ?y_down)
+ (at-z ?ag ?z_start)
+ (are-seq ?z_start ?z_end)
+ (are-seq ?y_3_down ?y_2_down)
+ (are-seq ?y_2_down ?y_down)
+ (are-seq ?y_down ?y_up)
+ (not (exists (?b - block) (and 
+(block-present ?b)
+ (at-x ?b ?x)
+ (or (at-y ?b ?y_up)
+ (at-y ?b ?y_down)
+ (at-y ?b ?y_2_down)
+) (at-z ?b ?z_end)
+))) (exists (?b - block) (and 
+(block-present ?b)
+ (at-x ?b ?x)
+ (at-y ?b ?y_3_down)
+ (at-z ?b ?z_end)
+)) (not (exists (?i - item) (and 
+(item-present ?i)
+ (at-x ?i ?x)
+ (or (at-y ?i ?y_2_down)
+) (at-z ?i ?z_end)
+))))
+	:effect (and 
+(not (at-z ?ag ?z_start)
+) (at-z ?ag ?z_end)
+ (not (at-y ?ag ?y_down)
+) (at-y ?ag ?y_2_down)
+)
+)
+
+
 (:action move-east
 	:parameters (?ag - agent ?z - position ?x_start - position ?x_end - position ?y_up - position ?y_down - position)
 	:precondition (and 
@@ -225,6 +301,44 @@
 )
 
 
+(:action jumpdown-east
+	:parameters (?ag - agent ?z - position ?x_start - position ?x_end - position ?y_up - position ?y_down - position ?y_2_down - position ?y_3_down - position)
+	:precondition (and 
+(agent-alive ?ag)
+ (at-x ?ag ?x_start)
+ (at-y ?ag ?y_down)
+ (at-z ?ag ?z)
+ (are-seq ?x_start ?x_end)
+ (are-seq ?y_3_down ?y_2_down)
+ (are-seq ?y_2_down ?y_down)
+ (are-seq ?y_down ?y_up)
+ (not (exists (?b - block) (and 
+(block-present ?b)
+ (at-x ?b ?x_end)
+ (or (at-y ?b ?y_up)
+ (at-y ?b ?y_down)
+ (at-y ?b ?y_2_down)
+) (at-z ?b ?z)
+))) (exists (?b - block) (and 
+(block-present ?b)
+ (at-x ?b ?x_end)
+ (at-y ?b ?y_3_down)
+ (at-z ?b ?z)
+)) (not (exists (?i - item) (and 
+(item-present ?i)
+ (at-x ?i ?x_end)
+ (or (at-y ?i ?y_2_down)
+) (at-z ?i ?z)
+))))
+	:effect (and 
+(not (at-x ?ag ?x_start)
+) (at-x ?ag ?x_end)
+ (not (at-y ?ag ?y_down)
+) (at-y ?ag ?y_2_down)
+)
+)
+
+
 (:action move-west
 	:parameters (?ag - agent ?z - position ?x_start - position ?x_end - position ?y_up - position ?y_down - position)
 	:precondition (and 
@@ -286,6 +400,44 @@
 ) (at-x ?ag ?x_end)
  (not (at-y ?ag ?y_down)
 ) (at-y ?ag ?y_up)
+)
+)
+
+
+(:action jumpdown-west
+	:parameters (?ag - agent ?z - position ?x_start - position ?x_end - position ?y_up - position ?y_down - position ?y_2_down - position ?y_3_down - position)
+	:precondition (and 
+(agent-alive ?ag)
+ (at-x ?ag ?x_start)
+ (at-y ?ag ?y_down)
+ (at-z ?ag ?z)
+ (are-seq ?x_end ?x_start)
+ (are-seq ?y_3_down ?y_2_down)
+ (are-seq ?y_2_down ?y_down)
+ (are-seq ?y_down ?y_up)
+ (not (exists (?b - block) (and 
+(block-present ?b)
+ (at-x ?b ?x_end)
+ (or (at-y ?b ?y_up)
+ (at-y ?b ?y_down)
+ (at-y ?b ?y_2_down)
+) (at-z ?b ?z)
+))) (exists (?b - block) (and 
+(block-present ?b)
+ (at-x ?b ?x_end)
+ (at-y ?b ?y_3_down)
+ (at-z ?b ?z)
+)) (not (exists (?i - item) (and 
+(item-present ?i)
+ (at-x ?i ?x_end)
+ (or (at-y ?i ?y_2_down)
+) (at-z ?i ?z)
+))))
+	:effect (and 
+(not (at-x ?ag ?x_start)
+) (at-x ?ag ?x_end)
+ (not (at-y ?ag ?y_down)
+) (at-y ?ag ?y_2_down)
 )
 )
 

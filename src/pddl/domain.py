@@ -177,6 +177,8 @@ class Domain:
         for dir in directions:
             self.actions.append(Move(dir))
             self.actions.append(JumpUp(dir))
+            self.actions.append(JumpDown(dir))               
+
 
         for item in items:
             for dir in directions:
