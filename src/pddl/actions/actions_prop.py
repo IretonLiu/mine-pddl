@@ -1,12 +1,12 @@
 from typing import List, Optional
 
-from numpy import who
 from pddl.pddl_types.types_names import TypeName
 from pddl.pddl_types.named_pddl_types import NamedBlockType, NamedItemType
 from pddl.operators import *
 from pddl.predicates import *
 from pddl.functions import *
 
+#TODO: add direction that we are facing as a parameter to the move action 
 
 class Action:
     def __init__(self) -> None:
@@ -120,7 +120,7 @@ class Move(Action):
         block_var = "?b"
         item_var = "?i"
         self.preconditions = pddl_and(
-            f"({AgentAlivePredicate.var_name} {self.param_name['Agent']})",
+            f"({AgentAlivePredicate.var_name} {self.param_name['Agent']})\n",
             AtXLocationPredicate.to_precondition(self.param_name["Agent"], x_start),
             AtYLocationPredicate.to_precondition(
                 self.param_name["Agent"],
@@ -130,11 +130,12 @@ class Move(Action):
             ),
             AtZLocationPredicate.to_precondition(self.param_name["Agent"], z_start),
             sequential_predicate,
+            AreSequentialPredicate.to_precondition(self.param_name["YPositionDown"], self.param_name["YPositionUp"]),
             pddl_not(
                 pddl_exists(
                     {TypeName.BLOCK_TYPE_NAME.value: block_var},
                     pddl_and(
-                        f"({BlockPresentPredicate.var_name} {block_var})",
+                        f"({BlockPresentPredicate.var_name} {block_var})\n",
                         AtXLocationPredicate.to_precondition(block_var, x_end),
                         # here we check that there is no block at the level of the agent (bottom) or the agent's eyeline (top)
                         pddl_or(
@@ -153,7 +154,7 @@ class Move(Action):
                 pddl_exists(
                     {TypeName.ITEM_TYPE_NAME.value: item_var},
                     pddl_and(
-                        f"({ItemPresentPredicate.var_name} {item_var})",
+                        f"({ItemPresentPredicate.var_name} {item_var})\n",
                         AtXLocationPredicate.to_precondition(item_var, x_end),
                         # here we only check that there is no item at the level of the agent (bottom) since items cannot float
                         # they would require a block to be placed beneath it, which is handled by the previous precondition
@@ -194,163 +195,186 @@ class Move(Action):
         return out
 
 
-class Pickup(Action):
-    def __init__(self, item: str) -> None:
-        super().__init__()
-        self.item = item
-        self.action_name = "pickup-" + item
-        self.parameters = {TypeName.AGENT_TYPE_NAME.value: "?ag", item: "?i"}
-
-    def construct_preconditions(self):
-        self.preconditions = pddl_and(
-            f"({ItemPresentPredicate.var_name} {self.parameters[self.item]})",
-            pddl_equal(
-                f"({XPositionFunction.var_name} {self.parameters[self.item]})",
-                f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-            ),
-            pddl_equal(
-                f"({YPositionFunction.var_name} {self.parameters[self.item]})",
-                f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-            ),
-            pddl_equal(
-                f"({ZPositionFunction.var_name} {self.parameters[self.item]})",
-                f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-            ),
-        )
-
-    def construct_effects(self):
-        self.effects = pddl_and(
-            pddl_increase(
-                f"({InventoryFunction.var_name.format(self.item)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                "1",
-            ),
-            pddl_not(f"({ItemPresentPredicate.var_name} {self.parameters[self.item]})"),
-        )
-
-    def to_pddl(self):
-        self.construct_preconditions()
-        self.construct_effects()
-        out = f"(:action {self.action_name}\n"
-        out += f"\t:parameters ({' '.join([f'{v} - {k}' for k, v in self.parameters.items()])})\n"
-        out += f"\t:precondition {self.preconditions}\n"
-        out += f"\t:effect {self.effects}\n"
-        out += ")\n"
-        return out
-
-
 class MoveAndPickup(Action):
     def __init__(self, dir, item) -> None:
         super().__init__()
         self.dir = dir
         self.item = item
         self.action_name = f"move-{dir}-and-pickup-{item}"
-        self.parameters = {TypeName.AGENT_TYPE_NAME.value: "?ag", item: "?i"}
+
+        self.param_name = {
+            "Agent": "?ag",
+            "Item": "?i",
+            "XPosition": "?x",
+            "ZPosition": "?z",
+            "XPositionStart": "?x_start",
+            "XPositionEnd": "?x_end",
+            "YPositionUp": "?y_up",
+            "YPositionDown": "?y_down",
+            "ZPositionStart": "?z_start",
+            "ZPositionEnd": "?z_end",
+            "NStart": "?n_start",
+            "NEnd": "?n_end",
+
+        }
+
+        self.param_types = { "Agent": TypeName.AGENT_TYPE_NAME.value,
+            "Item": self.item, 
+            "XPosition": TypeName.POSITION_TYPE_NAME.value,
+            "ZPosition": TypeName.POSITION_TYPE_NAME.value,
+            "XPositionStart": TypeName.POSITION_TYPE_NAME.value,
+            "XPositionEnd": TypeName.POSITION_TYPE_NAME.value,
+            "YPositionUp": TypeName.POSITION_TYPE_NAME.value,
+            "YPositionDown": TypeName.POSITION_TYPE_NAME.value,
+            "ZPositionStart": TypeName.POSITION_TYPE_NAME.value,
+            "ZPositionEnd": TypeName.POSITION_TYPE_NAME.value,
+            "NStart": TypeName.COUNT_TYPE_NAME.value,
+            "NEnd": TypeName.COUNT_TYPE_NAME.value,
+        }
+
+    def construct_parameters(self):
+        # need this generator since extra params have been added to the dicts in order to be more general
+        move_east_west = self.dir == "east" or self.dir == "west"
+        self.parameters = ""
+
+        # loop through all the parameters and add them to the parameters dict if they are used
+        for key in self.param_name.keys():
+            # if we move east or west, we use x_start and x_end, but only z
+            # if we move north or south, we use z_start and z_end, but only x
+
+            # if we are not dealing with x or z positions, then process as normal
+            if not ("XPosition" in key or "ZPosition" in key):
+                self.parameters += f"{self.param_name[key]} - {self.param_types[key]} "
+                continue
+
+            if key == "XPositionStart" or key == "XPositionEnd" or key == "ZPosition":
+                if move_east_west:
+                    self.parameters += (
+                        f"{self.param_name[key]} - {self.param_types[key]} "
+                    )
+                else:
+                    continue
+            elif key == "XPosition" or key == "ZPositionStart" or key == "ZPositionEnd":
+                if not move_east_west:
+                    self.parameters += (
+                        f"{self.param_name[key]} - {self.param_types[key]} "
+                    )
+                else:
+                    continue
+
+        self.parameters = self.parameters.strip()
 
     def construct_preconditions(self):
-        directions = {"north": "-1", "south": "1", "east": "1", "west": "-1"}
-        if self.dir == "east" or self.dir == "west":
-            x_equality = lambda x: pddl_equal(
-                f"({XPositionFunction.var_name} ?{x})",
-                pddl_add(
-                    f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                    directions[self.dir],
-                ),
+        # depending on the direction of travel, we need to check that the end location is not occupied by a block/item
+        # we will set the x_start, x_end, z_start, and z_end variables to hold the relevant arg names so we can just look them up later
+        move_east_west = self.dir == "east" or self.dir == "west"
+        direction_should_increase = self.dir == "south" or self.dir == "east"
+        if move_east_west:
+            x_start = self.param_name["XPositionStart"]
+            x_end = self.param_name["XPositionEnd"]
+        else:
+            x_start = self.param_name["XPosition"]
+            x_end = self.param_name["XPosition"]
+
+        if not move_east_west:
+            z_start = self.param_name["ZPositionStart"]
+            z_end = self.param_name["ZPositionEnd"]
+        else:
+            z_start = self.param_name["ZPosition"]
+            z_end = self.param_name["ZPosition"]
+
+        # todo: confirm that these orders are correct
+        if direction_should_increase:
+            sequential_predicate = AreSequentialPredicate.to_precondition(
+                x_start if move_east_west else z_start,
+                x_end if move_east_west else z_end,
             )
         else:
-            x_equality = lambda x: pddl_equal(
-                f"({XPositionFunction.var_name} ?{x})",
-                f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+            sequential_predicate = AreSequentialPredicate.to_precondition(
+                x_end if move_east_west else z_end,
+                x_start if move_east_west else z_start,
             )
 
-        if self.dir == "north" or self.dir == "south":
-            z_equality = lambda x: pddl_equal(
-                f"({ZPositionFunction.var_name} ?{x})",
-                pddl_add(
-                    f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                    directions[self.dir],
-                ),
-            )
-        else:
-            z_equality = lambda x: pddl_equal(
-                f"({ZPositionFunction.var_name} ?{x})",
-                f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-            )
-
+        block_var = "?b"
+        item_var = "?i"
         self.preconditions = pddl_and(
-            # preconditions for items
-            pddl_and(
-                f"({ItemPresentPredicate.var_name} {self.parameters[self.item]})",
-                pddl_equal(
-                    f"({XPositionFunction.var_name} {self.parameters[self.item]})",
-                    f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                ),
-                pddl_equal(
-                    f"({YPositionFunction.var_name} {self.parameters[self.item]})",
-                    f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                ),
-                pddl_equal(
-                    f"({ZPositionFunction.var_name} {self.parameters[self.item]})",
-                    pddl_add(
-                        f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                        "-1",
-                    ),
-                ),
+            f"({AgentAlivePredicate.var_name} {self.param_name['Agent']})\n",
+            AtXLocationPredicate.to_precondition(self.param_name["Agent"], x_start),
+            AtYLocationPredicate.to_precondition(
+                self.param_name["Agent"],
+                self.param_name[
+                    "YPositionDown"
+                ],  # agent coord is the bottom of the agent
             ),
-            # preconditions for movement
+            AtZLocationPredicate.to_precondition(self.param_name["Agent"], z_start),
+            sequential_predicate,
+            AreSequentialPredicate.to_precondition(self.param_name["YPositionDown"], self.param_name["YPositionUp"]),
             pddl_not(
                 pddl_exists(
-                    {TypeName.BLOCK_TYPE_NAME.value: "?b"},
+                    {TypeName.BLOCK_TYPE_NAME.value: block_var},
                     pddl_and(
-                        x_equality("b"),
-                        pddl_equal(
-                            f"({YPositionFunction.var_name} ?b)",
-                            pddl_add(
-                                f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                                "1",
+                        f"({BlockPresentPredicate.var_name} {block_var})\n",
+                        AtXLocationPredicate.to_precondition(block_var, x_end),
+                        # here we check that there is no block at the level of the agent (bottom) or the agent's eyeline (top)
+                        pddl_or(
+                            AtYLocationPredicate.to_precondition(
+                                block_var, self.param_name["YPositionUp"]
+                            ),
+                            AtYLocationPredicate.to_precondition(
+                                block_var, self.param_name["YPositionDown"]
                             ),
                         ),
-                        z_equality("b"),
+                        AtZLocationPredicate.to_precondition(block_var, z_end),
                     ),
-                ),
+                )
             ),
+            pddl_exists(
+                {TypeName.ITEM_TYPE_NAME.value: item_var},
+                pddl_and(
+                    f"({ItemPresentPredicate.var_name} {item_var})\n",
+                    AtXLocationPredicate.to_precondition(item_var, x_end),
+                    # here we only check that there is no item at the level of the agent (bottom) since items cannot float
+                    # they would require a block to be placed beneath it, which is handled by the previous precondition
+                    AtYLocationPredicate.to_precondition(
+                        item_var, self.param_name["YPositionDown"]
+                    ),
+                    AtZLocationPredicate.to_precondition(item_var, z_end),
+                ),
+            )
         )
 
     def construct_effects(self):
-        move_effect = ""
-        if self.dir == "north":
-            move_effect = pddl_decrease(
-                f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                "1",
-            )
-        elif self.dir == "south":
-            move_effect = pddl_increase(
-                f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                "1",
-            )
-        elif self.dir == "east":
-            move_effect = pddl_increase(
-                f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                "1",
-            )
-        elif self.dir == "west":
-            move_effect = pddl_decrease(
-                f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                "1",
-            )
+        # this is as simple as saying that agent is not at the start and is at the end
+        if self.dir == "north" or self.dir == "south":
+            start = self.param_name["ZPositionStart"]
+            end = self.param_name["ZPositionEnd"]
+            predicate_to_use = AtZLocationPredicate
+            item_location_x = self.param_name["XPosition"]
+            item_location_z = self.param_name["ZPositionEnd"]
+        else:
+            start = self.param_name["XPositionStart"]
+            end = self.param_name["XPositionEnd"]
+            predicate_to_use = AtXLocationPredicate
+            item_location_x = self.param_name["XPositionEnd"]
+            item_location_z = self.param_name["ZPosition"]
+
         self.effects = pddl_and(
-            pddl_increase(
-                f"({InventoryFunction.var_name.format(self.item)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                "1",
-            ),
-            pddl_not(f"({ItemPresentPredicate.var_name} {self.parameters[self.item]})"),
-            move_effect,
+            pddl_not(predicate_to_use.to_precondition(self.param_name["Agent"], start)),
+            predicate_to_use.to_precondition(self.param_name["Agent"], end),
+            pddl_not(AgentHasNItemsPredicate.to_precondition(self.param_name["Agent"], self.param_name["NStart"], item_type=self.item)),
+            pddl_not(AtXLocationPredicate.to_precondition(self.param_name["Item"], item_location_x)),
+            pddl_not(AtYLocationPredicate.to_precondition(self.param_name["Item"], self.param_name["YPositionDown"])),
+            pddl_not(AtZLocationPredicate.to_precondition(self.param_name["Item"], item_location_z)),
+            AgentHasNItemsPredicate.to_precondition(self.param_name["Agent"], self.param_name["NEnd"], item_type=self.item),
+            pddl_not(ItemPresentPredicate.to_precondition()),
         )
 
     def to_pddl(self):
+        self.construct_parameters()
         self.construct_preconditions()
         self.construct_effects()
         out = f"(:action {self.action_name}\n"
-        out += f"\t:parameters ({' '.join([f'{v} - {k}' for k, v in self.parameters.items()])})\n"
+        out += f"\t:parameters {self.parameters}\n"
         out += f"\t:precondition {self.preconditions}\n"
         out += f"\t:effect {self.effects}\n"
         out += ")\n"
@@ -544,62 +568,200 @@ class Place(Action):
 
 class JumpUp(Action):
     # jumps up one block forward
-    def __init__(self) -> None:
+    def __init__(self, dir: str) -> None:
         super().__init__()
-        self.action_name = "jump-up"
-        self.parameters = {TypeName.AGENT_TYPE_NAME.value: "?ag"}
+        self.dir = dir
+        # self.item_to_pickup = item_to_pickup
+        self.action_name = (
+            "jumpup-" + dir
+        )  # + "-only" if item_to_pickup is None else "-and-pickup-" + self.item_to_pickup.name
+
+        # have separate dictionaries for parameter names and types, but such that a common key is used to index corresponding values in both
+        # this is necessary because multiple parameters have different names but the same type
+        self.param_name = {
+            "Agent": "?ag",
+            "XPosition": "?x",
+            "ZPosition": "?z",
+            "XPositionStart": "?x_start",
+            "XPositionEnd": "?x_end",
+            "YPositionUp": "?y_up",
+            "YPositionUpUp": "?y_up_up", # for jumping up
+            "YPositionDown": "?y_down",
+            "ZPositionStart": "?z_start",
+            "ZPositionEnd": "?z_end",
+        }
+
+        self.param_types = {
+            "Agent": TypeName.AGENT_TYPE_NAME.value,
+            "XPosition": TypeName.POSITION_TYPE_NAME.value,
+            "ZPosition": TypeName.POSITION_TYPE_NAME.value,
+            "XPositionStart": TypeName.POSITION_TYPE_NAME.value,
+            "XPositionEnd": TypeName.POSITION_TYPE_NAME.value,
+            "YPositionUp": TypeName.POSITION_TYPE_NAME.value,
+            "YPositionUpUp": TypeName.POSITION_TYPE_NAME.value,
+            "YPositionDown": TypeName.POSITION_TYPE_NAME.value,
+            "ZPositionStart": TypeName.POSITION_TYPE_NAME.value,
+            "ZPositionEnd": TypeName.POSITION_TYPE_NAME.value,
+        }
+
+    def construct_parameters(self):
+        # need this generator since extra params have been added to the dicts in order to be more general
+        move_east_west = self.dir == "east" or self.dir == "west"
+        self.parameters = ""
+
+        # loop through all the parameters and add them to the parameters dict if they are used
+        for key in self.param_name.keys():
+            # if we move east or west, we use x_start and x_end, but only z
+            # if we move north or south, we use z_start and z_end, but only x
+
+            # if we are not dealing with x or z positions, then process as normal
+            if not ("XPosition" in key or "ZPosition" in key):
+                self.parameters += f"{self.param_name[key]} - {self.param_types[key]} "
+                continue
+
+            if key == "XPositionStart" or key == "XPositionEnd" or key == "ZPosition":
+                if move_east_west:
+                    self.parameters += (
+                        f"{self.param_name[key]} - {self.param_types[key]} "
+                    )
+                else:
+                    continue
+            elif key == "XPosition" or key == "ZPositionStart" or key == "ZPositionEnd":
+                if not move_east_west:
+                    self.parameters += (
+                        f"{self.param_name[key]} - {self.param_types[key]} "
+                    )
+                else:
+                    continue
+
+        self.parameters = self.parameters.strip()
 
     def construct_preconditions(self):
-        self.preconditions = pddl_and(
-            pddl_exists(
-                {TypeName.BLOCK_TYPE_NAME.value: "?bl"},
-                pddl_and(
-                    pddl_equal(
-                        f"({XPositionFunction.var_name} ?bl)",
-                        f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                    ),
-                    pddl_equal(
-                        f"({YPositionFunction.var_name} ?bl)",
-                        f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                    ),
-                    pddl_equal(
-                        f"({ZPositionFunction.var_name} ?bl)",
-                        pddl_add(
-                            f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                            "-1",
-                        ),
-                    ),
-                ),
-            )
-        )  # There must be a block underneath and infront
+        # depending on the direction of travel, we need to check that the end location is not occupied by a block/item
+        # we will set the x_start, x_end, z_start, and z_end variables to hold the relevant arg names so we can just look them up later
+        move_east_west = self.dir == "east" or self.dir == "west"
+        direction_should_increase = self.dir == "south" or self.dir == "east"
+        if move_east_west:
+            x_start = self.param_name["XPositionStart"]
+            x_end = self.param_name["XPositionEnd"]
+        else:
+            x_start = self.param_name["XPosition"]
+            x_end = self.param_name["XPosition"]
 
-    def construct_effects(self):
-        self.effects = pddl_and(
-            pddl_assign(
-                f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                pddl_add(
-                    f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                    "-1",
+        if not move_east_west:
+            z_start = self.param_name["ZPositionStart"]
+            z_end = self.param_name["ZPositionEnd"]
+        else:
+            z_start = self.param_name["ZPosition"]
+            z_end = self.param_name["ZPosition"]
+
+        # todo: confirm that these orders are correct
+        if direction_should_increase:
+            sequential_predicate = AreSequentialPredicate.to_precondition(
+                x_start if move_east_west else z_start,
+                x_end if move_east_west else z_end,
+            )
+        else:
+            sequential_predicate = AreSequentialPredicate.to_precondition(
+                x_end if move_east_west else z_end,
+                x_start if move_east_west else z_start,
+            )
+
+        block_var = "?b"
+        item_var = "?i"
+        self.preconditions = pddl_and(
+            f"({AgentAlivePredicate.var_name} {self.param_name['Agent']})\n",
+            AtXLocationPredicate.to_precondition(self.param_name["Agent"], x_start),
+            AtYLocationPredicate.to_precondition(
+                self.param_name["Agent"],
+                self.param_name[
+                    "YPositionDown"
+                ],  # agent coord is the bottom of the agent
+            ),
+            AtZLocationPredicate.to_precondition(self.param_name["Agent"], z_start),
+            sequential_predicate,
+            AreSequentialPredicate.to_precondition(self.param_name["YPositionDown"], self.param_name["YPositionUp"]),
+            AreSequentialPredicate.to_precondition(self.param_name["YPositionUp"], self.param_name["YPositionUpUp"]),
+            pddl_not(
+                pddl_exists(
+                    {TypeName.BLOCK_TYPE_NAME.value: block_var},
+                    pddl_and(
+                        f"({BlockPresentPredicate.var_name} {block_var})\n",
+                        AtXLocationPredicate.to_precondition(block_var, x_end),
+                        # here we check that there is no block at the level of the agent (bottom) or the agent's eyeline (top)
+                        pddl_or(
+                            AtYLocationPredicate.to_precondition(
+                                block_var, self.param_name["YPositionUp"]
+                            ),
+                            AtYLocationPredicate.to_precondition(
+                                block_var, self.param_name["YPositionUpUp"]
+                            ),
+                        ),
+                        AtZLocationPredicate.to_precondition(block_var, z_end),
+                    ),
+                )
+            ),
+            pddl_exists(
+                {TypeName.BLOCK_TYPE_NAME.value: block_var},
+                pddl_and(
+                    f"({BlockPresentPredicate.var_name} {block_var})\n",
+                    AtXLocationPredicate.to_precondition(block_var, x_end),
+                    # here we check that there is no block at the level of the agent (bottom) or the agent's eyeline (top)
+                    AtYLocationPredicate.to_precondition(block_var, self.param_name["YPositionDown"]),
+                    AtZLocationPredicate.to_precondition(block_var, z_end),
                 ),
             ),
-            pddl_assign(
-                f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                pddl_add(
-                    f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                    "1",
-                ),
+            pddl_not(
+                pddl_exists(
+                    {TypeName.ITEM_TYPE_NAME.value: item_var},
+                    pddl_and(
+                        f"({ItemPresentPredicate.var_name} {item_var})\n",
+                        AtXLocationPredicate.to_precondition(item_var, x_end),
+                        # here we only check that there is no item at the level of the agent (bottom) since items cannot float
+                        # they would require a block to be placed beneath it, which is handled by the previous precondition
+                        pddl_or(
+                            AtYLocationPredicate.to_precondition(
+                                item_var, self.param_name["YPositionDown"]
+                            ),
+                            AtYLocationPredicate.to_precondition(
+                                item_var, self.param_name["YPositionUp"]
+                            )
+                        ),
+                        AtZLocationPredicate.to_precondition(item_var, z_end),
+                    ),
+                )
             ),
         )
 
+    def construct_effects(self):
+        # this is as simple as saying that agent is not at the start and is at the end
+        if self.dir == "north" or self.dir == "south":
+            start = self.param_name["ZPositionStart"]
+            end = self.param_name["ZPositionEnd"]
+            predicate_to_use = AtZLocationPredicate
+        else:
+            start = self.param_name["XPositionStart"]
+            end = self.param_name["XPositionEnd"]
+            predicate_to_use = AtXLocationPredicate
+
+        self.effects = pddl_and(
+            pddl_not(predicate_to_use.to_precondition(self.param_name["Agent"], start)),
+            predicate_to_use.to_precondition(self.param_name["Agent"], end),
+            pddl_not(AtYLocationPredicate.to_precondition(self.param_name["Agent"], self.param_name["YPositionDown"])),
+            AtYLocationPredicate.to_precondition(self.param_name["Agent"], self.param_name["YPositionUp"]),
+        )
+
     def to_pddl(self):
+        self.construct_parameters()
         self.construct_preconditions()
         self.construct_effects()
         out = f"(:action {self.action_name}\n"
-        out += f"\t:parameters ({' '.join([f'{v} - {k}' for k, v in self.parameters.items()])})\n"
+        out += f"\t:parameters ({self.parameters})\n"
         out += f"\t:precondition {self.preconditions}\n"
         out += f"\t:effect {self.effects}\n"
         out += ")\n"
         return out
+
 
 
 class JumpDown(Action):

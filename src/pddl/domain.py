@@ -8,7 +8,7 @@ from collections import defaultdict
 
 # from pddl.actions.actions_num import *
 from pddl.predicates import AgentHasNItemsPredicate
-from pddl.actions.actions_prop import Move
+from pddl.actions.actions_prop import *
 
 
 class Domain:
@@ -176,10 +176,11 @@ class Domain:
 
         for dir in directions:
             self.actions.append(Move(dir))
+            self.actions.append(JumpUp(dir))
 
-        # for item in items:
-        #     for dir in directions:
-        #         self.actions.append(MoveAndPickup(dir, item))
+        for item in items:
+            for dir in directions:
+                self.actions.append(MoveAndPickup(dir, item))
 
         # for block in blocks:
         #     self.actions.append(Break(block))

@@ -4,7 +4,7 @@ from typing import List, Tuple, Dict
 
 
 def pddl_and(*args):
-    return f"(and {' '.join(args)})"
+    return f"(and \n{' '.join(args)})"
 
 
 def pddl_or(*args):

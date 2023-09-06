@@ -46,8 +46,9 @@ class ItemPresentPredicate(Predicate):
         # self.var_name = "item-present"
         self.arguments = {"?i": TypeName.ITEM_TYPE_NAME.value}
 
-    def to_precondition(self):
-        return f"({self.var_name} ?i)"
+    @staticmethod
+    def to_precondition():
+        return f"({ItemPresentPredicate.var_name} ?i)"
 
 
 class BlockPresentPredicate(Predicate):
@@ -98,7 +99,7 @@ class AreSequentialPredicate(Predicate):
 
     @staticmethod
     def to_precondition(x1: str, x2: str):
-        return f"({AreSequentialPredicate.var_name} {x1} {x2})"
+        return f"({AreSequentialPredicate.var_name} {x1} {x2})\n"
 
 
 class NotEqualPredicate(Predicate):
@@ -121,7 +122,8 @@ class AgentHasNItemsPredicate(Predicate):
             "?ag": TypeName.AGENT_TYPE_NAME.value,
             "?n": TypeName.COUNT_TYPE_NAME.value,
         }
-
+    
+    # to domain adds it to the predicate
     def to_domain(self, item_type: str):
         full_var_name = self.var_name.format(item_type)
         out = f"({full_var_name}"
@@ -129,6 +131,11 @@ class AgentHasNItemsPredicate(Predicate):
             out += f" {arg} - {self.arguments[arg]}"
         out += ")"
         return out
+
+    @staticmethod
+    def to_precondition(agent: str, n: str, item_type: str):
+        full_var_name = AgentHasNItemsPredicate.var_name.format(item_type)
+        return f"({full_var_name} {agent} {n})\n"
 
 
 class AtLocationPredicate(Predicate):
@@ -146,7 +153,7 @@ class AtXLocationPredicate(AtLocationPredicate):
 
     @staticmethod
     def to_precondition(object: str, location: str):
-        return f"({AtXLocationPredicate.var_name} {object} {location})"
+        return f"({AtXLocationPredicate.var_name} {object} {location})\n"
 
 
 class AtYLocationPredicate(AtLocationPredicate):
@@ -158,7 +165,7 @@ class AtYLocationPredicate(AtLocationPredicate):
 
     @staticmethod
     def to_precondition(object: str, location: str):
-        return f"({AtYLocationPredicate.var_name} {object} {location})"
+        return f"({AtYLocationPredicate.var_name} {object} {location})\n"
 
 
 class AtZLocationPredicate(AtLocationPredicate):
@@ -170,4 +177,4 @@ class AtZLocationPredicate(AtLocationPredicate):
 
     @staticmethod
     def to_precondition(object: str, location: str):
-        return f"({AtZLocationPredicate.var_name} {object} {location})"
+        return f"({AtZLocationPredicate.var_name} {object} {location})\n"
