@@ -347,6 +347,10 @@ class MoveAndPickup(Action):
                     AtZLocationPredicate.to_precondition(item_var, z_end),
                 ),
             ),
+            # add pressure for NStart to be meaningful
+            AgentHasNItemsPredicate.to_precondition(
+                self.param_name["Agent"], self.param_name["NStart"], item_type=self.item
+            ),
         )
 
     def construct_effects(self):
@@ -413,44 +417,109 @@ class Break(Action):
         self.block = block + "-block"
         self.item = block
         self.action_name = "break-" + block
-        self.parameters = {TypeName.AGENT_TYPE_NAME.value: "?ag", self.block: "?b"}
+
+        self.param_names = {
+            "Agent": "?ag",
+            "Block": "?b",
+            "XPosition": "?x",
+            "YPosition": "?y",
+            "ZPosition": "?z",
+            "ZPositionFront": "?z_front",
+            "NStart": "?n_start",
+            "NEnd": "?n_end",
+        }
+
+        self.param_types = {
+            "Agent": TypeName.AGENT_TYPE_NAME.value,
+            "Block": self.block,
+            "XPosition": TypeName.POSITION_TYPE_NAME.value,
+            "YPosition": TypeName.POSITION_TYPE_NAME.value,
+            "ZPosition": TypeName.POSITION_TYPE_NAME.value,
+            "ZPositionFront": TypeName.POSITION_TYPE_NAME.value,
+            "NStart": TypeName.COUNT_TYPE_NAME.value,
+            "NEnd": TypeName.COUNT_TYPE_NAME.value,
+        }
+
+    def construct_parameters(self):
+        self.parameters = ""
+        for key in self.param_names.keys():
+            self.parameters += f"{self.param_names[key]} - {self.param_types[key]} "
+
+        self.parameters = self.parameters.strip()
 
     def construct_preconditions(self):
         self.preconditions = pddl_and(
-            pddl_equal(
-                f"({XPositionFunction.var_name} {self.parameters[self.block]})",
-                f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+            AtXLocationPredicate.to_precondition(
+                self.param_names["Agent"], self.param_names["XPosition"]
             ),
-            pddl_equal(
-                f"({YPositionFunction.var_name} {self.parameters[self.block]})",
-                f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+            AtYLocationPredicate.to_precondition(
+                self.param_names["Agent"], self.param_names["YPosition"]
             ),
-            pddl_equal(
-                f"({ZPositionFunction.var_name} {self.parameters[self.block]})",
-                pddl_add(
-                    f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                    "-1",
-                ),
+            AtZLocationPredicate.to_precondition(
+                self.param_names["Agent"], self.param_names["ZPosition"]
             ),
-            f"({BlockPresentPredicate.var_name} {self.parameters[self.block]})",
+            AtXLocationPredicate.to_precondition(
+                self.param_names["Block"], self.param_names["XPosition"]
+            ),
+            AtYLocationPredicate.to_precondition(
+                self.param_names["Block"], self.param_names["YPosition"]
+            ),
+            AtZLocationPredicate.to_precondition(
+                self.param_names["Block"], self.param_names["ZPositionFront"]
+            ),
+            AreSequentialPredicate.to_precondition(
+                self.param_names["ZPositionFront"], self.param_names["ZPosition"]
+            ),
+            f'({BlockPresentPredicate.var_name} {self.param_names["Block"]})',
+            AreSequentialPredicate.to_precondition(
+                self.param_names["NStart"], self.param_names["NEnd"]
+            ),
+            # add pressure for NStart to be meaningful
+            AgentHasNItemsPredicate.to_precondition(
+                self.param_names["Agent"],
+                self.param_names["NStart"],
+                item_type=self.item,
+            ),
         )
 
     def construct_effects(self):
         self.effects = pddl_and(
+            # set NOT block present, block location, previous inventory count
+            # set TRUE current inventory count
+            pddl_not(f'({BlockPresentPredicate.var_name} {self.param_names["Block"]})'),
             pddl_not(
-                f"({BlockPresentPredicate.var_name} {self.parameters[self.block]})"
+                AtXLocationPredicate.to_precondition(
+                    self.param_names["Block"], self.param_names["XPosition"]
+                )
             ),
-            pddl_increase(
-                f"({InventoryFunction.var_name.format(self.item)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                "1",
+            pddl_not(
+                AtYLocationPredicate.to_precondition(
+                    self.param_names["Block"], self.param_names["YPosition"]
+                )
+            ),
+            pddl_not(
+                AtZLocationPredicate.to_precondition(
+                    self.param_names["Block"], self.param_names["ZPositionFront"]
+                )
+            ),
+            pddl_not(
+                AgentHasNItemsPredicate.to_precondition(
+                    self.param_names["Agent"],
+                    self.param_names["NStart"],
+                    item_type=self.item,
+                )
+            ),
+            AgentHasNItemsPredicate.to_precondition(
+                self.param_names["Agent"], self.param_names["NEnd"], item_type=self.item
             ),
         )
 
     def to_pddl(self):
+        self.construct_parameters()
         self.construct_preconditions()
         self.construct_effects()
         out = f"(:action {self.action_name}\n"
-        out += f"\t:parameters ({' '.join([f'{v} - {k}' for k, v in self.parameters.items()])})\n"
+        out += f"\t:parameters ({self.parameters})\n"
         out += f"\t:precondition {self.preconditions}\n"
         out += f"\t:effect {self.effects}\n"
         out += ")\n"

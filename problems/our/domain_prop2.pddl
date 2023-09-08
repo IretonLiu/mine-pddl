@@ -9,25 +9,25 @@
 	dirt-block grass_block-block log-block - destructible-block
 )
 (:predicates
-	(agent-has-n-obsidian ?ag - agent ?n - count)
-	(goal-achieved ?ag - agent)
-	(agent-has-n-log ?ag - agent ?n - count)
-	(item-present ?i - item)
-	(at-x ?l - locatable ?x - position)
-	(at-y ?l - locatable ?y - position)
-	(at-z ?l - locatable ?z - position)
-	(agent-alive ?ag - agent)
-	(block-present ?b - block)
-	(not-equal ?x1 - int ?x2 - int)
 	(are-seq ?x1 - int ?x2 - int)
+	(goal-achieved ?ag - agent)
+	(at-y ?l - locatable ?y - position)
+	(item-present ?i - item)
+	(not-equal ?x1 - int ?x2 - int)
+	(at-x ?l - locatable ?x - position)
+	(agent-alive ?ag - agent)
+	(at-z ?l - locatable ?z - position)
+	(agent-has-n-log ?ag - agent ?n - count)
+	(agent-has-n-obsidian ?ag - agent ?n - count)
+	(block-present ?b - block)
 )
 (:functions
-	(x ?l - locatable )
 	(y ?l - locatable )
-	(agent-num-log ?ag - agent )
 	(block-hits ?b - destructible-block )
-	(agent-num-obsidian ?ag - agent )
+	(agent-num-log ?ag - agent )
 	(z ?l - locatable )
+	(x ?l - locatable )
+	(agent-num-obsidian ?ag - agent )
 )
 
 (:action move-north
@@ -462,7 +462,8 @@
  (at-x ?i ?x)
  (at-y ?i ?y_down)
  (at-z ?i ?z_end)
-)))
+)) (agent-has-n-log ?ag ?n_start)
+)
 	:effect (and 
 (not (at-z ?ag ?z_start)
 ) (at-z ?ag ?z_end)
@@ -495,7 +496,8 @@
  (at-x ?i ?x)
  (at-y ?i ?y_down)
  (at-z ?i ?z_end)
-)))
+)) (agent-has-n-log ?ag ?n_start)
+)
 	:effect (and 
 (not (at-z ?ag ?z_start)
 ) (at-z ?ag ?z_end)
@@ -528,7 +530,8 @@
  (at-x ?i ?x_end)
  (at-y ?i ?y_down)
  (at-z ?i ?z)
-)))
+)) (agent-has-n-log ?ag ?n_start)
+)
 	:effect (and 
 (not (at-x ?ag ?x_start)
 ) (at-x ?ag ?x_end)
@@ -561,7 +564,8 @@
  (at-x ?i ?x_end)
  (at-y ?i ?y_down)
  (at-z ?i ?z)
-)))
+)) (agent-has-n-log ?ag ?n_start)
+)
 	:effect (and 
 (not (at-x ?ag ?x_start)
 ) (at-x ?ag ?x_end)
@@ -594,7 +598,8 @@
  (at-x ?i ?x)
  (at-y ?i ?y_down)
  (at-z ?i ?z_end)
-)))
+)) (agent-has-n-obsidian ?ag ?n_start)
+)
 	:effect (and 
 (not (at-z ?ag ?z_start)
 ) (at-z ?ag ?z_end)
@@ -627,7 +632,8 @@
  (at-x ?i ?x)
  (at-y ?i ?y_down)
  (at-z ?i ?z_end)
-)))
+)) (agent-has-n-obsidian ?ag ?n_start)
+)
 	:effect (and 
 (not (at-z ?ag ?z_start)
 ) (at-z ?ag ?z_end)
@@ -660,7 +666,8 @@
  (at-x ?i ?x_end)
  (at-y ?i ?y_down)
  (at-z ?i ?z)
-)))
+)) (agent-has-n-obsidian ?ag ?n_start)
+)
 	:effect (and 
 (not (at-x ?ag ?x_start)
 ) (at-x ?ag ?x_end)
@@ -693,7 +700,8 @@
  (at-x ?i ?x_end)
  (at-y ?i ?y_down)
  (at-z ?i ?z)
-)))
+)) (agent-has-n-obsidian ?ag ?n_start)
+)
 	:effect (and 
 (not (at-x ?ag ?x_start)
 ) (at-x ?ag ?x_end)
@@ -703,6 +711,75 @@
 ) (not (at-z ?i ?z)
 ) (agent-has-n-obsidian ?ag ?n_end)
  (not (item-present ?i)))
+)
+
+
+(:action break-dirt
+	:parameters (?ag - agent ?b - dirt-block ?x - position ?y - position ?z - position ?z_front - position ?n_start - count ?n_end - count)
+	:precondition (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?b ?x)
+ (at-y ?b ?y)
+ (at-z ?b ?z_front)
+ (are-seq ?z_front ?z)
+ (block-present ?b) (are-seq ?n_start ?n_end)
+ (agent-has-n-dirt ?ag ?n_start)
+)
+	:effect (and 
+(not (block-present ?b)) (not (at-x ?b ?x)
+) (not (at-y ?b ?y)
+) (not (at-z ?b ?z_front)
+) (not (agent-has-n-dirt ?ag ?n_start)
+) (agent-has-n-dirt ?ag ?n_end)
+)
+)
+
+
+(:action break-grass_block
+	:parameters (?ag - agent ?b - grass_block-block ?x - position ?y - position ?z - position ?z_front - position ?n_start - count ?n_end - count)
+	:precondition (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?b ?x)
+ (at-y ?b ?y)
+ (at-z ?b ?z_front)
+ (are-seq ?z_front ?z)
+ (block-present ?b) (are-seq ?n_start ?n_end)
+ (agent-has-n-grass_block ?ag ?n_start)
+)
+	:effect (and 
+(not (block-present ?b)) (not (at-x ?b ?x)
+) (not (at-y ?b ?y)
+) (not (at-z ?b ?z_front)
+) (not (agent-has-n-grass_block ?ag ?n_start)
+) (agent-has-n-grass_block ?ag ?n_end)
+)
+)
+
+
+(:action break-log
+	:parameters (?ag - agent ?b - log-block ?x - position ?y - position ?z - position ?z_front - position ?n_start - count ?n_end - count)
+	:precondition (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?b ?x)
+ (at-y ?b ?y)
+ (at-z ?b ?z_front)
+ (are-seq ?z_front ?z)
+ (block-present ?b) (are-seq ?n_start ?n_end)
+ (agent-has-n-log ?ag ?n_start)
+)
+	:effect (and 
+(not (block-present ?b)) (not (at-x ?b ?x)
+) (not (at-y ?b ?y)
+) (not (at-z ?b ?z_front)
+) (not (agent-has-n-log ?ag ?n_start)
+) (agent-has-n-log ?ag ?n_end)
+)
 )
 
 

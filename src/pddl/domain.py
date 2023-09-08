@@ -187,12 +187,10 @@ class Domain:
             for dir in directions:
                 self.actions.append(MoveAndPickup(dir, item))
 
-        # for block in blocks:
-        #     self.actions.append(Break(block))
+        for block in blocks:
+            self.actions.append(Break(block))
         #     self.actions.append(Place(block))
 
-        # self.actions.append(JumpUp())
-        # self.actions.append(JumpDown())
         self.actions.append(CheckGoal(goal, self.max_inventory_stack))
 
         action_str = ""
