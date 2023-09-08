@@ -189,7 +189,7 @@ class Domain:
 
         for block in blocks:
             self.actions.append(Break(block))
-        #     self.actions.append(Place(block))
+            self.actions.append(Place(block))
 
         self.actions.append(CheckGoal(goal, self.max_inventory_stack))
 
