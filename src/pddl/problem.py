@@ -1,7 +1,8 @@
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
 from pddl.domain import Domain
 from pddl.pddl_types.named_pddl_types import NamedBlockType, NamedItemType
 from pddl.pddl_types.base_pddl_types import AgentType
+from pddl.pddl_types.special_pddl_types import PositionType, CountType
 from pddl.functions import *
 from pddl.operators import *
 from pddl.pddl_types.types_names import TypeName
@@ -27,6 +28,8 @@ class Problem:
         self,
         name: str,
         domain: Domain,
+        obs_range: Tuple[int, int, int],
+        max_inventory_stack: int,
         objects: List = [],
         init: List = [],
         goal: List = [],
@@ -36,6 +39,8 @@ class Problem:
         self.objects = objects
         self.init = init
         self.goal = goal
+        self.obs_range = obs_range
+        self.max_inventory_stack = max_inventory_stack
 
     def initialize_problem(self):
         for function in self.domain.functions:
@@ -68,6 +73,19 @@ class Problem:
                 # add the temp string to the object string
                 output += f"\t{temp}\n"
 
+        # add the position objects
+        max_range = max(self.obs_range)
+        output += f"\t"
+        for i in range(-max_range // 2, max_range // 2 + 1):
+            output += f"{PositionType.construct_problem_object(i)} "
+        output += f"- {PositionType.type_name}\n"
+
+        # add the count objects
+        output += f"\t"
+        for i in range(self.max_inventory_stack + 1):
+            output += f"{CountType.construct_problem_object(i)} "
+        output += f"- {CountType.type_name}\n"
+
         return output + ")"
 
     def construct_initial_state(
@@ -93,35 +111,30 @@ class Problem:
                         if i.in_inventory:
                             output_list.append(
                                 function.to_problem(
-                                    agent.name, label=key, quantity=i.quantity)
+                                    agent.name, label=key, quantity=i.quantity
+                                )
                             )
                         else:
                             output_list.append(
-                                function.to_problem(
-                                    agent.name, label=key, quantity=0)
+                                function.to_problem(agent.name, label=key, quantity=0)
                             )
             else:
                 output_list.append(function.to_problem(agent.name))
 
         # process items, blocks
-        to_process = [blocks,items]
+        to_process = [blocks, items]
         for i, proc in enumerate(to_process):
             for key in proc:
                 # entity is a NamedBlockType or NamedItemType
                 for j, entity in enumerate(proc[key]):
-                    name = entity.name+"-block" if i == 0 else entity.name
+                    name = entity.name + "-block" if i == 0 else entity.name
                     # process the predicates
                     for predicate in entity.predicates.values():
-                        output_list.append(
-                            predicate.to_problem(f"{name}{j}")
-                        )
+                        output_list.append(predicate.to_problem(f"{name}{j}"))
 
                     # process the functions
                     for function in entity.functions.values():
-                        output_list.append(
-                            function.to_problem(
-                                f"{name}{j}")
-                        )
+                        output_list.append(function.to_problem(f"{name}{j}"))
 
         output = "(:init\n\t"
         output += "\n\t".join(output_list)
@@ -130,7 +143,7 @@ class Problem:
 
     def construct_goal(self, goal_json: Dict[str, List[Dict[str, Any]]]):
         # goal_json is a dict of lists of dicts
-        output = "(:goal" 
+        output = "(:goal"
         output += f"\n\t(and ({GoalAchievedPredicate.var_name} steve)\n\t\t"
         output += "\n))"
         return output
@@ -147,9 +160,9 @@ class Problem:
         pddl += f"\t(:domain {self.domain.name})\n"
         pddl += f"{self.construct_objects(agent, items, blocks)}\n"
         pddl += f"{self.construct_initial_state(agent, items, blocks)}\n"
-        pddl += f"{self.construct_goal(goal_json)}\n" 
+        pddl += f"{self.construct_goal(goal_json)}\n"
         pddl += ")"
         with open(file_path, "w") as file:
             file.write(pddl)
-            
+
         return pddl

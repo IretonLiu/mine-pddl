@@ -82,8 +82,9 @@ class GoalAchievedPredicate(Predicate):
         self.arguments = {"?ag": TypeName.AGENT_TYPE_NAME.value}
         self.value = False
 
-    def to_precondition(self):
-        return f"({self.var_name} ?g)"
+    @staticmethod
+    def to_precondition(agent: str):
+        return f"({GoalAchievedPredicate.var_name} ?{agent})"
 
 
 # for propositional logic
@@ -122,7 +123,7 @@ class AgentHasNItemsPredicate(Predicate):
             "?ag": TypeName.AGENT_TYPE_NAME.value,
             "?n": TypeName.COUNT_TYPE_NAME.value,
         }
-    
+
     # to domain adds it to the predicate
     def to_domain(self, item_type: str):
         full_var_name = self.var_name.format(item_type)

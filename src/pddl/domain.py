@@ -12,9 +12,13 @@ from pddl.actions.actions_prop import *
 
 
 class Domain:
-    def __init__(self, name: str):
+    def __init__(
+        self,
+        name: str,
+        max_inventory_stack: int,
+    ):
         self.name = name
-        # self.obs = obs
+        self.max_inventory_stack = max_inventory_stack
         self.types = None
         self.constants = []
         self.predicates = []
@@ -177,8 +181,7 @@ class Domain:
         for dir in directions:
             self.actions.append(Move(dir))
             self.actions.append(JumpUp(dir))
-            self.actions.append(JumpDown(dir))               
-
+            self.actions.append(JumpDown(dir))
 
         for item in items:
             for dir in directions:
@@ -190,7 +193,7 @@ class Domain:
 
         # self.actions.append(JumpUp())
         # self.actions.append(JumpDown())
-        # self.actions.append(CheckGoal(goal))
+        self.actions.append(CheckGoal(goal, self.max_inventory_stack))
 
         action_str = ""
         for action in self.actions:

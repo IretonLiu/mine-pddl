@@ -7,6 +7,8 @@
 	log-block0 - log-block
 	log0 - log
 	obsidian0 - obsidian
+	position-4 position-3 position-2 position-1 position0 position1 position2 position3 position4 - position
+	count0 count1 count2 count3 count4 count5 count6 count7 count8 count9 count10 count11 count12 count13 count14 count15 count16 count17 count18 count19 count20 count21 count22 count23 count24 count25 count26 count27 count28 count29 count30 count31 count32 count33 count34 count35 count36 count37 count38 count39 count40 count41 count42 count43 count44 count45 count46 count47 count48 count49 count50 count51 count52 count53 count54 count55 count56 count57 count58 count59 count60 count61 count62 count63 count64 - count
 )
 (:init
 	(not (at-x steve))

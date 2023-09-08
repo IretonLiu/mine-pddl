@@ -34,6 +34,7 @@ from pddl.problem import Problem
 world_json = json_helper.load_json("worlds/example.json")
 # print(world_json)
 # print(json_helper.json_blocks_to_xml_str(world_json["blocks"]))
+max_inventory_stack = 64
 ranges = (8, 4, 8)
 voxel_size = dict(
     xmin=-ranges[0] // 2,
@@ -83,7 +84,7 @@ video_helper.save_image(obs["rgb"])
 items, agent = extract_entities(obs)
 blocks = extract_blocks(obs)
 inventory = extract_inventory(obs, items, agent)
-domain = Domain("first_world")
+domain = Domain("first_world", max_inventory_stack)
 # int_types = create_int_pddl_types(["count", "position"], ranges)
 
 print(
@@ -98,6 +99,8 @@ print(
 problem = Problem(
     "first_world_problem",
     domain,
+    ranges,
+    max_inventory_stack,
 )
 
 print(
