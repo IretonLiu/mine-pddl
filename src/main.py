@@ -4,7 +4,6 @@ import handlers.entities as handlers
 from helpers import execution_helper, json_helper
 from helpers.observation_helpers import *
 from helpers.video_helper import VideoHelper
-from helpers.prop_helper import create_int_pddl_types
 import minedojo
 import numpy as np
 from pddl.actions import *

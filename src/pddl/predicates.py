@@ -144,6 +144,11 @@ class AtLocationPredicate(Predicate):
         super().__init__()
         self.arguments = {"?l": TypeName.LOCATABLE_TYPE_NAME.value}
 
+    @staticmethod
+    def to_precondition(object: str, location: str):
+        raise NotImplementedError("to_precondition not implemented for this predicate")
+
+
 
 class AtXLocationPredicate(AtLocationPredicate):
     var_name = "at-x"

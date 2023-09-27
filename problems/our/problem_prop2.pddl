@@ -11,1335 +11,1317 @@
 	count0 count1 count2 count3 count4 count5 count6 count7 count8 count9 count10 count11 count12 count13 count14 count15 count16 count17 count18 count19 count20 count21 count22 count23 count24 count25 count26 count27 count28 count29 count30 count31 count32 count33 count34 count35 count36 count37 count38 count39 count40 count41 count42 count43 count44 count45 count46 count47 count48 count49 count50 count51 count52 count53 count54 count55 count56 count57 count58 count59 count60 count61 count62 count63 count64 - count
 )
 (:init
-	(not (at-x steve))
-	(not (at-y steve))
-	(not (at-z steve))
+	(are-seq position-4 position-3)
+
+	(are-seq position-3 position-2)
+
+	(are-seq position-2 position-1)
+
+	(are-seq position-1 position0)
+
+	(are-seq position0 position1)
+
+	(are-seq position1 position2)
+
+	(are-seq position2 position3)
+
+	(are-seq position3 position4)
+
+	(are-seq count0 count1)
+
+	(are-seq count1 count2)
+
+	(are-seq count2 count3)
+
+	(are-seq count3 count4)
+
+	(are-seq count4 count5)
+
+	(are-seq count5 count6)
+
+	(are-seq count6 count7)
+
+	(are-seq count7 count8)
+
+	(are-seq count8 count9)
+
+	(are-seq count9 count10)
+
+	(are-seq count10 count11)
+
+	(are-seq count11 count12)
+
+	(are-seq count12 count13)
+
+	(are-seq count13 count14)
+
+	(are-seq count14 count15)
+
+	(are-seq count15 count16)
+
+	(are-seq count16 count17)
+
+	(are-seq count17 count18)
+
+	(are-seq count18 count19)
+
+	(are-seq count19 count20)
+
+	(are-seq count20 count21)
+
+	(are-seq count21 count22)
+
+	(are-seq count22 count23)
+
+	(are-seq count23 count24)
+
+	(are-seq count24 count25)
+
+	(are-seq count25 count26)
+
+	(are-seq count26 count27)
+
+	(are-seq count27 count28)
+
+	(are-seq count28 count29)
+
+	(are-seq count29 count30)
+
+	(are-seq count30 count31)
+
+	(are-seq count31 count32)
+
+	(are-seq count32 count33)
+
+	(are-seq count33 count34)
+
+	(are-seq count34 count35)
+
+	(are-seq count35 count36)
+
+	(are-seq count36 count37)
+
+	(are-seq count37 count38)
+
+	(are-seq count38 count39)
+
+	(are-seq count39 count40)
+
+	(are-seq count40 count41)
+
+	(are-seq count41 count42)
+
+	(are-seq count42 count43)
+
+	(are-seq count43 count44)
+
+	(are-seq count44 count45)
+
+	(are-seq count45 count46)
+
+	(are-seq count46 count47)
+
+	(are-seq count47 count48)
+
+	(are-seq count48 count49)
+
+	(are-seq count49 count50)
+
+	(are-seq count50 count51)
+
+	(are-seq count51 count52)
+
+	(are-seq count52 count53)
+
+	(are-seq count53 count54)
+
+	(are-seq count54 count55)
+
+	(are-seq count55 count56)
+
+	(are-seq count56 count57)
+
+	(are-seq count57 count58)
+
+	(are-seq count58 count59)
+
+	(are-seq count59 count60)
+
+	(are-seq count60 count61)
+
+	(are-seq count61 count62)
+
+	(are-seq count62 count63)
+
+	(are-seq count63 count64)
+
+	(at-x steve position0)
+
+	(at-y steve position4)
+
+	(at-z steve position0)
+
 	(agent-alive steve)
 	(not (goal-achieved steve))
-	(not (agent-has-n-{} steve))
-	(= (x steve) 0)
-	(= (y steve) 4)
-	(= (z steve) 0)
-	(= (agent-num-log steve) 64)
-	(= (agent-num-obsidian steve) 64)
-	(at-x dirt-block0)
-	(at-y dirt-block0)
-	(at-z dirt-block0)
+	(agent-has-n-log steve count64)
+
+	(agent-has-n-obsidian steve count64)
+
+	(at-x dirt-block0 position-3)
+
+	(at-y dirt-block0 position2)
+
+	(at-z dirt-block0 position-3)
+
 	(block-present dirt-block0)
-	(= (x dirt-block0) -3)
-	(= (y dirt-block0) 2)
-	(= (z dirt-block0) -3)
-	(= (block-hits dirt-block0) 0)
-	(at-x dirt-block1)
-	(at-y dirt-block1)
-	(at-z dirt-block1)
+	(at-x dirt-block1 position-3)
+
+	(at-y dirt-block1 position2)
+
+	(at-z dirt-block1 position-2)
+
 	(block-present dirt-block1)
-	(= (x dirt-block1) -3)
-	(= (y dirt-block1) 2)
-	(= (z dirt-block1) -2)
-	(= (block-hits dirt-block1) 0)
-	(at-x dirt-block2)
-	(at-y dirt-block2)
-	(at-z dirt-block2)
+	(at-x dirt-block2 position-3)
+
+	(at-y dirt-block2 position2)
+
+	(at-z dirt-block2 position-1)
+
 	(block-present dirt-block2)
-	(= (x dirt-block2) -3)
-	(= (y dirt-block2) 2)
-	(= (z dirt-block2) -1)
-	(= (block-hits dirt-block2) 0)
-	(at-x dirt-block3)
-	(at-y dirt-block3)
-	(at-z dirt-block3)
+	(at-x dirt-block3 position-3)
+
+	(at-y dirt-block3 position2)
+
+	(at-z dirt-block3 position0)
+
 	(block-present dirt-block3)
-	(= (x dirt-block3) -3)
-	(= (y dirt-block3) 2)
-	(= (z dirt-block3) 0)
-	(= (block-hits dirt-block3) 0)
-	(at-x dirt-block4)
-	(at-y dirt-block4)
-	(at-z dirt-block4)
+	(at-x dirt-block4 position-3)
+
+	(at-y dirt-block4 position2)
+
+	(at-z dirt-block4 position0)
+
 	(block-present dirt-block4)
-	(= (x dirt-block4) -3)
-	(= (y dirt-block4) 2)
-	(= (z dirt-block4) 0)
-	(= (block-hits dirt-block4) 0)
-	(at-x dirt-block5)
-	(at-y dirt-block5)
-	(at-z dirt-block5)
+	(at-x dirt-block5 position-3)
+
+	(at-y dirt-block5 position2)
+
+	(at-z dirt-block5 position1)
+
 	(block-present dirt-block5)
-	(= (x dirt-block5) -3)
-	(= (y dirt-block5) 2)
-	(= (z dirt-block5) 1)
-	(= (block-hits dirt-block5) 0)
-	(at-x dirt-block6)
-	(at-y dirt-block6)
-	(at-z dirt-block6)
+	(at-x dirt-block6 position-3)
+
+	(at-y dirt-block6 position2)
+
+	(at-z dirt-block6 position2)
+
 	(block-present dirt-block6)
-	(= (x dirt-block6) -3)
-	(= (y dirt-block6) 2)
-	(= (z dirt-block6) 2)
-	(= (block-hits dirt-block6) 0)
-	(at-x dirt-block7)
-	(at-y dirt-block7)
-	(at-z dirt-block7)
+	(at-x dirt-block7 position-3)
+
+	(at-y dirt-block7 position2)
+
+	(at-z dirt-block7 position3)
+
 	(block-present dirt-block7)
-	(= (x dirt-block7) -3)
-	(= (y dirt-block7) 2)
-	(= (z dirt-block7) 3)
-	(= (block-hits dirt-block7) 0)
-	(at-x dirt-block8)
-	(at-y dirt-block8)
-	(at-z dirt-block8)
+	(at-x dirt-block8 position-3)
+
+	(at-y dirt-block8 position2)
+
+	(at-z dirt-block8 position4)
+
 	(block-present dirt-block8)
-	(= (x dirt-block8) -3)
-	(= (y dirt-block8) 2)
-	(= (z dirt-block8) 4)
-	(= (block-hits dirt-block8) 0)
-	(at-x dirt-block9)
-	(at-y dirt-block9)
-	(at-z dirt-block9)
+	(at-x dirt-block9 position-2)
+
+	(at-y dirt-block9 position2)
+
+	(at-z dirt-block9 position-3)
+
 	(block-present dirt-block9)
-	(= (x dirt-block9) -2)
-	(= (y dirt-block9) 2)
-	(= (z dirt-block9) -3)
-	(= (block-hits dirt-block9) 0)
-	(at-x dirt-block10)
-	(at-y dirt-block10)
-	(at-z dirt-block10)
+	(at-x dirt-block10 position-2)
+
+	(at-y dirt-block10 position2)
+
+	(at-z dirt-block10 position-2)
+
 	(block-present dirt-block10)
-	(= (x dirt-block10) -2)
-	(= (y dirt-block10) 2)
-	(= (z dirt-block10) -2)
-	(= (block-hits dirt-block10) 0)
-	(at-x dirt-block11)
-	(at-y dirt-block11)
-	(at-z dirt-block11)
+	(at-x dirt-block11 position-2)
+
+	(at-y dirt-block11 position2)
+
+	(at-z dirt-block11 position-1)
+
 	(block-present dirt-block11)
-	(= (x dirt-block11) -2)
-	(= (y dirt-block11) 2)
-	(= (z dirt-block11) -1)
-	(= (block-hits dirt-block11) 0)
-	(at-x dirt-block12)
-	(at-y dirt-block12)
-	(at-z dirt-block12)
+	(at-x dirt-block12 position-2)
+
+	(at-y dirt-block12 position2)
+
+	(at-z dirt-block12 position0)
+
 	(block-present dirt-block12)
-	(= (x dirt-block12) -2)
-	(= (y dirt-block12) 2)
-	(= (z dirt-block12) 0)
-	(= (block-hits dirt-block12) 0)
-	(at-x dirt-block13)
-	(at-y dirt-block13)
-	(at-z dirt-block13)
+	(at-x dirt-block13 position-2)
+
+	(at-y dirt-block13 position2)
+
+	(at-z dirt-block13 position0)
+
 	(block-present dirt-block13)
-	(= (x dirt-block13) -2)
-	(= (y dirt-block13) 2)
-	(= (z dirt-block13) 0)
-	(= (block-hits dirt-block13) 0)
-	(at-x dirt-block14)
-	(at-y dirt-block14)
-	(at-z dirt-block14)
+	(at-x dirt-block14 position-2)
+
+	(at-y dirt-block14 position2)
+
+	(at-z dirt-block14 position1)
+
 	(block-present dirt-block14)
-	(= (x dirt-block14) -2)
-	(= (y dirt-block14) 2)
-	(= (z dirt-block14) 1)
-	(= (block-hits dirt-block14) 0)
-	(at-x dirt-block15)
-	(at-y dirt-block15)
-	(at-z dirt-block15)
+	(at-x dirt-block15 position-2)
+
+	(at-y dirt-block15 position2)
+
+	(at-z dirt-block15 position2)
+
 	(block-present dirt-block15)
-	(= (x dirt-block15) -2)
-	(= (y dirt-block15) 2)
-	(= (z dirt-block15) 2)
-	(= (block-hits dirt-block15) 0)
-	(at-x dirt-block16)
-	(at-y dirt-block16)
-	(at-z dirt-block16)
+	(at-x dirt-block16 position-2)
+
+	(at-y dirt-block16 position2)
+
+	(at-z dirt-block16 position3)
+
 	(block-present dirt-block16)
-	(= (x dirt-block16) -2)
-	(= (y dirt-block16) 2)
-	(= (z dirt-block16) 3)
-	(= (block-hits dirt-block16) 0)
-	(at-x dirt-block17)
-	(at-y dirt-block17)
-	(at-z dirt-block17)
+	(at-x dirt-block17 position-2)
+
+	(at-y dirt-block17 position2)
+
+	(at-z dirt-block17 position4)
+
 	(block-present dirt-block17)
-	(= (x dirt-block17) -2)
-	(= (y dirt-block17) 2)
-	(= (z dirt-block17) 4)
-	(= (block-hits dirt-block17) 0)
-	(at-x dirt-block18)
-	(at-y dirt-block18)
-	(at-z dirt-block18)
+	(at-x dirt-block18 position-1)
+
+	(at-y dirt-block18 position2)
+
+	(at-z dirt-block18 position-3)
+
 	(block-present dirt-block18)
-	(= (x dirt-block18) -1)
-	(= (y dirt-block18) 2)
-	(= (z dirt-block18) -3)
-	(= (block-hits dirt-block18) 0)
-	(at-x dirt-block19)
-	(at-y dirt-block19)
-	(at-z dirt-block19)
+	(at-x dirt-block19 position-1)
+
+	(at-y dirt-block19 position2)
+
+	(at-z dirt-block19 position-2)
+
 	(block-present dirt-block19)
-	(= (x dirt-block19) -1)
-	(= (y dirt-block19) 2)
-	(= (z dirt-block19) -2)
-	(= (block-hits dirt-block19) 0)
-	(at-x dirt-block20)
-	(at-y dirt-block20)
-	(at-z dirt-block20)
+	(at-x dirt-block20 position-1)
+
+	(at-y dirt-block20 position2)
+
+	(at-z dirt-block20 position-1)
+
 	(block-present dirt-block20)
-	(= (x dirt-block20) -1)
-	(= (y dirt-block20) 2)
-	(= (z dirt-block20) -1)
-	(= (block-hits dirt-block20) 0)
-	(at-x dirt-block21)
-	(at-y dirt-block21)
-	(at-z dirt-block21)
+	(at-x dirt-block21 position-1)
+
+	(at-y dirt-block21 position2)
+
+	(at-z dirt-block21 position0)
+
 	(block-present dirt-block21)
-	(= (x dirt-block21) -1)
-	(= (y dirt-block21) 2)
-	(= (z dirt-block21) 0)
-	(= (block-hits dirt-block21) 0)
-	(at-x dirt-block22)
-	(at-y dirt-block22)
-	(at-z dirt-block22)
+	(at-x dirt-block22 position-1)
+
+	(at-y dirt-block22 position2)
+
+	(at-z dirt-block22 position0)
+
 	(block-present dirt-block22)
-	(= (x dirt-block22) -1)
-	(= (y dirt-block22) 2)
-	(= (z dirt-block22) 0)
-	(= (block-hits dirt-block22) 0)
-	(at-x dirt-block23)
-	(at-y dirt-block23)
-	(at-z dirt-block23)
+	(at-x dirt-block23 position-1)
+
+	(at-y dirt-block23 position2)
+
+	(at-z dirt-block23 position1)
+
 	(block-present dirt-block23)
-	(= (x dirt-block23) -1)
-	(= (y dirt-block23) 2)
-	(= (z dirt-block23) 1)
-	(= (block-hits dirt-block23) 0)
-	(at-x dirt-block24)
-	(at-y dirt-block24)
-	(at-z dirt-block24)
+	(at-x dirt-block24 position-1)
+
+	(at-y dirt-block24 position2)
+
+	(at-z dirt-block24 position2)
+
 	(block-present dirt-block24)
-	(= (x dirt-block24) -1)
-	(= (y dirt-block24) 2)
-	(= (z dirt-block24) 2)
-	(= (block-hits dirt-block24) 0)
-	(at-x dirt-block25)
-	(at-y dirt-block25)
-	(at-z dirt-block25)
+	(at-x dirt-block25 position-1)
+
+	(at-y dirt-block25 position2)
+
+	(at-z dirt-block25 position3)
+
 	(block-present dirt-block25)
-	(= (x dirt-block25) -1)
-	(= (y dirt-block25) 2)
-	(= (z dirt-block25) 3)
-	(= (block-hits dirt-block25) 0)
-	(at-x dirt-block26)
-	(at-y dirt-block26)
-	(at-z dirt-block26)
+	(at-x dirt-block26 position-1)
+
+	(at-y dirt-block26 position2)
+
+	(at-z dirt-block26 position4)
+
 	(block-present dirt-block26)
-	(= (x dirt-block26) -1)
-	(= (y dirt-block26) 2)
-	(= (z dirt-block26) 4)
-	(= (block-hits dirt-block26) 0)
-	(at-x dirt-block27)
-	(at-y dirt-block27)
-	(at-z dirt-block27)
+	(at-x dirt-block27 position0)
+
+	(at-y dirt-block27 position2)
+
+	(at-z dirt-block27 position-3)
+
 	(block-present dirt-block27)
-	(= (x dirt-block27) 0)
-	(= (y dirt-block27) 2)
-	(= (z dirt-block27) -3)
-	(= (block-hits dirt-block27) 0)
-	(at-x dirt-block28)
-	(at-y dirt-block28)
-	(at-z dirt-block28)
+	(at-x dirt-block28 position0)
+
+	(at-y dirt-block28 position2)
+
+	(at-z dirt-block28 position-2)
+
 	(block-present dirt-block28)
-	(= (x dirt-block28) 0)
-	(= (y dirt-block28) 2)
-	(= (z dirt-block28) -2)
-	(= (block-hits dirt-block28) 0)
-	(at-x dirt-block29)
-	(at-y dirt-block29)
-	(at-z dirt-block29)
+	(at-x dirt-block29 position0)
+
+	(at-y dirt-block29 position2)
+
+	(at-z dirt-block29 position-1)
+
 	(block-present dirt-block29)
-	(= (x dirt-block29) 0)
-	(= (y dirt-block29) 2)
-	(= (z dirt-block29) -1)
-	(= (block-hits dirt-block29) 0)
-	(at-x dirt-block30)
-	(at-y dirt-block30)
-	(at-z dirt-block30)
+	(at-x dirt-block30 position0)
+
+	(at-y dirt-block30 position2)
+
+	(at-z dirt-block30 position0)
+
 	(block-present dirt-block30)
-	(= (x dirt-block30) 0)
-	(= (y dirt-block30) 2)
-	(= (z dirt-block30) 0)
-	(= (block-hits dirt-block30) 0)
-	(at-x dirt-block31)
-	(at-y dirt-block31)
-	(at-z dirt-block31)
+	(at-x dirt-block31 position0)
+
+	(at-y dirt-block31 position2)
+
+	(at-z dirt-block31 position0)
+
 	(block-present dirt-block31)
-	(= (x dirt-block31) 0)
-	(= (y dirt-block31) 2)
-	(= (z dirt-block31) 0)
-	(= (block-hits dirt-block31) 0)
-	(at-x dirt-block32)
-	(at-y dirt-block32)
-	(at-z dirt-block32)
+	(at-x dirt-block32 position0)
+
+	(at-y dirt-block32 position2)
+
+	(at-z dirt-block32 position1)
+
 	(block-present dirt-block32)
-	(= (x dirt-block32) 0)
-	(= (y dirt-block32) 2)
-	(= (z dirt-block32) 1)
-	(= (block-hits dirt-block32) 0)
-	(at-x dirt-block33)
-	(at-y dirt-block33)
-	(at-z dirt-block33)
+	(at-x dirt-block33 position0)
+
+	(at-y dirt-block33 position2)
+
+	(at-z dirt-block33 position2)
+
 	(block-present dirt-block33)
-	(= (x dirt-block33) 0)
-	(= (y dirt-block33) 2)
-	(= (z dirt-block33) 2)
-	(= (block-hits dirt-block33) 0)
-	(at-x dirt-block34)
-	(at-y dirt-block34)
-	(at-z dirt-block34)
+	(at-x dirt-block34 position0)
+
+	(at-y dirt-block34 position2)
+
+	(at-z dirt-block34 position3)
+
 	(block-present dirt-block34)
-	(= (x dirt-block34) 0)
-	(= (y dirt-block34) 2)
-	(= (z dirt-block34) 3)
-	(= (block-hits dirt-block34) 0)
-	(at-x dirt-block35)
-	(at-y dirt-block35)
-	(at-z dirt-block35)
+	(at-x dirt-block35 position0)
+
+	(at-y dirt-block35 position2)
+
+	(at-z dirt-block35 position4)
+
 	(block-present dirt-block35)
-	(= (x dirt-block35) 0)
-	(= (y dirt-block35) 2)
-	(= (z dirt-block35) 4)
-	(= (block-hits dirt-block35) 0)
-	(at-x dirt-block36)
-	(at-y dirt-block36)
-	(at-z dirt-block36)
+	(at-x dirt-block36 position0)
+
+	(at-y dirt-block36 position2)
+
+	(at-z dirt-block36 position-3)
+
 	(block-present dirt-block36)
-	(= (x dirt-block36) 0)
-	(= (y dirt-block36) 2)
-	(= (z dirt-block36) -3)
-	(= (block-hits dirt-block36) 0)
-	(at-x dirt-block37)
-	(at-y dirt-block37)
-	(at-z dirt-block37)
+	(at-x dirt-block37 position0)
+
+	(at-y dirt-block37 position2)
+
+	(at-z dirt-block37 position-2)
+
 	(block-present dirt-block37)
-	(= (x dirt-block37) 0)
-	(= (y dirt-block37) 2)
-	(= (z dirt-block37) -2)
-	(= (block-hits dirt-block37) 0)
-	(at-x dirt-block38)
-	(at-y dirt-block38)
-	(at-z dirt-block38)
+	(at-x dirt-block38 position0)
+
+	(at-y dirt-block38 position2)
+
+	(at-z dirt-block38 position-1)
+
 	(block-present dirt-block38)
-	(= (x dirt-block38) 0)
-	(= (y dirt-block38) 2)
-	(= (z dirt-block38) -1)
-	(= (block-hits dirt-block38) 0)
-	(at-x dirt-block39)
-	(at-y dirt-block39)
-	(at-z dirt-block39)
+	(at-x dirt-block39 position0)
+
+	(at-y dirt-block39 position2)
+
+	(at-z dirt-block39 position0)
+
 	(block-present dirt-block39)
-	(= (x dirt-block39) 0)
-	(= (y dirt-block39) 2)
-	(= (z dirt-block39) 0)
-	(= (block-hits dirt-block39) 0)
-	(at-x dirt-block40)
-	(at-y dirt-block40)
-	(at-z dirt-block40)
+	(at-x dirt-block40 position0)
+
+	(at-y dirt-block40 position2)
+
+	(at-z dirt-block40 position0)
+
 	(block-present dirt-block40)
-	(= (x dirt-block40) 0)
-	(= (y dirt-block40) 2)
-	(= (z dirt-block40) 0)
-	(= (block-hits dirt-block40) 0)
-	(at-x dirt-block41)
-	(at-y dirt-block41)
-	(at-z dirt-block41)
+	(at-x dirt-block41 position0)
+
+	(at-y dirt-block41 position2)
+
+	(at-z dirt-block41 position1)
+
 	(block-present dirt-block41)
-	(= (x dirt-block41) 0)
-	(= (y dirt-block41) 2)
-	(= (z dirt-block41) 1)
-	(= (block-hits dirt-block41) 0)
-	(at-x dirt-block42)
-	(at-y dirt-block42)
-	(at-z dirt-block42)
+	(at-x dirt-block42 position0)
+
+	(at-y dirt-block42 position2)
+
+	(at-z dirt-block42 position2)
+
 	(block-present dirt-block42)
-	(= (x dirt-block42) 0)
-	(= (y dirt-block42) 2)
-	(= (z dirt-block42) 2)
-	(= (block-hits dirt-block42) 0)
-	(at-x dirt-block43)
-	(at-y dirt-block43)
-	(at-z dirt-block43)
+	(at-x dirt-block43 position0)
+
+	(at-y dirt-block43 position2)
+
+	(at-z dirt-block43 position3)
+
 	(block-present dirt-block43)
-	(= (x dirt-block43) 0)
-	(= (y dirt-block43) 2)
-	(= (z dirt-block43) 3)
-	(= (block-hits dirt-block43) 0)
-	(at-x dirt-block44)
-	(at-y dirt-block44)
-	(at-z dirt-block44)
+	(at-x dirt-block44 position0)
+
+	(at-y dirt-block44 position2)
+
+	(at-z dirt-block44 position4)
+
 	(block-present dirt-block44)
-	(= (x dirt-block44) 0)
-	(= (y dirt-block44) 2)
-	(= (z dirt-block44) 4)
-	(= (block-hits dirt-block44) 0)
-	(at-x dirt-block45)
-	(at-y dirt-block45)
-	(at-z dirt-block45)
+	(at-x dirt-block45 position1)
+
+	(at-y dirt-block45 position2)
+
+	(at-z dirt-block45 position-3)
+
 	(block-present dirt-block45)
-	(= (x dirt-block45) 1)
-	(= (y dirt-block45) 2)
-	(= (z dirt-block45) -3)
-	(= (block-hits dirt-block45) 0)
-	(at-x dirt-block46)
-	(at-y dirt-block46)
-	(at-z dirt-block46)
+	(at-x dirt-block46 position1)
+
+	(at-y dirt-block46 position2)
+
+	(at-z dirt-block46 position-2)
+
 	(block-present dirt-block46)
-	(= (x dirt-block46) 1)
-	(= (y dirt-block46) 2)
-	(= (z dirt-block46) -2)
-	(= (block-hits dirt-block46) 0)
-	(at-x dirt-block47)
-	(at-y dirt-block47)
-	(at-z dirt-block47)
+	(at-x dirt-block47 position1)
+
+	(at-y dirt-block47 position2)
+
+	(at-z dirt-block47 position-1)
+
 	(block-present dirt-block47)
-	(= (x dirt-block47) 1)
-	(= (y dirt-block47) 2)
-	(= (z dirt-block47) -1)
-	(= (block-hits dirt-block47) 0)
-	(at-x dirt-block48)
-	(at-y dirt-block48)
-	(at-z dirt-block48)
+	(at-x dirt-block48 position1)
+
+	(at-y dirt-block48 position2)
+
+	(at-z dirt-block48 position0)
+
 	(block-present dirt-block48)
-	(= (x dirt-block48) 1)
-	(= (y dirt-block48) 2)
-	(= (z dirt-block48) 0)
-	(= (block-hits dirt-block48) 0)
-	(at-x dirt-block49)
-	(at-y dirt-block49)
-	(at-z dirt-block49)
+	(at-x dirt-block49 position1)
+
+	(at-y dirt-block49 position2)
+
+	(at-z dirt-block49 position0)
+
 	(block-present dirt-block49)
-	(= (x dirt-block49) 1)
-	(= (y dirt-block49) 2)
-	(= (z dirt-block49) 0)
-	(= (block-hits dirt-block49) 0)
-	(at-x dirt-block50)
-	(at-y dirt-block50)
-	(at-z dirt-block50)
+	(at-x dirt-block50 position1)
+
+	(at-y dirt-block50 position2)
+
+	(at-z dirt-block50 position1)
+
 	(block-present dirt-block50)
-	(= (x dirt-block50) 1)
-	(= (y dirt-block50) 2)
-	(= (z dirt-block50) 1)
-	(= (block-hits dirt-block50) 0)
-	(at-x dirt-block51)
-	(at-y dirt-block51)
-	(at-z dirt-block51)
+	(at-x dirt-block51 position1)
+
+	(at-y dirt-block51 position2)
+
+	(at-z dirt-block51 position2)
+
 	(block-present dirt-block51)
-	(= (x dirt-block51) 1)
-	(= (y dirt-block51) 2)
-	(= (z dirt-block51) 2)
-	(= (block-hits dirt-block51) 0)
-	(at-x dirt-block52)
-	(at-y dirt-block52)
-	(at-z dirt-block52)
+	(at-x dirt-block52 position1)
+
+	(at-y dirt-block52 position2)
+
+	(at-z dirt-block52 position3)
+
 	(block-present dirt-block52)
-	(= (x dirt-block52) 1)
-	(= (y dirt-block52) 2)
-	(= (z dirt-block52) 3)
-	(= (block-hits dirt-block52) 0)
-	(at-x dirt-block53)
-	(at-y dirt-block53)
-	(at-z dirt-block53)
+	(at-x dirt-block53 position1)
+
+	(at-y dirt-block53 position2)
+
+	(at-z dirt-block53 position4)
+
 	(block-present dirt-block53)
-	(= (x dirt-block53) 1)
-	(= (y dirt-block53) 2)
-	(= (z dirt-block53) 4)
-	(= (block-hits dirt-block53) 0)
-	(at-x dirt-block54)
-	(at-y dirt-block54)
-	(at-z dirt-block54)
+	(at-x dirt-block54 position2)
+
+	(at-y dirt-block54 position2)
+
+	(at-z dirt-block54 position-3)
+
 	(block-present dirt-block54)
-	(= (x dirt-block54) 2)
-	(= (y dirt-block54) 2)
-	(= (z dirt-block54) -3)
-	(= (block-hits dirt-block54) 0)
-	(at-x dirt-block55)
-	(at-y dirt-block55)
-	(at-z dirt-block55)
+	(at-x dirt-block55 position2)
+
+	(at-y dirt-block55 position2)
+
+	(at-z dirt-block55 position-2)
+
 	(block-present dirt-block55)
-	(= (x dirt-block55) 2)
-	(= (y dirt-block55) 2)
-	(= (z dirt-block55) -2)
-	(= (block-hits dirt-block55) 0)
-	(at-x dirt-block56)
-	(at-y dirt-block56)
-	(at-z dirt-block56)
+	(at-x dirt-block56 position2)
+
+	(at-y dirt-block56 position2)
+
+	(at-z dirt-block56 position-1)
+
 	(block-present dirt-block56)
-	(= (x dirt-block56) 2)
-	(= (y dirt-block56) 2)
-	(= (z dirt-block56) -1)
-	(= (block-hits dirt-block56) 0)
-	(at-x dirt-block57)
-	(at-y dirt-block57)
-	(at-z dirt-block57)
+	(at-x dirt-block57 position2)
+
+	(at-y dirt-block57 position2)
+
+	(at-z dirt-block57 position0)
+
 	(block-present dirt-block57)
-	(= (x dirt-block57) 2)
-	(= (y dirt-block57) 2)
-	(= (z dirt-block57) 0)
-	(= (block-hits dirt-block57) 0)
-	(at-x dirt-block58)
-	(at-y dirt-block58)
-	(at-z dirt-block58)
+	(at-x dirt-block58 position2)
+
+	(at-y dirt-block58 position2)
+
+	(at-z dirt-block58 position0)
+
 	(block-present dirt-block58)
-	(= (x dirt-block58) 2)
-	(= (y dirt-block58) 2)
-	(= (z dirt-block58) 0)
-	(= (block-hits dirt-block58) 0)
-	(at-x dirt-block59)
-	(at-y dirt-block59)
-	(at-z dirt-block59)
+	(at-x dirt-block59 position2)
+
+	(at-y dirt-block59 position2)
+
+	(at-z dirt-block59 position1)
+
 	(block-present dirt-block59)
-	(= (x dirt-block59) 2)
-	(= (y dirt-block59) 2)
-	(= (z dirt-block59) 1)
-	(= (block-hits dirt-block59) 0)
-	(at-x dirt-block60)
-	(at-y dirt-block60)
-	(at-z dirt-block60)
+	(at-x dirt-block60 position2)
+
+	(at-y dirt-block60 position2)
+
+	(at-z dirt-block60 position2)
+
 	(block-present dirt-block60)
-	(= (x dirt-block60) 2)
-	(= (y dirt-block60) 2)
-	(= (z dirt-block60) 2)
-	(= (block-hits dirt-block60) 0)
-	(at-x dirt-block61)
-	(at-y dirt-block61)
-	(at-z dirt-block61)
+	(at-x dirt-block61 position2)
+
+	(at-y dirt-block61 position2)
+
+	(at-z dirt-block61 position3)
+
 	(block-present dirt-block61)
-	(= (x dirt-block61) 2)
-	(= (y dirt-block61) 2)
-	(= (z dirt-block61) 3)
-	(= (block-hits dirt-block61) 0)
-	(at-x dirt-block62)
-	(at-y dirt-block62)
-	(at-z dirt-block62)
+	(at-x dirt-block62 position2)
+
+	(at-y dirt-block62 position2)
+
+	(at-z dirt-block62 position4)
+
 	(block-present dirt-block62)
-	(= (x dirt-block62) 2)
-	(= (y dirt-block62) 2)
-	(= (z dirt-block62) 4)
-	(= (block-hits dirt-block62) 0)
-	(at-x dirt-block63)
-	(at-y dirt-block63)
-	(at-z dirt-block63)
+	(at-x dirt-block63 position3)
+
+	(at-y dirt-block63 position2)
+
+	(at-z dirt-block63 position-3)
+
 	(block-present dirt-block63)
-	(= (x dirt-block63) 3)
-	(= (y dirt-block63) 2)
-	(= (z dirt-block63) -3)
-	(= (block-hits dirt-block63) 0)
-	(at-x dirt-block64)
-	(at-y dirt-block64)
-	(at-z dirt-block64)
+	(at-x dirt-block64 position3)
+
+	(at-y dirt-block64 position2)
+
+	(at-z dirt-block64 position-2)
+
 	(block-present dirt-block64)
-	(= (x dirt-block64) 3)
-	(= (y dirt-block64) 2)
-	(= (z dirt-block64) -2)
-	(= (block-hits dirt-block64) 0)
-	(at-x dirt-block65)
-	(at-y dirt-block65)
-	(at-z dirt-block65)
+	(at-x dirt-block65 position3)
+
+	(at-y dirt-block65 position2)
+
+	(at-z dirt-block65 position-1)
+
 	(block-present dirt-block65)
-	(= (x dirt-block65) 3)
-	(= (y dirt-block65) 2)
-	(= (z dirt-block65) -1)
-	(= (block-hits dirt-block65) 0)
-	(at-x dirt-block66)
-	(at-y dirt-block66)
-	(at-z dirt-block66)
+	(at-x dirt-block66 position3)
+
+	(at-y dirt-block66 position2)
+
+	(at-z dirt-block66 position0)
+
 	(block-present dirt-block66)
-	(= (x dirt-block66) 3)
-	(= (y dirt-block66) 2)
-	(= (z dirt-block66) 0)
-	(= (block-hits dirt-block66) 0)
-	(at-x dirt-block67)
-	(at-y dirt-block67)
-	(at-z dirt-block67)
+	(at-x dirt-block67 position3)
+
+	(at-y dirt-block67 position2)
+
+	(at-z dirt-block67 position0)
+
 	(block-present dirt-block67)
-	(= (x dirt-block67) 3)
-	(= (y dirt-block67) 2)
-	(= (z dirt-block67) 0)
-	(= (block-hits dirt-block67) 0)
-	(at-x dirt-block68)
-	(at-y dirt-block68)
-	(at-z dirt-block68)
+	(at-x dirt-block68 position3)
+
+	(at-y dirt-block68 position2)
+
+	(at-z dirt-block68 position1)
+
 	(block-present dirt-block68)
-	(= (x dirt-block68) 3)
-	(= (y dirt-block68) 2)
-	(= (z dirt-block68) 1)
-	(= (block-hits dirt-block68) 0)
-	(at-x dirt-block69)
-	(at-y dirt-block69)
-	(at-z dirt-block69)
+	(at-x dirt-block69 position3)
+
+	(at-y dirt-block69 position2)
+
+	(at-z dirt-block69 position2)
+
 	(block-present dirt-block69)
-	(= (x dirt-block69) 3)
-	(= (y dirt-block69) 2)
-	(= (z dirt-block69) 2)
-	(= (block-hits dirt-block69) 0)
-	(at-x dirt-block70)
-	(at-y dirt-block70)
-	(at-z dirt-block70)
+	(at-x dirt-block70 position3)
+
+	(at-y dirt-block70 position2)
+
+	(at-z dirt-block70 position3)
+
 	(block-present dirt-block70)
-	(= (x dirt-block70) 3)
-	(= (y dirt-block70) 2)
-	(= (z dirt-block70) 3)
-	(= (block-hits dirt-block70) 0)
-	(at-x dirt-block71)
-	(at-y dirt-block71)
-	(at-z dirt-block71)
+	(at-x dirt-block71 position3)
+
+	(at-y dirt-block71 position2)
+
+	(at-z dirt-block71 position4)
+
 	(block-present dirt-block71)
-	(= (x dirt-block71) 3)
-	(= (y dirt-block71) 2)
-	(= (z dirt-block71) 4)
-	(= (block-hits dirt-block71) 0)
-	(at-x dirt-block72)
-	(at-y dirt-block72)
-	(at-z dirt-block72)
+	(at-x dirt-block72 position4)
+
+	(at-y dirt-block72 position2)
+
+	(at-z dirt-block72 position-3)
+
 	(block-present dirt-block72)
-	(= (x dirt-block72) 4)
-	(= (y dirt-block72) 2)
-	(= (z dirt-block72) -3)
-	(= (block-hits dirt-block72) 0)
-	(at-x dirt-block73)
-	(at-y dirt-block73)
-	(at-z dirt-block73)
+	(at-x dirt-block73 position4)
+
+	(at-y dirt-block73 position2)
+
+	(at-z dirt-block73 position-2)
+
 	(block-present dirt-block73)
-	(= (x dirt-block73) 4)
-	(= (y dirt-block73) 2)
-	(= (z dirt-block73) -2)
-	(= (block-hits dirt-block73) 0)
-	(at-x dirt-block74)
-	(at-y dirt-block74)
-	(at-z dirt-block74)
+	(at-x dirt-block74 position4)
+
+	(at-y dirt-block74 position2)
+
+	(at-z dirt-block74 position-1)
+
 	(block-present dirt-block74)
-	(= (x dirt-block74) 4)
-	(= (y dirt-block74) 2)
-	(= (z dirt-block74) -1)
-	(= (block-hits dirt-block74) 0)
-	(at-x dirt-block75)
-	(at-y dirt-block75)
-	(at-z dirt-block75)
+	(at-x dirt-block75 position4)
+
+	(at-y dirt-block75 position2)
+
+	(at-z dirt-block75 position0)
+
 	(block-present dirt-block75)
-	(= (x dirt-block75) 4)
-	(= (y dirt-block75) 2)
-	(= (z dirt-block75) 0)
-	(= (block-hits dirt-block75) 0)
-	(at-x dirt-block76)
-	(at-y dirt-block76)
-	(at-z dirt-block76)
+	(at-x dirt-block76 position4)
+
+	(at-y dirt-block76 position2)
+
+	(at-z dirt-block76 position0)
+
 	(block-present dirt-block76)
-	(= (x dirt-block76) 4)
-	(= (y dirt-block76) 2)
-	(= (z dirt-block76) 0)
-	(= (block-hits dirt-block76) 0)
-	(at-x dirt-block77)
-	(at-y dirt-block77)
-	(at-z dirt-block77)
+	(at-x dirt-block77 position4)
+
+	(at-y dirt-block77 position2)
+
+	(at-z dirt-block77 position1)
+
 	(block-present dirt-block77)
-	(= (x dirt-block77) 4)
-	(= (y dirt-block77) 2)
-	(= (z dirt-block77) 1)
-	(= (block-hits dirt-block77) 0)
-	(at-x dirt-block78)
-	(at-y dirt-block78)
-	(at-z dirt-block78)
+	(at-x dirt-block78 position4)
+
+	(at-y dirt-block78 position2)
+
+	(at-z dirt-block78 position2)
+
 	(block-present dirt-block78)
-	(= (x dirt-block78) 4)
-	(= (y dirt-block78) 2)
-	(= (z dirt-block78) 2)
-	(= (block-hits dirt-block78) 0)
-	(at-x dirt-block79)
-	(at-y dirt-block79)
-	(at-z dirt-block79)
+	(at-x dirt-block79 position4)
+
+	(at-y dirt-block79 position2)
+
+	(at-z dirt-block79 position3)
+
 	(block-present dirt-block79)
-	(= (x dirt-block79) 4)
-	(= (y dirt-block79) 2)
-	(= (z dirt-block79) 3)
-	(= (block-hits dirt-block79) 0)
-	(at-x dirt-block80)
-	(at-y dirt-block80)
-	(at-z dirt-block80)
+	(at-x dirt-block80 position4)
+
+	(at-y dirt-block80 position2)
+
+	(at-z dirt-block80 position4)
+
 	(block-present dirt-block80)
-	(= (x dirt-block80) 4)
-	(= (y dirt-block80) 2)
-	(= (z dirt-block80) 4)
-	(= (block-hits dirt-block80) 0)
-	(at-x grass_block-block0)
-	(at-y grass_block-block0)
-	(at-z grass_block-block0)
+	(at-x grass_block-block0 position-3)
+
+	(at-y grass_block-block0 position3)
+
+	(at-z grass_block-block0 position-3)
+
 	(block-present grass_block-block0)
-	(= (x grass_block-block0) -3)
-	(= (y grass_block-block0) 3)
-	(= (z grass_block-block0) -3)
-	(= (block-hits grass_block-block0) 0)
-	(at-x grass_block-block1)
-	(at-y grass_block-block1)
-	(at-z grass_block-block1)
+	(at-x grass_block-block1 position-3)
+
+	(at-y grass_block-block1 position3)
+
+	(at-z grass_block-block1 position-2)
+
 	(block-present grass_block-block1)
-	(= (x grass_block-block1) -3)
-	(= (y grass_block-block1) 3)
-	(= (z grass_block-block1) -2)
-	(= (block-hits grass_block-block1) 0)
-	(at-x grass_block-block2)
-	(at-y grass_block-block2)
-	(at-z grass_block-block2)
+	(at-x grass_block-block2 position-3)
+
+	(at-y grass_block-block2 position3)
+
+	(at-z grass_block-block2 position-1)
+
 	(block-present grass_block-block2)
-	(= (x grass_block-block2) -3)
-	(= (y grass_block-block2) 3)
-	(= (z grass_block-block2) -1)
-	(= (block-hits grass_block-block2) 0)
-	(at-x grass_block-block3)
-	(at-y grass_block-block3)
-	(at-z grass_block-block3)
+	(at-x grass_block-block3 position-3)
+
+	(at-y grass_block-block3 position3)
+
+	(at-z grass_block-block3 position0)
+
 	(block-present grass_block-block3)
-	(= (x grass_block-block3) -3)
-	(= (y grass_block-block3) 3)
-	(= (z grass_block-block3) 0)
-	(= (block-hits grass_block-block3) 0)
-	(at-x grass_block-block4)
-	(at-y grass_block-block4)
-	(at-z grass_block-block4)
+	(at-x grass_block-block4 position-3)
+
+	(at-y grass_block-block4 position3)
+
+	(at-z grass_block-block4 position0)
+
 	(block-present grass_block-block4)
-	(= (x grass_block-block4) -3)
-	(= (y grass_block-block4) 3)
-	(= (z grass_block-block4) 0)
-	(= (block-hits grass_block-block4) 0)
-	(at-x grass_block-block5)
-	(at-y grass_block-block5)
-	(at-z grass_block-block5)
+	(at-x grass_block-block5 position-3)
+
+	(at-y grass_block-block5 position3)
+
+	(at-z grass_block-block5 position1)
+
 	(block-present grass_block-block5)
-	(= (x grass_block-block5) -3)
-	(= (y grass_block-block5) 3)
-	(= (z grass_block-block5) 1)
-	(= (block-hits grass_block-block5) 0)
-	(at-x grass_block-block6)
-	(at-y grass_block-block6)
-	(at-z grass_block-block6)
+	(at-x grass_block-block6 position-3)
+
+	(at-y grass_block-block6 position3)
+
+	(at-z grass_block-block6 position2)
+
 	(block-present grass_block-block6)
-	(= (x grass_block-block6) -3)
-	(= (y grass_block-block6) 3)
-	(= (z grass_block-block6) 2)
-	(= (block-hits grass_block-block6) 0)
-	(at-x grass_block-block7)
-	(at-y grass_block-block7)
-	(at-z grass_block-block7)
+	(at-x grass_block-block7 position-3)
+
+	(at-y grass_block-block7 position3)
+
+	(at-z grass_block-block7 position3)
+
 	(block-present grass_block-block7)
-	(= (x grass_block-block7) -3)
-	(= (y grass_block-block7) 3)
-	(= (z grass_block-block7) 3)
-	(= (block-hits grass_block-block7) 0)
-	(at-x grass_block-block8)
-	(at-y grass_block-block8)
-	(at-z grass_block-block8)
+	(at-x grass_block-block8 position-3)
+
+	(at-y grass_block-block8 position3)
+
+	(at-z grass_block-block8 position4)
+
 	(block-present grass_block-block8)
-	(= (x grass_block-block8) -3)
-	(= (y grass_block-block8) 3)
-	(= (z grass_block-block8) 4)
-	(= (block-hits grass_block-block8) 0)
-	(at-x grass_block-block9)
-	(at-y grass_block-block9)
-	(at-z grass_block-block9)
+	(at-x grass_block-block9 position-2)
+
+	(at-y grass_block-block9 position3)
+
+	(at-z grass_block-block9 position-3)
+
 	(block-present grass_block-block9)
-	(= (x grass_block-block9) -2)
-	(= (y grass_block-block9) 3)
-	(= (z grass_block-block9) -3)
-	(= (block-hits grass_block-block9) 0)
-	(at-x grass_block-block10)
-	(at-y grass_block-block10)
-	(at-z grass_block-block10)
+	(at-x grass_block-block10 position-2)
+
+	(at-y grass_block-block10 position3)
+
+	(at-z grass_block-block10 position-2)
+
 	(block-present grass_block-block10)
-	(= (x grass_block-block10) -2)
-	(= (y grass_block-block10) 3)
-	(= (z grass_block-block10) -2)
-	(= (block-hits grass_block-block10) 0)
-	(at-x grass_block-block11)
-	(at-y grass_block-block11)
-	(at-z grass_block-block11)
+	(at-x grass_block-block11 position-2)
+
+	(at-y grass_block-block11 position3)
+
+	(at-z grass_block-block11 position-1)
+
 	(block-present grass_block-block11)
-	(= (x grass_block-block11) -2)
-	(= (y grass_block-block11) 3)
-	(= (z grass_block-block11) -1)
-	(= (block-hits grass_block-block11) 0)
-	(at-x grass_block-block12)
-	(at-y grass_block-block12)
-	(at-z grass_block-block12)
+	(at-x grass_block-block12 position-2)
+
+	(at-y grass_block-block12 position3)
+
+	(at-z grass_block-block12 position0)
+
 	(block-present grass_block-block12)
-	(= (x grass_block-block12) -2)
-	(= (y grass_block-block12) 3)
-	(= (z grass_block-block12) 0)
-	(= (block-hits grass_block-block12) 0)
-	(at-x grass_block-block13)
-	(at-y grass_block-block13)
-	(at-z grass_block-block13)
+	(at-x grass_block-block13 position-2)
+
+	(at-y grass_block-block13 position3)
+
+	(at-z grass_block-block13 position0)
+
 	(block-present grass_block-block13)
-	(= (x grass_block-block13) -2)
-	(= (y grass_block-block13) 3)
-	(= (z grass_block-block13) 0)
-	(= (block-hits grass_block-block13) 0)
-	(at-x grass_block-block14)
-	(at-y grass_block-block14)
-	(at-z grass_block-block14)
+	(at-x grass_block-block14 position-2)
+
+	(at-y grass_block-block14 position3)
+
+	(at-z grass_block-block14 position1)
+
 	(block-present grass_block-block14)
-	(= (x grass_block-block14) -2)
-	(= (y grass_block-block14) 3)
-	(= (z grass_block-block14) 1)
-	(= (block-hits grass_block-block14) 0)
-	(at-x grass_block-block15)
-	(at-y grass_block-block15)
-	(at-z grass_block-block15)
+	(at-x grass_block-block15 position-2)
+
+	(at-y grass_block-block15 position3)
+
+	(at-z grass_block-block15 position2)
+
 	(block-present grass_block-block15)
-	(= (x grass_block-block15) -2)
-	(= (y grass_block-block15) 3)
-	(= (z grass_block-block15) 2)
-	(= (block-hits grass_block-block15) 0)
-	(at-x grass_block-block16)
-	(at-y grass_block-block16)
-	(at-z grass_block-block16)
+	(at-x grass_block-block16 position-2)
+
+	(at-y grass_block-block16 position3)
+
+	(at-z grass_block-block16 position3)
+
 	(block-present grass_block-block16)
-	(= (x grass_block-block16) -2)
-	(= (y grass_block-block16) 3)
-	(= (z grass_block-block16) 3)
-	(= (block-hits grass_block-block16) 0)
-	(at-x grass_block-block17)
-	(at-y grass_block-block17)
-	(at-z grass_block-block17)
+	(at-x grass_block-block17 position-2)
+
+	(at-y grass_block-block17 position3)
+
+	(at-z grass_block-block17 position4)
+
 	(block-present grass_block-block17)
-	(= (x grass_block-block17) -2)
-	(= (y grass_block-block17) 3)
-	(= (z grass_block-block17) 4)
-	(= (block-hits grass_block-block17) 0)
-	(at-x grass_block-block18)
-	(at-y grass_block-block18)
-	(at-z grass_block-block18)
+	(at-x grass_block-block18 position-1)
+
+	(at-y grass_block-block18 position3)
+
+	(at-z grass_block-block18 position-3)
+
 	(block-present grass_block-block18)
-	(= (x grass_block-block18) -1)
-	(= (y grass_block-block18) 3)
-	(= (z grass_block-block18) -3)
-	(= (block-hits grass_block-block18) 0)
-	(at-x grass_block-block19)
-	(at-y grass_block-block19)
-	(at-z grass_block-block19)
+	(at-x grass_block-block19 position-1)
+
+	(at-y grass_block-block19 position3)
+
+	(at-z grass_block-block19 position-2)
+
 	(block-present grass_block-block19)
-	(= (x grass_block-block19) -1)
-	(= (y grass_block-block19) 3)
-	(= (z grass_block-block19) -2)
-	(= (block-hits grass_block-block19) 0)
-	(at-x grass_block-block20)
-	(at-y grass_block-block20)
-	(at-z grass_block-block20)
+	(at-x grass_block-block20 position-1)
+
+	(at-y grass_block-block20 position3)
+
+	(at-z grass_block-block20 position-1)
+
 	(block-present grass_block-block20)
-	(= (x grass_block-block20) -1)
-	(= (y grass_block-block20) 3)
-	(= (z grass_block-block20) -1)
-	(= (block-hits grass_block-block20) 0)
-	(at-x grass_block-block21)
-	(at-y grass_block-block21)
-	(at-z grass_block-block21)
+	(at-x grass_block-block21 position-1)
+
+	(at-y grass_block-block21 position3)
+
+	(at-z grass_block-block21 position0)
+
 	(block-present grass_block-block21)
-	(= (x grass_block-block21) -1)
-	(= (y grass_block-block21) 3)
-	(= (z grass_block-block21) 0)
-	(= (block-hits grass_block-block21) 0)
-	(at-x grass_block-block22)
-	(at-y grass_block-block22)
-	(at-z grass_block-block22)
+	(at-x grass_block-block22 position-1)
+
+	(at-y grass_block-block22 position3)
+
+	(at-z grass_block-block22 position0)
+
 	(block-present grass_block-block22)
-	(= (x grass_block-block22) -1)
-	(= (y grass_block-block22) 3)
-	(= (z grass_block-block22) 0)
-	(= (block-hits grass_block-block22) 0)
-	(at-x grass_block-block23)
-	(at-y grass_block-block23)
-	(at-z grass_block-block23)
+	(at-x grass_block-block23 position-1)
+
+	(at-y grass_block-block23 position3)
+
+	(at-z grass_block-block23 position1)
+
 	(block-present grass_block-block23)
-	(= (x grass_block-block23) -1)
-	(= (y grass_block-block23) 3)
-	(= (z grass_block-block23) 1)
-	(= (block-hits grass_block-block23) 0)
-	(at-x grass_block-block24)
-	(at-y grass_block-block24)
-	(at-z grass_block-block24)
+	(at-x grass_block-block24 position-1)
+
+	(at-y grass_block-block24 position3)
+
+	(at-z grass_block-block24 position2)
+
 	(block-present grass_block-block24)
-	(= (x grass_block-block24) -1)
-	(= (y grass_block-block24) 3)
-	(= (z grass_block-block24) 2)
-	(= (block-hits grass_block-block24) 0)
-	(at-x grass_block-block25)
-	(at-y grass_block-block25)
-	(at-z grass_block-block25)
+	(at-x grass_block-block25 position-1)
+
+	(at-y grass_block-block25 position3)
+
+	(at-z grass_block-block25 position3)
+
 	(block-present grass_block-block25)
-	(= (x grass_block-block25) -1)
-	(= (y grass_block-block25) 3)
-	(= (z grass_block-block25) 3)
-	(= (block-hits grass_block-block25) 0)
-	(at-x grass_block-block26)
-	(at-y grass_block-block26)
-	(at-z grass_block-block26)
+	(at-x grass_block-block26 position-1)
+
+	(at-y grass_block-block26 position3)
+
+	(at-z grass_block-block26 position4)
+
 	(block-present grass_block-block26)
-	(= (x grass_block-block26) -1)
-	(= (y grass_block-block26) 3)
-	(= (z grass_block-block26) 4)
-	(= (block-hits grass_block-block26) 0)
-	(at-x grass_block-block27)
-	(at-y grass_block-block27)
-	(at-z grass_block-block27)
+	(at-x grass_block-block27 position0)
+
+	(at-y grass_block-block27 position3)
+
+	(at-z grass_block-block27 position-3)
+
 	(block-present grass_block-block27)
-	(= (x grass_block-block27) 0)
-	(= (y grass_block-block27) 3)
-	(= (z grass_block-block27) -3)
-	(= (block-hits grass_block-block27) 0)
-	(at-x grass_block-block28)
-	(at-y grass_block-block28)
-	(at-z grass_block-block28)
+	(at-x grass_block-block28 position0)
+
+	(at-y grass_block-block28 position3)
+
+	(at-z grass_block-block28 position-2)
+
 	(block-present grass_block-block28)
-	(= (x grass_block-block28) 0)
-	(= (y grass_block-block28) 3)
-	(= (z grass_block-block28) -2)
-	(= (block-hits grass_block-block28) 0)
-	(at-x grass_block-block29)
-	(at-y grass_block-block29)
-	(at-z grass_block-block29)
+	(at-x grass_block-block29 position0)
+
+	(at-y grass_block-block29 position3)
+
+	(at-z grass_block-block29 position-1)
+
 	(block-present grass_block-block29)
-	(= (x grass_block-block29) 0)
-	(= (y grass_block-block29) 3)
-	(= (z grass_block-block29) -1)
-	(= (block-hits grass_block-block29) 0)
-	(at-x grass_block-block30)
-	(at-y grass_block-block30)
-	(at-z grass_block-block30)
+	(at-x grass_block-block30 position0)
+
+	(at-y grass_block-block30 position3)
+
+	(at-z grass_block-block30 position0)
+
 	(block-present grass_block-block30)
-	(= (x grass_block-block30) 0)
-	(= (y grass_block-block30) 3)
-	(= (z grass_block-block30) 0)
-	(= (block-hits grass_block-block30) 0)
-	(at-x grass_block-block31)
-	(at-y grass_block-block31)
-	(at-z grass_block-block31)
+	(at-x grass_block-block31 position0)
+
+	(at-y grass_block-block31 position3)
+
+	(at-z grass_block-block31 position0)
+
 	(block-present grass_block-block31)
-	(= (x grass_block-block31) 0)
-	(= (y grass_block-block31) 3)
-	(= (z grass_block-block31) 0)
-	(= (block-hits grass_block-block31) 0)
-	(at-x grass_block-block32)
-	(at-y grass_block-block32)
-	(at-z grass_block-block32)
+	(at-x grass_block-block32 position0)
+
+	(at-y grass_block-block32 position3)
+
+	(at-z grass_block-block32 position1)
+
 	(block-present grass_block-block32)
-	(= (x grass_block-block32) 0)
-	(= (y grass_block-block32) 3)
-	(= (z grass_block-block32) 1)
-	(= (block-hits grass_block-block32) 0)
-	(at-x grass_block-block33)
-	(at-y grass_block-block33)
-	(at-z grass_block-block33)
+	(at-x grass_block-block33 position0)
+
+	(at-y grass_block-block33 position3)
+
+	(at-z grass_block-block33 position2)
+
 	(block-present grass_block-block33)
-	(= (x grass_block-block33) 0)
-	(= (y grass_block-block33) 3)
-	(= (z grass_block-block33) 2)
-	(= (block-hits grass_block-block33) 0)
-	(at-x grass_block-block34)
-	(at-y grass_block-block34)
-	(at-z grass_block-block34)
+	(at-x grass_block-block34 position0)
+
+	(at-y grass_block-block34 position3)
+
+	(at-z grass_block-block34 position3)
+
 	(block-present grass_block-block34)
-	(= (x grass_block-block34) 0)
-	(= (y grass_block-block34) 3)
-	(= (z grass_block-block34) 3)
-	(= (block-hits grass_block-block34) 0)
-	(at-x grass_block-block35)
-	(at-y grass_block-block35)
-	(at-z grass_block-block35)
+	(at-x grass_block-block35 position0)
+
+	(at-y grass_block-block35 position3)
+
+	(at-z grass_block-block35 position4)
+
 	(block-present grass_block-block35)
-	(= (x grass_block-block35) 0)
-	(= (y grass_block-block35) 3)
-	(= (z grass_block-block35) 4)
-	(= (block-hits grass_block-block35) 0)
-	(at-x grass_block-block36)
-	(at-y grass_block-block36)
-	(at-z grass_block-block36)
+	(at-x grass_block-block36 position0)
+
+	(at-y grass_block-block36 position3)
+
+	(at-z grass_block-block36 position-3)
+
 	(block-present grass_block-block36)
-	(= (x grass_block-block36) 0)
-	(= (y grass_block-block36) 3)
-	(= (z grass_block-block36) -3)
-	(= (block-hits grass_block-block36) 0)
-	(at-x grass_block-block37)
-	(at-y grass_block-block37)
-	(at-z grass_block-block37)
+	(at-x grass_block-block37 position0)
+
+	(at-y grass_block-block37 position3)
+
+	(at-z grass_block-block37 position-2)
+
 	(block-present grass_block-block37)
-	(= (x grass_block-block37) 0)
-	(= (y grass_block-block37) 3)
-	(= (z grass_block-block37) -2)
-	(= (block-hits grass_block-block37) 0)
-	(at-x grass_block-block38)
-	(at-y grass_block-block38)
-	(at-z grass_block-block38)
+	(at-x grass_block-block38 position0)
+
+	(at-y grass_block-block38 position3)
+
+	(at-z grass_block-block38 position-1)
+
 	(block-present grass_block-block38)
-	(= (x grass_block-block38) 0)
-	(= (y grass_block-block38) 3)
-	(= (z grass_block-block38) -1)
-	(= (block-hits grass_block-block38) 0)
-	(at-x grass_block-block39)
-	(at-y grass_block-block39)
-	(at-z grass_block-block39)
+	(at-x grass_block-block39 position0)
+
+	(at-y grass_block-block39 position3)
+
+	(at-z grass_block-block39 position0)
+
 	(block-present grass_block-block39)
-	(= (x grass_block-block39) 0)
-	(= (y grass_block-block39) 3)
-	(= (z grass_block-block39) 0)
-	(= (block-hits grass_block-block39) 0)
-	(at-x grass_block-block40)
-	(at-y grass_block-block40)
-	(at-z grass_block-block40)
+	(at-x grass_block-block40 position0)
+
+	(at-y grass_block-block40 position3)
+
+	(at-z grass_block-block40 position0)
+
 	(block-present grass_block-block40)
-	(= (x grass_block-block40) 0)
-	(= (y grass_block-block40) 3)
-	(= (z grass_block-block40) 0)
-	(= (block-hits grass_block-block40) 0)
-	(at-x grass_block-block41)
-	(at-y grass_block-block41)
-	(at-z grass_block-block41)
+	(at-x grass_block-block41 position0)
+
+	(at-y grass_block-block41 position3)
+
+	(at-z grass_block-block41 position1)
+
 	(block-present grass_block-block41)
-	(= (x grass_block-block41) 0)
-	(= (y grass_block-block41) 3)
-	(= (z grass_block-block41) 1)
-	(= (block-hits grass_block-block41) 0)
-	(at-x grass_block-block42)
-	(at-y grass_block-block42)
-	(at-z grass_block-block42)
+	(at-x grass_block-block42 position0)
+
+	(at-y grass_block-block42 position3)
+
+	(at-z grass_block-block42 position2)
+
 	(block-present grass_block-block42)
-	(= (x grass_block-block42) 0)
-	(= (y grass_block-block42) 3)
-	(= (z grass_block-block42) 2)
-	(= (block-hits grass_block-block42) 0)
-	(at-x grass_block-block43)
-	(at-y grass_block-block43)
-	(at-z grass_block-block43)
+	(at-x grass_block-block43 position0)
+
+	(at-y grass_block-block43 position3)
+
+	(at-z grass_block-block43 position3)
+
 	(block-present grass_block-block43)
-	(= (x grass_block-block43) 0)
-	(= (y grass_block-block43) 3)
-	(= (z grass_block-block43) 3)
-	(= (block-hits grass_block-block43) 0)
-	(at-x grass_block-block44)
-	(at-y grass_block-block44)
-	(at-z grass_block-block44)
+	(at-x grass_block-block44 position0)
+
+	(at-y grass_block-block44 position3)
+
+	(at-z grass_block-block44 position4)
+
 	(block-present grass_block-block44)
-	(= (x grass_block-block44) 0)
-	(= (y grass_block-block44) 3)
-	(= (z grass_block-block44) 4)
-	(= (block-hits grass_block-block44) 0)
-	(at-x grass_block-block45)
-	(at-y grass_block-block45)
-	(at-z grass_block-block45)
+	(at-x grass_block-block45 position1)
+
+	(at-y grass_block-block45 position3)
+
+	(at-z grass_block-block45 position-3)
+
 	(block-present grass_block-block45)
-	(= (x grass_block-block45) 1)
-	(= (y grass_block-block45) 3)
-	(= (z grass_block-block45) -3)
-	(= (block-hits grass_block-block45) 0)
-	(at-x grass_block-block46)
-	(at-y grass_block-block46)
-	(at-z grass_block-block46)
+	(at-x grass_block-block46 position1)
+
+	(at-y grass_block-block46 position3)
+
+	(at-z grass_block-block46 position-2)
+
 	(block-present grass_block-block46)
-	(= (x grass_block-block46) 1)
-	(= (y grass_block-block46) 3)
-	(= (z grass_block-block46) -2)
-	(= (block-hits grass_block-block46) 0)
-	(at-x grass_block-block47)
-	(at-y grass_block-block47)
-	(at-z grass_block-block47)
+	(at-x grass_block-block47 position1)
+
+	(at-y grass_block-block47 position3)
+
+	(at-z grass_block-block47 position-1)
+
 	(block-present grass_block-block47)
-	(= (x grass_block-block47) 1)
-	(= (y grass_block-block47) 3)
-	(= (z grass_block-block47) -1)
-	(= (block-hits grass_block-block47) 0)
-	(at-x grass_block-block48)
-	(at-y grass_block-block48)
-	(at-z grass_block-block48)
+	(at-x grass_block-block48 position1)
+
+	(at-y grass_block-block48 position3)
+
+	(at-z grass_block-block48 position0)
+
 	(block-present grass_block-block48)
-	(= (x grass_block-block48) 1)
-	(= (y grass_block-block48) 3)
-	(= (z grass_block-block48) 0)
-	(= (block-hits grass_block-block48) 0)
-	(at-x grass_block-block49)
-	(at-y grass_block-block49)
-	(at-z grass_block-block49)
+	(at-x grass_block-block49 position1)
+
+	(at-y grass_block-block49 position3)
+
+	(at-z grass_block-block49 position0)
+
 	(block-present grass_block-block49)
-	(= (x grass_block-block49) 1)
-	(= (y grass_block-block49) 3)
-	(= (z grass_block-block49) 0)
-	(= (block-hits grass_block-block49) 0)
-	(at-x grass_block-block50)
-	(at-y grass_block-block50)
-	(at-z grass_block-block50)
+	(at-x grass_block-block50 position1)
+
+	(at-y grass_block-block50 position3)
+
+	(at-z grass_block-block50 position1)
+
 	(block-present grass_block-block50)
-	(= (x grass_block-block50) 1)
-	(= (y grass_block-block50) 3)
-	(= (z grass_block-block50) 1)
-	(= (block-hits grass_block-block50) 0)
-	(at-x grass_block-block51)
-	(at-y grass_block-block51)
-	(at-z grass_block-block51)
+	(at-x grass_block-block51 position1)
+
+	(at-y grass_block-block51 position3)
+
+	(at-z grass_block-block51 position2)
+
 	(block-present grass_block-block51)
-	(= (x grass_block-block51) 1)
-	(= (y grass_block-block51) 3)
-	(= (z grass_block-block51) 2)
-	(= (block-hits grass_block-block51) 0)
-	(at-x grass_block-block52)
-	(at-y grass_block-block52)
-	(at-z grass_block-block52)
+	(at-x grass_block-block52 position1)
+
+	(at-y grass_block-block52 position3)
+
+	(at-z grass_block-block52 position3)
+
 	(block-present grass_block-block52)
-	(= (x grass_block-block52) 1)
-	(= (y grass_block-block52) 3)
-	(= (z grass_block-block52) 3)
-	(= (block-hits grass_block-block52) 0)
-	(at-x grass_block-block53)
-	(at-y grass_block-block53)
-	(at-z grass_block-block53)
+	(at-x grass_block-block53 position1)
+
+	(at-y grass_block-block53 position3)
+
+	(at-z grass_block-block53 position4)
+
 	(block-present grass_block-block53)
-	(= (x grass_block-block53) 1)
-	(= (y grass_block-block53) 3)
-	(= (z grass_block-block53) 4)
-	(= (block-hits grass_block-block53) 0)
-	(at-x grass_block-block54)
-	(at-y grass_block-block54)
-	(at-z grass_block-block54)
+	(at-x grass_block-block54 position2)
+
+	(at-y grass_block-block54 position3)
+
+	(at-z grass_block-block54 position-3)
+
 	(block-present grass_block-block54)
-	(= (x grass_block-block54) 2)
-	(= (y grass_block-block54) 3)
-	(= (z grass_block-block54) -3)
-	(= (block-hits grass_block-block54) 0)
-	(at-x grass_block-block55)
-	(at-y grass_block-block55)
-	(at-z grass_block-block55)
+	(at-x grass_block-block55 position2)
+
+	(at-y grass_block-block55 position3)
+
+	(at-z grass_block-block55 position-2)
+
 	(block-present grass_block-block55)
-	(= (x grass_block-block55) 2)
-	(= (y grass_block-block55) 3)
-	(= (z grass_block-block55) -2)
-	(= (block-hits grass_block-block55) 0)
-	(at-x grass_block-block56)
-	(at-y grass_block-block56)
-	(at-z grass_block-block56)
+	(at-x grass_block-block56 position2)
+
+	(at-y grass_block-block56 position3)
+
+	(at-z grass_block-block56 position-1)
+
 	(block-present grass_block-block56)
-	(= (x grass_block-block56) 2)
-	(= (y grass_block-block56) 3)
-	(= (z grass_block-block56) -1)
-	(= (block-hits grass_block-block56) 0)
-	(at-x grass_block-block57)
-	(at-y grass_block-block57)
-	(at-z grass_block-block57)
+	(at-x grass_block-block57 position2)
+
+	(at-y grass_block-block57 position3)
+
+	(at-z grass_block-block57 position0)
+
 	(block-present grass_block-block57)
-	(= (x grass_block-block57) 2)
-	(= (y grass_block-block57) 3)
-	(= (z grass_block-block57) 0)
-	(= (block-hits grass_block-block57) 0)
-	(at-x grass_block-block58)
-	(at-y grass_block-block58)
-	(at-z grass_block-block58)
+	(at-x grass_block-block58 position2)
+
+	(at-y grass_block-block58 position3)
+
+	(at-z grass_block-block58 position0)
+
 	(block-present grass_block-block58)
-	(= (x grass_block-block58) 2)
-	(= (y grass_block-block58) 3)
-	(= (z grass_block-block58) 0)
-	(= (block-hits grass_block-block58) 0)
-	(at-x grass_block-block59)
-	(at-y grass_block-block59)
-	(at-z grass_block-block59)
+	(at-x grass_block-block59 position2)
+
+	(at-y grass_block-block59 position3)
+
+	(at-z grass_block-block59 position1)
+
 	(block-present grass_block-block59)
-	(= (x grass_block-block59) 2)
-	(= (y grass_block-block59) 3)
-	(= (z grass_block-block59) 1)
-	(= (block-hits grass_block-block59) 0)
-	(at-x grass_block-block60)
-	(at-y grass_block-block60)
-	(at-z grass_block-block60)
+	(at-x grass_block-block60 position2)
+
+	(at-y grass_block-block60 position3)
+
+	(at-z grass_block-block60 position2)
+
 	(block-present grass_block-block60)
-	(= (x grass_block-block60) 2)
-	(= (y grass_block-block60) 3)
-	(= (z grass_block-block60) 2)
-	(= (block-hits grass_block-block60) 0)
-	(at-x grass_block-block61)
-	(at-y grass_block-block61)
-	(at-z grass_block-block61)
+	(at-x grass_block-block61 position2)
+
+	(at-y grass_block-block61 position3)
+
+	(at-z grass_block-block61 position3)
+
 	(block-present grass_block-block61)
-	(= (x grass_block-block61) 2)
-	(= (y grass_block-block61) 3)
-	(= (z grass_block-block61) 3)
-	(= (block-hits grass_block-block61) 0)
-	(at-x grass_block-block62)
-	(at-y grass_block-block62)
-	(at-z grass_block-block62)
+	(at-x grass_block-block62 position2)
+
+	(at-y grass_block-block62 position3)
+
+	(at-z grass_block-block62 position4)
+
 	(block-present grass_block-block62)
-	(= (x grass_block-block62) 2)
-	(= (y grass_block-block62) 3)
-	(= (z grass_block-block62) 4)
-	(= (block-hits grass_block-block62) 0)
-	(at-x grass_block-block63)
-	(at-y grass_block-block63)
-	(at-z grass_block-block63)
+	(at-x grass_block-block63 position3)
+
+	(at-y grass_block-block63 position3)
+
+	(at-z grass_block-block63 position-3)
+
 	(block-present grass_block-block63)
-	(= (x grass_block-block63) 3)
-	(= (y grass_block-block63) 3)
-	(= (z grass_block-block63) -3)
-	(= (block-hits grass_block-block63) 0)
-	(at-x grass_block-block64)
-	(at-y grass_block-block64)
-	(at-z grass_block-block64)
+	(at-x grass_block-block64 position3)
+
+	(at-y grass_block-block64 position3)
+
+	(at-z grass_block-block64 position-2)
+
 	(block-present grass_block-block64)
-	(= (x grass_block-block64) 3)
-	(= (y grass_block-block64) 3)
-	(= (z grass_block-block64) -2)
-	(= (block-hits grass_block-block64) 0)
-	(at-x grass_block-block65)
-	(at-y grass_block-block65)
-	(at-z grass_block-block65)
+	(at-x grass_block-block65 position3)
+
+	(at-y grass_block-block65 position3)
+
+	(at-z grass_block-block65 position-1)
+
 	(block-present grass_block-block65)
-	(= (x grass_block-block65) 3)
-	(= (y grass_block-block65) 3)
-	(= (z grass_block-block65) -1)
-	(= (block-hits grass_block-block65) 0)
-	(at-x grass_block-block66)
-	(at-y grass_block-block66)
-	(at-z grass_block-block66)
+	(at-x grass_block-block66 position3)
+
+	(at-y grass_block-block66 position3)
+
+	(at-z grass_block-block66 position0)
+
 	(block-present grass_block-block66)
-	(= (x grass_block-block66) 3)
-	(= (y grass_block-block66) 3)
-	(= (z grass_block-block66) 0)
-	(= (block-hits grass_block-block66) 0)
-	(at-x grass_block-block67)
-	(at-y grass_block-block67)
-	(at-z grass_block-block67)
+	(at-x grass_block-block67 position3)
+
+	(at-y grass_block-block67 position3)
+
+	(at-z grass_block-block67 position0)
+
 	(block-present grass_block-block67)
-	(= (x grass_block-block67) 3)
-	(= (y grass_block-block67) 3)
-	(= (z grass_block-block67) 0)
-	(= (block-hits grass_block-block67) 0)
-	(at-x grass_block-block68)
-	(at-y grass_block-block68)
-	(at-z grass_block-block68)
+	(at-x grass_block-block68 position3)
+
+	(at-y grass_block-block68 position3)
+
+	(at-z grass_block-block68 position1)
+
 	(block-present grass_block-block68)
-	(= (x grass_block-block68) 3)
-	(= (y grass_block-block68) 3)
-	(= (z grass_block-block68) 1)
-	(= (block-hits grass_block-block68) 0)
-	(at-x grass_block-block69)
-	(at-y grass_block-block69)
-	(at-z grass_block-block69)
+	(at-x grass_block-block69 position3)
+
+	(at-y grass_block-block69 position3)
+
+	(at-z grass_block-block69 position2)
+
 	(block-present grass_block-block69)
-	(= (x grass_block-block69) 3)
-	(= (y grass_block-block69) 3)
-	(= (z grass_block-block69) 2)
-	(= (block-hits grass_block-block69) 0)
-	(at-x grass_block-block70)
-	(at-y grass_block-block70)
-	(at-z grass_block-block70)
+	(at-x grass_block-block70 position3)
+
+	(at-y grass_block-block70 position3)
+
+	(at-z grass_block-block70 position3)
+
 	(block-present grass_block-block70)
-	(= (x grass_block-block70) 3)
-	(= (y grass_block-block70) 3)
-	(= (z grass_block-block70) 3)
-	(= (block-hits grass_block-block70) 0)
-	(at-x grass_block-block71)
-	(at-y grass_block-block71)
-	(at-z grass_block-block71)
+	(at-x grass_block-block71 position3)
+
+	(at-y grass_block-block71 position3)
+
+	(at-z grass_block-block71 position4)
+
 	(block-present grass_block-block71)
-	(= (x grass_block-block71) 3)
-	(= (y grass_block-block71) 3)
-	(= (z grass_block-block71) 4)
-	(= (block-hits grass_block-block71) 0)
-	(at-x grass_block-block72)
-	(at-y grass_block-block72)
-	(at-z grass_block-block72)
+	(at-x grass_block-block72 position4)
+
+	(at-y grass_block-block72 position3)
+
+	(at-z grass_block-block72 position-3)
+
 	(block-present grass_block-block72)
-	(= (x grass_block-block72) 4)
-	(= (y grass_block-block72) 3)
-	(= (z grass_block-block72) -3)
-	(= (block-hits grass_block-block72) 0)
-	(at-x grass_block-block73)
-	(at-y grass_block-block73)
-	(at-z grass_block-block73)
+	(at-x grass_block-block73 position4)
+
+	(at-y grass_block-block73 position3)
+
+	(at-z grass_block-block73 position-2)
+
 	(block-present grass_block-block73)
-	(= (x grass_block-block73) 4)
-	(= (y grass_block-block73) 3)
-	(= (z grass_block-block73) -2)
-	(= (block-hits grass_block-block73) 0)
-	(at-x grass_block-block74)
-	(at-y grass_block-block74)
-	(at-z grass_block-block74)
+	(at-x grass_block-block74 position4)
+
+	(at-y grass_block-block74 position3)
+
+	(at-z grass_block-block74 position-1)
+
 	(block-present grass_block-block74)
-	(= (x grass_block-block74) 4)
-	(= (y grass_block-block74) 3)
-	(= (z grass_block-block74) -1)
-	(= (block-hits grass_block-block74) 0)
-	(at-x grass_block-block75)
-	(at-y grass_block-block75)
-	(at-z grass_block-block75)
+	(at-x grass_block-block75 position4)
+
+	(at-y grass_block-block75 position3)
+
+	(at-z grass_block-block75 position0)
+
 	(block-present grass_block-block75)
-	(= (x grass_block-block75) 4)
-	(= (y grass_block-block75) 3)
-	(= (z grass_block-block75) 0)
-	(= (block-hits grass_block-block75) 0)
-	(at-x grass_block-block76)
-	(at-y grass_block-block76)
-	(at-z grass_block-block76)
+	(at-x grass_block-block76 position4)
+
+	(at-y grass_block-block76 position3)
+
+	(at-z grass_block-block76 position0)
+
 	(block-present grass_block-block76)
-	(= (x grass_block-block76) 4)
-	(= (y grass_block-block76) 3)
-	(= (z grass_block-block76) 0)
-	(= (block-hits grass_block-block76) 0)
-	(at-x grass_block-block77)
-	(at-y grass_block-block77)
-	(at-z grass_block-block77)
+	(at-x grass_block-block77 position4)
+
+	(at-y grass_block-block77 position3)
+
+	(at-z grass_block-block77 position1)
+
 	(block-present grass_block-block77)
-	(= (x grass_block-block77) 4)
-	(= (y grass_block-block77) 3)
-	(= (z grass_block-block77) 1)
-	(= (block-hits grass_block-block77) 0)
-	(at-x grass_block-block78)
-	(at-y grass_block-block78)
-	(at-z grass_block-block78)
+	(at-x grass_block-block78 position4)
+
+	(at-y grass_block-block78 position3)
+
+	(at-z grass_block-block78 position2)
+
 	(block-present grass_block-block78)
-	(= (x grass_block-block78) 4)
-	(= (y grass_block-block78) 3)
-	(= (z grass_block-block78) 2)
-	(= (block-hits grass_block-block78) 0)
-	(at-x grass_block-block79)
-	(at-y grass_block-block79)
-	(at-z grass_block-block79)
+	(at-x grass_block-block79 position4)
+
+	(at-y grass_block-block79 position3)
+
+	(at-z grass_block-block79 position3)
+
 	(block-present grass_block-block79)
-	(= (x grass_block-block79) 4)
-	(= (y grass_block-block79) 3)
-	(= (z grass_block-block79) 3)
-	(= (block-hits grass_block-block79) 0)
-	(at-x grass_block-block80)
-	(at-y grass_block-block80)
-	(at-z grass_block-block80)
+	(at-x grass_block-block80 position4)
+
+	(at-y grass_block-block80 position3)
+
+	(at-z grass_block-block80 position4)
+
 	(block-present grass_block-block80)
-	(= (x grass_block-block80) 4)
-	(= (y grass_block-block80) 3)
-	(= (z grass_block-block80) 4)
-	(= (block-hits grass_block-block80) 0)
-	(at-x log-block0)
-	(at-y log-block0)
-	(at-z log-block0)
+	(at-x log-block0 position4)
+
+	(at-y log-block0 position5)
+
+	(at-z log-block0 position-3)
+
 	(block-present log-block0)
-	(= (x log-block0) 4)
-	(= (y log-block0) 5)
-	(= (z log-block0) -3)
-	(= (block-hits log-block0) 0)
-	(not (at-x log0))
-	(not (at-y log0))
-	(not (at-z log0))
+	(at-x log0 position0)
+
+	(at-y log0 position4)
+
+	(at-z log0 position0)
+
 	(not (item-present log0))
-	(= (x log0) 0)
-	(= (y log0) 4)
-	(= (z log0) 0)
-	(not (at-x obsidian0))
-	(not (at-y obsidian0))
-	(not (at-z obsidian0))
+	(at-x obsidian0 position0)
+
+	(at-y obsidian0 position4)
+
+	(at-z obsidian0 position0)
+
 	(not (item-present obsidian0))
-	(= (x obsidian0) 0)
-	(= (y obsidian0) 4)
-	(= (z obsidian0) 0)
 )
 (:goal
 	(and (goal-achieved steve)

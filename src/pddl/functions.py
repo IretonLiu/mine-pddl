@@ -1,11 +1,11 @@
-from typing import List
+from typing import List, Optional
 from pddl.operators import *
 # from pddl.pddl_types.base_pddl_types import *
 from pddl.pddl_types.types_names import TypeName
 
 
 class Function:
-    var_name = None
+    var_name:Optional[str] = None
 
     def __init__(self):
         self.arguments = {}
