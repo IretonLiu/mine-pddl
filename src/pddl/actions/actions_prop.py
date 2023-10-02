@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from pddl.pddl_types.types_names import TypeName
 from pddl.pddl_types.named_pddl_types import NamedBlockType, NamedItemType
-from pddl.pddl_types.special_pddl_types import CountType
+from pddl.pddl_types.special_pddl_types import CountType, PositionType
 from pddl.operators import *
 from pddl.predicates import *
 from pddl.functions import *
@@ -404,7 +404,7 @@ class MoveAndPickup(Action):
         self.construct_preconditions()
         self.construct_effects()
         out = f"(:action {self.action_name}\n"
-        out += f"\t:parameters {self.parameters}\n"
+        out += f"\t:parameters ({self.parameters})\n"
         out += f"\t:precondition {self.preconditions}\n"
         out += f"\t:effect {self.effects}\n"
         out += ")\n"
@@ -1120,13 +1120,22 @@ class CheckGoal(Action):
                 {block["type"] + "-block": block_var},
                 pddl_and(
                     AtXLocationPredicate.to_precondition(
-                        block_var, block["position"]["x"]
+                        block_var,
+                        PositionType.construct_problem_object(
+                            int(block["position"]["x"])
+                        ),
                     ),
                     AtYLocationPredicate.to_precondition(
-                        block_var, block["position"]["y"]
+                        block_var,
+                        PositionType.construct_problem_object(
+                            int(block["position"]["y"])
+                        ),
                     ),
                     AtZLocationPredicate.to_precondition(
-                        block_var, block["position"]["z"]
+                        block_var,
+                        PositionType.construct_problem_object(
+                            int(block["position"]["z"])
+                        ),
                     ),
                 ),
             )

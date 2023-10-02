@@ -82,7 +82,10 @@ class Problem:
         self.count_objects = []
         max_range = max(self.obs_range)
         output += f"\t"
-        for i in range(-max_range // 2, max_range // 2 + 1):
+        for i in range(
+            -max_range // 2 - 1, max_range // 2 + 1 + 1
+        ):  # add a buffer of 1 to either side of the position range
+            # todo: could double the range, but that would add in quite a bit of complexity
             output += f"{PositionType.construct_problem_object(i)} "
             self.postition_objects.append(PositionType.construct_problem_object(i))
 
@@ -106,7 +109,6 @@ class Problem:
         # for each state variable, loop through predicates and functions
         output_list = []
 
-
         # process int type objects
         output_list.extend(generate_initial_seq_predicates(self.postition_objects))
         output_list.extend(generate_initial_seq_predicates(self.count_objects))
@@ -120,13 +122,17 @@ class Problem:
                         if i.in_inventory:
                             output_list.append(
                                 predicate.to_precondition(
-                                    agent.name, n=CountType.construct_problem_object(i.quantity), item_type= key
+                                    agent.name,
+                                    n=CountType.construct_problem_object(i.quantity),
+                                    item_type=key,
                                 )
                             )
                         else:
                             output_list.append(
                                 predicate.to_precondition(
-                                    agent.name, n=CountType.construct_problem_object(0), item_type=key
+                                    agent.name,
+                                    n=CountType.construct_problem_object(0),
+                                    item_type=key,
                                 )
                             )
             elif isinstance(predicate, AtLocationPredicate):
@@ -137,7 +143,11 @@ class Problem:
                     position = int(agent.functions[YPositionFunction].value)
                 elif isinstance(predicate, AtZLocationPredicate):
                     position = int(agent.functions[ZPositionFunction].value)
-                output_list.append(predicate.to_precondition(agent.name, PositionType.construct_problem_object(position)))
+                output_list.append(
+                    predicate.to_precondition(
+                        agent.name, PositionType.construct_problem_object(position)
+                    )
+                )
             else:
                 output_list.append(predicate.to_problem(agent.name))
 
@@ -173,12 +183,23 @@ class Problem:
                         if isinstance(predicate, AtLocationPredicate):
                             position = float("inf")
                             if isinstance(predicate, AtXLocationPredicate):
-                                position = int(entity.functions[XPositionFunction].value)
+                                position = int(
+                                    entity.functions[XPositionFunction].value
+                                )
                             elif isinstance(predicate, AtYLocationPredicate):
-                                position = int(entity.functions[YPositionFunction].value)
+                                position = int(
+                                    entity.functions[YPositionFunction].value
+                                )
                             elif isinstance(predicate, AtZLocationPredicate):
-                                position = int(entity.functions[ZPositionFunction].value)
-                            output_list.append(predicate.to_precondition(f"{name}{j}", PositionType.construct_problem_object(position)))
+                                position = int(
+                                    entity.functions[ZPositionFunction].value
+                                )
+                            output_list.append(
+                                predicate.to_precondition(
+                                    f"{name}{j}",
+                                    PositionType.construct_problem_object(position),
+                                )
+                            )
                         else:
                             output_list.append(predicate.to_problem(f"{name}{j}"))
 
@@ -186,7 +207,7 @@ class Problem:
                     # for function in entity.functions.values():
                     #     output_list.append(function.to_problem(f"{name}{j}"))
 
-        #TODO: fix fomatting
+        # TODO: fix fomatting
         output = "(:init\n\t"
         output += "\n\t".join(output_list)
         output += "\n)"

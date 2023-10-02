@@ -84,6 +84,7 @@ class Domain:
         modules,
         return_predicates: bool,
         items: Optional[Dict[str, List[named_pddl_types.NamedItemType]]] = None,
+        blocks: Optional[Dict[str, List[named_pddl_types.NamedBlockType]]] = None,
     ):
         # return_predicates is true to return predicate strings and false to return function strings
         # items is only meaningful is we are processing functions
@@ -111,6 +112,8 @@ class Domain:
                                 )
                             for item in items:
                                 output.append(predicate.to_domain(item))
+                            for block in blocks:
+                                output.append(predicate.to_domain(block))
                         else:
                             output.append(predicate.to_domain())
                 else:
@@ -129,6 +132,10 @@ class Domain:
                                 )
                             for item in items:
                                 output.append(function.to_domain(label=item))
+
+                            # todo: add the named blocks for the functions - confirm this works
+                            for block in blocks:
+                                output.append(predicate.to_domain(block))
                         else:
                             output.append(function.to_domain())
 
@@ -206,10 +213,10 @@ class Domain:
         file_path: str,
     ):
         pddl = f"(define (domain {self.name})\n"
-        pddl += "(:requirements :typing :fluents :negative-preconditions :universal-preconditions :existential-preconditions)\n"
+        pddl += "(:requirements :typing :negative-preconditions :universal-preconditions :existential-preconditions)\n"
         pddl += self.construct_types(items, blocks) + "\n"
         pddl += self.construct_predicates(items) + "\n"
-        pddl += self.construct_functions(items) + "\n"
+        # pddl += self.construct_functions(items) + "\n"
         pddl += self.construct_actions(items, blocks, goal) + "\n"
         pddl += ")"
 

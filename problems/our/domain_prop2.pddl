@@ -1,5 +1,5 @@
 (define (domain first_world)
-(:requirements :typing :fluents :negative-preconditions :universal-preconditions :existential-preconditions)
+(:requirements :typing :negative-preconditions :universal-preconditions :existential-preconditions)
 (:types
 	locatable int - object
 	agent block item - locatable
@@ -20,14 +20,8 @@
 	(agent-has-n-log ?ag - agent ?n - count)
 	(agent-alive ?ag - agent)
 	(at-x ?l - locatable ?x - position)
-)
-(:functions
-	(block-hits ?b - destructible-block )
-	(y ?l - locatable )
-	(agent-num-log ?ag - agent )
-	(x ?l - locatable )
-	(agent-num-obsidian ?ag - agent )
-	(z ?l - locatable )
+	(agent-has-n-dirt ?ag - agent ?n - count)
+	(agent-has-n-grass_block ?ag - agent ?n - count)
 )
 
 (:action move-north
@@ -56,7 +50,6 @@
 ) (at-z ?ag ?z_end)
 )
 )
-
 
 (:action jumpup-north
 	:parameters (?ag - agent ?x - position ?y_up - position ?y_up_up - position ?y_down - position ?z_start - position ?z_end - position)
@@ -94,7 +87,6 @@
 )
 )
 
-
 (:action jumpdown-north
 	:parameters (?ag - agent ?x - position ?y_up - position ?y_down - position ?y_2_down - position ?y_3_down - position ?z_start - position ?z_end - position)
 	:precondition (and 
@@ -131,6 +123,11 @@
 ) (at-y ?ag ?y_2_down)
 )
 )
+
+
+
+
+
 
 
 (:action move-south
@@ -441,9 +438,8 @@
 )
 )
 
-
 (:action move-north-and-pickup-log
-	:parameters ?ag - agent ?i - log ?x - position ?y_up - position ?y_down - position ?z_start - position ?z_end - position ?n_start - count ?n_end - count
+	:parameters (?ag - agent ?i - log ?x - position ?y_up - position ?y_down - position ?z_start - position ?z_end - position ?n_start - count ?n_end - count)
 	:precondition (and 
 (agent-alive ?ag)
  (at-x ?ag ?x)
@@ -476,8 +472,13 @@
 )
 
 
+
+
+
+
+
 (:action move-south-and-pickup-log
-	:parameters ?ag - agent ?i - log ?x - position ?y_up - position ?y_down - position ?z_start - position ?z_end - position ?n_start - count ?n_end - count
+	:parameters (?ag - agent ?i - log ?x - position ?y_up - position ?y_down - position ?z_start - position ?z_end - position ?n_start - count ?n_end - count)
 	:precondition (and 
 (agent-alive ?ag)
  (at-x ?ag ?x)
@@ -511,7 +512,7 @@
 
 
 (:action move-east-and-pickup-log
-	:parameters ?ag - agent ?i - log ?z - position ?x_start - position ?x_end - position ?y_up - position ?y_down - position ?n_start - count ?n_end - count
+	:parameters (?ag - agent ?i - log ?z - position ?x_start - position ?x_end - position ?y_up - position ?y_down - position ?n_start - count ?n_end - count)
 	:precondition (and 
 (agent-alive ?ag)
  (at-x ?ag ?x_start)
@@ -545,7 +546,7 @@
 
 
 (:action move-west-and-pickup-log
-	:parameters ?ag - agent ?i - log ?z - position ?x_start - position ?x_end - position ?y_up - position ?y_down - position ?n_start - count ?n_end - count
+	:parameters (?ag - agent ?i - log ?z - position ?x_start - position ?x_end - position ?y_up - position ?y_down - position ?n_start - count ?n_end - count)
 	:precondition (and 
 (agent-alive ?ag)
  (at-x ?ag ?x_start)
@@ -579,7 +580,7 @@
 
 
 (:action move-north-and-pickup-obsidian
-	:parameters ?ag - agent ?i - obsidian ?x - position ?y_up - position ?y_down - position ?z_start - position ?z_end - position ?n_start - count ?n_end - count
+	:parameters (?ag - agent ?i - obsidian ?x - position ?y_up - position ?y_down - position ?z_start - position ?z_end - position ?n_start - count ?n_end - count)
 	:precondition (and 
 (agent-alive ?ag)
  (at-x ?ag ?x)
@@ -613,7 +614,7 @@
 
 
 (:action move-south-and-pickup-obsidian
-	:parameters ?ag - agent ?i - obsidian ?x - position ?y_up - position ?y_down - position ?z_start - position ?z_end - position ?n_start - count ?n_end - count
+	:parameters (?ag - agent ?i - obsidian ?x - position ?y_up - position ?y_down - position ?z_start - position ?z_end - position ?n_start - count ?n_end - count)
 	:precondition (and 
 (agent-alive ?ag)
  (at-x ?ag ?x)
@@ -647,7 +648,7 @@
 
 
 (:action move-east-and-pickup-obsidian
-	:parameters ?ag - agent ?i - obsidian ?z - position ?x_start - position ?x_end - position ?y_up - position ?y_down - position ?n_start - count ?n_end - count
+	:parameters (?ag - agent ?i - obsidian ?z - position ?x_start - position ?x_end - position ?y_up - position ?y_down - position ?n_start - count ?n_end - count)
 	:precondition (and 
 (agent-alive ?ag)
  (at-x ?ag ?x_start)
@@ -681,7 +682,7 @@
 
 
 (:action move-west-and-pickup-obsidian
-	:parameters ?ag - agent ?i - obsidian ?z - position ?x_start - position ?x_end - position ?y_up - position ?y_down - position ?n_start - count ?n_end - count
+	:parameters (?ag - agent ?i - obsidian ?z - position ?x_start - position ?x_end - position ?y_up - position ?y_down - position ?n_start - count ?n_end - count)
 	:precondition (and 
 (agent-alive ?ag)
  (at-x ?ag ?x_start)
@@ -883,9 +884,9 @@
 	:parameters (?ag - agent)
 	:precondition (and 
 (exists (?b - log-block) (and 
-(at-x ?b 0)
- (at-y ?b 4)
- (at-z ?b -2)
+(at-x ?b position0)
+ (at-y ?b position4)
+ (at-z ?b position-2)
 ))
 	 (or (agent-has-n-log ?ag count1)
  (agent-has-n-log ?ag count2)
