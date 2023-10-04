@@ -90,7 +90,7 @@ print(
     domain.to_pddl(
         items,
         blocks,
-        file_path="./problems/our/domain_prop2.pddl",
+        file_path="./problems/our/domain_prop3.pddl",
         goal=world_json["goal"],
     )
 )
@@ -108,7 +108,7 @@ print(
         items,
         blocks,
         goal_json=world_json["goal"],
-        file_path="./problems/our/problem_prop2.pddl",
+        file_path="./problems/our/problem_prop3.pddl",
     )
 )
 

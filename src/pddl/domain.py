@@ -87,7 +87,8 @@ class Domain:
         blocks: Optional[Dict[str, List[named_pddl_types.NamedBlockType]]] = None,
     ):
         # return_predicates is true to return predicate strings and false to return function strings
-        # items is only meaningful is we are processing functions
+        # items is only meaningful is we are processing functions <- not true for propositional pddl
+        assert items is not None and blocks is not None
 
         output = []
         all_classes = []
@@ -135,7 +136,7 @@ class Domain:
 
                             # todo: add the named blocks for the functions - confirm this works
                             for block in blocks:
-                                output.append(predicate.to_domain(block))
+                                output.append(function.to_domain(label=block))
                         else:
                             output.append(function.to_domain())
 
@@ -145,16 +146,17 @@ class Domain:
         self,
         process_predicates: bool,
         items: Optional[Dict[str, List[named_pddl_types.NamedItemType]]] = None,
+        blocks: Optional[Dict[str, List[named_pddl_types.NamedBlockType]]] = None,
     ):
         # process_predicates is true to process predicate strings and false to process function strings
-        # items is only meaningful if we are processing functions (i.e. process_predicates is false)
+        # items is only meaningful if we are processing functions (i.e. process_predicates is false) <- not true for propositional pddl
 
         # get the pddl representation for the types - is a list
         pddl_strings = self.get_pddl_strings(
-            [base_pddl_types, special_pddl_types], process_predicates, items
+            [base_pddl_types, special_pddl_types], process_predicates, items, blocks
         )
         pddl_strings.extend(
-            self.get_pddl_strings([named_pddl_types], process_predicates, items)
+            self.get_pddl_strings([named_pddl_types], process_predicates, items, blocks)
         )
 
         # use a set to remove duplicate occurrences (e.g. if there is a common parent)
@@ -168,14 +170,18 @@ class Domain:
         return output
 
     def construct_predicates(
-        self, items: Dict[str, List[named_pddl_types.NamedItemType]]
+        self,
+        items: Dict[str, List[named_pddl_types.NamedItemType]],
+        blocks: Dict[str, List[named_pddl_types.NamedBlockType]],
     ):
-        return self.predicates_or_functions_helper(True, items=items)
+        return self.predicates_or_functions_helper(True, items=items, blocks=blocks)
 
     def construct_functions(
-        self, items: Dict[str, List[named_pddl_types.NamedItemType]]
+        self,
+        items: Dict[str, List[named_pddl_types.NamedItemType]],
+        blocks: Dict[str, List[named_pddl_types.NamedBlockType]],
     ):
-        return self.predicates_or_functions_helper(False, items=items)
+        return self.predicates_or_functions_helper(False, items=items, blocks=blocks)
 
     def construct_actions(
         self,
@@ -215,8 +221,8 @@ class Domain:
         pddl = f"(define (domain {self.name})\n"
         pddl += "(:requirements :typing :negative-preconditions :universal-preconditions :existential-preconditions)\n"
         pddl += self.construct_types(items, blocks) + "\n"
-        pddl += self.construct_predicates(items) + "\n"
-        # pddl += self.construct_functions(items) + "\n"
+        pddl += self.construct_predicates(items, blocks) + "\n"
+        # pddl += self.construct_functions(items, blocks) + "\n"
         pddl += self.construct_actions(items, blocks, goal) + "\n"
         pddl += ")"
 
