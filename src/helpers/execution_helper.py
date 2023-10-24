@@ -22,7 +22,7 @@ def read_plan(plan_path: str):
     return action_sequence
 
 
-def move_command(env, direction: str, agent: AgentType):
+def move_command(env, direction: str, jump_dir = 0, agent: AgentType):
     """
     Move the agent in the environment by using teleport command
     """
@@ -36,25 +36,25 @@ def move_command(env, direction: str, agent: AgentType):
     if direction == "south":
         command = "/tp @p {} {} {}".format(
             agent.functions[XPositionFunction].value,
-            agent.functions[YPositionFunction].value,
+            agent.functions[YPositionFunction].value + jump_dir,
             agent.functions[ZPositionFunction].value + 1,
         )
     elif direction == "north":
         command = "/tp @p {} {} {}".format(
             agent.functions[XPositionFunction].value,
-            agent.functions[YPositionFunction].value,
+            agent.functions[YPositionFunction].value + jump_dir,
             agent.functions[ZPositionFunction].value - 1,
         )
     elif direction == "east":
         command = "/tp @p {} {} {}".format(
             agent.functions[XPositionFunction].value + 1,
-            agent.functions[YPositionFunction].value,
+            agent.functions[YPositionFunction].value + jump_dir,
             agent.functions[ZPositionFunction].value,
         )
     elif direction == "west":
         command = "/tp @p {} {} {}".format(
             agent.functions[XPositionFunction].value - 1,
-            agent.functions[YPositionFunction].value,
+            agent.functions[YPositionFunction].value + jump_dir,
             agent.functions[ZPositionFunction].value,
         )
 
@@ -126,7 +126,6 @@ def jump(env, direction, agent):
         )
     env.execute_cmd(command)
 
-
 # def drop(env, item_name, inventory, action_vector):
 #     """
 #     remove the item from the agent's inventory and spawn the item into the world
@@ -142,6 +141,34 @@ def jump(env, direction, agent):
 #     action_vector[5] = 2
 #     return action_vector
 
+def get_prop_action_from_str(action: str, inventory=None, agent=None, env=None):
+    """
+    Formulate the action vector from the pddl action string
+    """
+    action_vector = env.action_space.no_op()
+    # split by first hyphen
+    action_name, action_args = action.split("-", 1)
+    if action_name == "move":
+        move_command(env, action_args, 0, agent)
+    elif action_name == "jumpup":
+        move_command(env, action_args, 1, agent)
+    elif action_name == "jumpdown":
+        move_command(env, action_args, -1, agent)
+    elif action_name == "place":
+        # eg action is "place-obsidian"
+        # action_args will be "obsidian"
+        place_block(env, action_args, agent)
+    elif action_name == "break":
+        break_block(env, action_args, agent)
+    elif action_name == "drop":
+        action_vector[5] = 2
+        for i, name in enumerate(inventory["name"]):
+            if name == action_args:
+                action_vector[7] = i
+                break
+
+    return action_vector
+
 
 def get_action_from_str(action: str, inventory=None, agent=None, env=None):
     """
@@ -151,7 +178,7 @@ def get_action_from_str(action: str, inventory=None, agent=None, env=None):
     # split by first hyphen
     action_name, action_args = action.split("-", 1)
     if action_name == "move":
-        move_command(env, action_args, agent)
+        move_command(env, action_args, 0, agent)
     elif action_name == "place":
         # eg action is "place-obsidian"
         # action_args will be "obsidian"
