@@ -213,8 +213,8 @@ class Problem:
         output += "\n)"
         return output
 
-    def construct_goal(self, goal_json: Dict[str, List[Dict[str, Any]]]):
-        # goal_json is a dict of lists of dicts
+    def construct_goal(self, goal_yaml: Dict[str, List[Dict[str, Any]]]):
+        # goal_yaml is a dict of lists of dicts
         output = "(:goal"
         output += f"\n\t(and ({GoalAchievedPredicate.var_name} steve)\n\t\t"
         output += "\n))"
@@ -225,14 +225,14 @@ class Problem:
         agent,
         items: Dict[str, List[NamedItemType]],
         blocks: Dict[str, List[NamedBlockType]],
-        goal_json: Dict[str, List[Dict[str, str]]],
+        goal_yaml: Dict[str, List[Dict[str, str]]],
         file_path: str,
     ):
         pddl = f"(define (problem {self.name})\n"
         pddl += f"\t(:domain {self.domain.name})\n"
         pddl += f"{self.construct_objects(agent, items, blocks)}\n"
         pddl += f"{self.construct_initial_state(agent, items, blocks)}\n"
-        pddl += f"{self.construct_goal(goal_json)}\n"
+        pddl += f"{self.construct_goal(goal_yaml)}\n"
         pddl += ")"
         with open(file_path, "w") as file:
             file.write(pddl)

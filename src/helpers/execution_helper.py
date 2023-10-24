@@ -1,3 +1,6 @@
+from typing import Dict, Optional
+from minedojo.sim.wrappers.ar_nn.ar_nn_wrapper import ARNNWrapper
+
 import numpy as np
 from pddl.pddl_types.base_pddl_types import AgentType
 from pddl.functions import XPositionFunction, YPositionFunction, ZPositionFunction
@@ -22,16 +25,16 @@ def read_plan(plan_path: str):
     return action_sequence
 
 
-def move_command(env, direction: str, jump_dir = 0, agent: AgentType):
+def move_command(
+    env,
+    direction: str,
+    jump_dir: int,
+    agent: AgentType,
+):
     """
     Move the agent in the environment by using teleport command
     """
 
-    # command = "/tp @p {} {} {}".format(
-    #     agent.functions[XPositionFunction].value,
-    #     agent.functions[YPositionFunction].value,
-    #     agent.functions[ZPositionFunction].value + 1,
-    # )
     command = ""
     if direction == "south":
         command = "/tp @p {} {} {}".format(
@@ -124,7 +127,11 @@ def jump(env, direction, agent):
             agent.functions[YPositionFunction].value - 1,
             agent.functions[ZPositionFunction].value + 1,
         )
+    else:
+        raise ValueError("direction must be either 'up' or 'down'")
+
     env.execute_cmd(command)
+
 
 # def drop(env, item_name, inventory, action_vector):
 #     """
@@ -141,7 +148,10 @@ def jump(env, direction, agent):
 #     action_vector[5] = 2
 #     return action_vector
 
-def get_prop_action_from_str(action: str, inventory=None, agent=None, env=None):
+
+def get_prop_action_from_str(
+    action: str, agent: AgentType, env: ARNNWrapper, inventory: Optional[Dict] = None
+):
     """
     Formulate the action vector from the pddl action string
     """
@@ -161,6 +171,7 @@ def get_prop_action_from_str(action: str, inventory=None, agent=None, env=None):
     elif action_name == "break":
         break_block(env, action_args, agent)
     elif action_name == "drop":
+        assert inventory is not None
         action_vector[5] = 2
         for i, name in enumerate(inventory["name"]):
             if name == action_args:
@@ -170,7 +181,9 @@ def get_prop_action_from_str(action: str, inventory=None, agent=None, env=None):
     return action_vector
 
 
-def get_action_from_str(action: str, inventory=None, agent=None, env=None):
+def get_action_from_str(
+    action: str, agent: AgentType, env: ARNNWrapper, inventory: Optional[Dict] = None
+):
     """
     Formulate the action vector from the pddl action string
     """
@@ -188,6 +201,7 @@ def get_action_from_str(action: str, inventory=None, agent=None, env=None):
     elif action_name == "jump":
         jump(env, action_args, agent)
     elif action_name == "drop":
+        assert inventory is not None
         action_vector[5] = 2
         for i, name in enumerate(inventory["name"]):
             if name == action_args:

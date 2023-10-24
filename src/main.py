@@ -1,7 +1,7 @@
 import pickle
 
 import handlers.entities as handlers
-from helpers import execution_helper, json_helper
+from helpers import execution_helper, yaml_helper
 from helpers.observation_helpers import *
 from helpers.video_helper import VideoHelper
 import minedojo
@@ -30,9 +30,8 @@ from pddl.problem import Problem
 
 # todo: process the agent's inventory - will go into the items dict
 
-world_json = json_helper.load_json("worlds/example.json")
-# print(world_json)
-# print(json_helper.json_blocks_to_xml_str(world_json["blocks"]))
+world_config = yaml_helper.load_yaml("worlds/example.yaml")
+
 max_inventory_stack = 64
 ranges = (8, 4, 8)
 voxel_size = dict(
@@ -52,11 +51,11 @@ env = minedojo.make(
     use_voxel=True,
     # spawn_mobs=False,
     voxel_size=voxel_size,
-    drawing_str=f"""{json_helper.json_blocks_to_xml_str(world_json["blocks"])}""",
-    initial_inventory=json_helper.json_inventory_to_inventory_item(
-        world_json["inventory"]
+    drawing_str=f"""{yaml_helper.yaml_blocks_to_xml_str(world_config["blocks"])}""",
+    initial_inventory=yaml_helper.yaml_inventory_to_inventory_item(
+        world_config["inventory"]
     ),
-    generate_world_type=world_json["world_type"],
+    generate_world_type=world_config["world_type"],
     break_speed_multiplier=1000,
     allow_mob_spawn=False,
 )
@@ -66,10 +65,10 @@ env.env.env.env.env._sim_spec._obs_handlers.append(handlers.EntityObservation(ra
 
 # create the items in the world
 
-video_helper = VideoHelper(world_json["video_save_path"])
+video_helper = VideoHelper(world_config["video_save_path"])
 
 obs = env.reset()
-item_commands = json_helper.json_items_to_cmd(world_json["items"])
+item_commands = yaml_helper.yaml_items_to_cmd(world_config["items"])
 for cmd in item_commands:
     env.execute_cmd(cmd)
 
@@ -91,7 +90,7 @@ print(
         items,
         blocks,
         file_path="./problems/our/domain_prop3.pddl",
-        goal=world_json["goal"],
+        goal=world_config["goal"],
     )
 )
 
@@ -107,7 +106,7 @@ print(
         agent,
         items,
         blocks,
-        goal_json=world_json["goal"],
+        goal_yaml=world_config["goal"],
         file_path="./problems/our/problem_prop3.pddl",
     )
 )
@@ -134,7 +133,7 @@ action_sequence = [
 for action_str in action_sequence:
     # get the action vector
     action = execution_helper.get_action_from_str(
-        action_str, inventory=inventory, agent=agent, env=env
+        action_str, agent=agent, env=env, inventory=inventory
     )
     obs, reward, done, info = env.step(action)
     for i in range(5):
@@ -152,12 +151,12 @@ for action_str in action_sequence:
 
 print(
     "plan successful: ",
-    execution_helper.check_goal_state(obs, voxel_size, world_json["goal"]),
+    execution_helper.check_goal_state(obs, voxel_size, world_config["goal"]),
 )
 
 print("Generating Video...")
 
-video_name = str(world_json["video_name"])
+video_name = str(world_config["video_name"])
 first = video_name.find(".")
 first = first if first != -1 else len(video_name)
 video_helper.generate_video(video_name[:first] + ".mp4")

@@ -9,19 +9,19 @@
 	dirt-block grass_block-block log-block - destructible-block
 )
 (:predicates
-	(not-equal ?x1 - int ?x2 - int)
+	(block-present ?b - block)
+	(are-seq ?x1 - int ?x2 - int)
+	(agent-has-n-log ?ag - agent ?n - count)
+	(item-present ?i - item)
 	(agent-has-n-grass_block ?ag - agent ?n - count)
+	(agent-has-n-obsidian ?ag - agent ?n - count)
+	(at-y ?l - locatable ?y - position)
 	(goal-achieved ?ag - agent)
 	(agent-has-n-dirt ?ag - agent ?n - count)
-	(agent-has-n-obsidian ?ag - agent ?n - count)
-	(are-seq ?x1 - int ?x2 - int)
+	(not-equal ?x1 - int ?x2 - int)
 	(agent-alive ?ag - agent)
-	(agent-has-n-log ?ag - agent ?n - count)
-	(block-present ?b - block)
 	(at-z ?l - locatable ?z - position)
 	(at-x ?l - locatable ?x - position)
-	(item-present ?i - item)
-	(at-y ?l - locatable ?y - position)
 )
 
 (:action move-north

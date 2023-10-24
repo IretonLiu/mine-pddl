@@ -7,6 +7,7 @@ from pddl.predicates import *
 
 rename = {"wood": "log"}
 
+
 def get_valid_inventory_types():
     import xml.etree.ElementTree as ET
 
@@ -93,19 +94,16 @@ def extract_blocks(obs):
 
                 named_block = NamedBlockType(block_name)
 
-                named_block.functions[XPositionFunction].set_value(
-                    absolute_pos[0])
-                named_block.functions[YPositionFunction].set_value(
-                    absolute_pos[1])
-                named_block.functions[ZPositionFunction].set_value(
-                    absolute_pos[2])
+                named_block.functions[XPositionFunction].set_value(absolute_pos[0])
+                named_block.functions[YPositionFunction].set_value(absolute_pos[1])
+                named_block.functions[ZPositionFunction].set_value(absolute_pos[2])
 
-            #    elif isinstance(function, BlockHitsFunction):
-            #         # todo: figure out how to get this info from the obs
-            #         pass
-            #     elif isinstance(function, InventoryFunction):
-            #         # we do not need to process inventory now - that will be done when the PDDL is produced
-            #         pass
+                #    elif isinstance(function, BlockHitsFunction):
+                #         # todo: figure out how to get this info from the obs
+                #         pass
+                #     elif isinstance(function, InventoryFunction):
+                #         # we do not need to process inventory now - that will be done when the PDDL is produced
+                #         pass
 
                 # assign value to the predicates
                 # we are reading these items/blocks/agent from the world, so they must exist
@@ -120,7 +118,7 @@ def extract_blocks(obs):
     return blocks
 
 
-def extract_entities(obs):
+def extract_entities(obs) -> Tuple[Dict, AgentType]:
     """
     pass in the observation returned from minedojo
     returns a dict of items (key is their item name, value is a NamedItemType)
@@ -132,7 +130,8 @@ def extract_entities(obs):
     entities = obs["entities"]
 
     items = {}
-    agent = None
+    agent = AgentType()
+    have_processed_agent = False
     # process the entity data to get all the items
     for entity in entities:
         # only consider valid types
@@ -167,7 +166,8 @@ def extract_entities(obs):
 
         elif entity["name"] == "MineDojoAgent0":
             # we are working with the agent now
-            agent = AgentType()
+            have_processed_agent = True
+
             agent.predicates[AgentAlivePredicate].set_value(True)
             agent.predicates[GoalAchievedPredicate].set_value(False)
 
@@ -176,13 +176,11 @@ def extract_entities(obs):
 
         # for function in object_to_process.functions:
         #     if isinstance(function, PositionFunction):
-            # set the position of the object
+        # set the position of the object
         if object_to_process is None:
             raise Exception("object_to_process is None")
-            
 
-        position = ((entity["x"]), (
-            entity["y"]), (entity["z"]))
+        position = ((entity["x"]), (entity["y"]), (entity["z"]))
         object_to_process.functions[XPositionFunction].set_value(position[0])
         object_to_process.functions[YPositionFunction].set_value(position[1])
         object_to_process.functions[ZPositionFunction].set_value(position[2])
@@ -194,7 +192,7 @@ def extract_entities(obs):
         #     # we do not need to process inventory now - that will be done when the PDDL is produced
         #     pass
 
-
+    assert have_processed_agent, "Agent not found in observation"
     return items, agent
 
 
@@ -203,29 +201,32 @@ def extract_inventory(obs, items, agent):
     pass in the inventory of the agent into the list of items
     """
     inventory = obs["inventory"]
-    
-    for i, name in enumerate(inventory['name']):
+
+    for i, name in enumerate(inventory["name"]):
         # only consider valid types
         if name == "air":
             continue
         named_item = NamedItemType(
-                item_name=name,
-                variation=inventory["variant"][i],
-                quantity=int(inventory["quantity"][i]),
-                in_inventory=True
-            )
-        
-        
-        named_item.functions[XPositionFunction].set_value(agent.functions[XPositionFunction].value)
-        named_item.functions[YPositionFunction].set_value(agent.functions[YPositionFunction].value)
-        named_item.functions[ZPositionFunction].set_value(agent.functions[ZPositionFunction].value)
-        
+            item_name=name,
+            variation=inventory["variant"][i],
+            quantity=int(inventory["quantity"][i]),
+            in_inventory=True,
+        )
+
+        named_item.functions[XPositionFunction].set_value(
+            agent.functions[XPositionFunction].value
+        )
+        named_item.functions[YPositionFunction].set_value(
+            agent.functions[YPositionFunction].value
+        )
+        named_item.functions[ZPositionFunction].set_value(
+            agent.functions[ZPositionFunction].value
+        )
+
         # store the items
         if named_item.name not in items:
-                items[named_item.name] = [named_item]
+            items[named_item.name] = [named_item]
         else:
             items[named_item.name].append(named_item)
-            
-    return inventory
 
-        
+    return inventory

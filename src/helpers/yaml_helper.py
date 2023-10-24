@@ -1,16 +1,16 @@
 from minedojo.sim.inventory import InventoryItem
-import json
+import yaml
 
 
-def load_json(json_file: str) -> dict:
+def load_yaml(yaml_file: str) -> dict:
     """
-    Loads a json file
+    Loads a YAML file
     """
-    with open(json_file, "r") as f:
-        return json.load(f)
+    with open(yaml_file, "r") as f:
+        return yaml.safe_load(f)
 
 
-def json_cuboids_to_xml_str(cuboids: list[dict]) -> str:
+def yaml_cuboids_to_xml_str(cuboids: list[dict]) -> str:
     """
     Converts a list of cuboids to an xml string
     """
@@ -22,7 +22,7 @@ def json_cuboids_to_xml_str(cuboids: list[dict]) -> str:
     return xml_str
 
 
-def json_blocks_to_xml_str(blocks: list[dict]) -> str:
+def yaml_blocks_to_xml_str(blocks: list[dict]) -> str:
     """
     Converts a list of blocks to an xml string
     """
@@ -34,7 +34,7 @@ def json_blocks_to_xml_str(blocks: list[dict]) -> str:
     return xml_str
 
 
-def json_inventory_to_inventory_item(inventory: list[dict]) -> list:
+def yaml_inventory_to_inventory_item(inventory: list[dict]) -> list:
     """
     Converts a list of inventory items to an inventory item list
     """
@@ -51,9 +51,9 @@ def json_inventory_to_inventory_item(inventory: list[dict]) -> list:
     return inventory_item_list
 
 
-def json_items_to_cmd(items: list[dict]) -> list:
+def yaml_items_to_cmd(items: list[dict]) -> list:
     """
-    take in a list of json item objects and returns a list of strings, which are the minecraft commands for generating them in the world
+    take in a list of YAML item objects and returns a list of strings, which are the minecraft commands for generating them in the world
     """
 
     # https://www.digminecraft.com/game_commands/summon_command.php
