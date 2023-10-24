@@ -1,11 +1,12 @@
 from typing import List, Optional
 from pddl.operators import *
+
 # from pddl.pddl_types.base_pddl_types import *
 from pddl.pddl_types.types_names import TypeName
 
 
 class Function:
-    var_name:Optional[str] = None
+    var_name: Optional[str] = None
 
     def __init__(self):
         self.arguments = {}
@@ -15,6 +16,8 @@ class Function:
         self.value = value
 
     def to_domain(self, label=None):
+        assert self.var_name is not None
+
         out = "("
         if not label is None:
             out += f"{self.var_name.format(label)} "
@@ -27,18 +30,30 @@ class Function:
         return out
 
     def to_problem(self, parent_object_name: str, label=None):
+        assert self.var_name is not None
+        assert self.value is not None
+
         full_var_name = ""
         if not label is None:
             full_var_name = self.var_name.format(label)
         else:
             full_var_name = self.var_name
 
-        if (len(self.arguments) == 1):
+        if len(self.arguments) == 1:
             return pddl_equal(
-                f"({full_var_name} {parent_object_name})", str(int(self.value)))
+                f"({full_var_name} {parent_object_name})", str(int(self.value))
+            )
         else:
             # if there are multple arguments, we need to create a conjunction of equalities
-            return pddl_and([pddl_equal(f"({full_var_name} {parent_object_name} {arg})", str(int(self.value[arg]))) for arg in self.arguments])
+            return pddl_and(
+                [
+                    pddl_equal(
+                        f"({full_var_name} {parent_object_name} {arg})",
+                        str(int(self.value[arg])),
+                    )
+                    for arg in self.arguments
+                ]
+            )
 
 
 class InventoryFunction(Function):
@@ -53,16 +68,15 @@ class InventoryFunction(Function):
         self.value = 0
 
     def to_problem(self, parent_object_name: str, label=None, quantity=None):
+        assert self.var_name is not None
+
         full_var_name = ""
         if not label is None:
             full_var_name = self.var_name.format(label)
         else:
             full_var_name = self.var_name
 
-        return pddl_equal(
-            f"({full_var_name} {parent_object_name})", str(quantity))
-
-
+        return pddl_equal(f"({full_var_name} {parent_object_name})", str(quantity))
 
 
 class PositionFunction(Function):

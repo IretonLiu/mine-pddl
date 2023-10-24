@@ -27,7 +27,7 @@ class EntityObservation(KeymapTranslationHandler):
     """
 
     def to_hero(self, x) -> str:
-        pass
+        return ""
 
     def to_string(self):
         return "entities"

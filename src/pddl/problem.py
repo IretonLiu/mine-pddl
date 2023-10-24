@@ -145,7 +145,7 @@ class Problem:
                     position = int(agent.functions[ZPositionFunction].value)
                 output_list.append(
                     predicate.to_precondition(
-                        agent.name, PositionType.construct_problem_object(position)
+                        agent.name, PositionType.construct_problem_object(int(position))
                     )
                 )
             else:
@@ -197,7 +197,9 @@ class Problem:
                             output_list.append(
                                 predicate.to_precondition(
                                     f"{name}{j}",
-                                    PositionType.construct_problem_object(position),
+                                    PositionType.construct_problem_object(
+                                        int(position)
+                                    ),
                                 )
                             )
                         else:
