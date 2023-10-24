@@ -1,7 +1,4 @@
-world_name: open-ended
-world_type: flat
-video_save_path: problems/our/images
-video_name: plan_video
+# This YAML file will only be used to specify the initial state of the world, and the goal state of the world
 
 # intialise all block positions
 blocks:
