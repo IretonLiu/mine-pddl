@@ -412,16 +412,18 @@ class MoveAndPickup(Action):
 
 
 class Break(Action):
-    def __init__(self, block: str) -> None:
+    def __init__(self, block: str, dir: str) -> None:
         super().__init__()
         self.block = block + "-block"
         self.item = block
         self.action_name = "break-" + block
+        self.dir = dir
 
         self.param_names = {
             "Agent": "?ag",
             "Block": "?b",
             "XPosition": "?x",
+            "XPositionFront": "?x_front",
             "YPosition": "?y",
             "ZPosition": "?z",
             "ZPositionFront": "?z_front",
@@ -433,6 +435,7 @@ class Break(Action):
             "Agent": TypeName.AGENT_TYPE_NAME.value,
             "Block": self.block,
             "XPosition": TypeName.POSITION_TYPE_NAME.value,
+            "XPositionFront": TypeName.POSITION_TYPE_NAME.value,
             "YPosition": TypeName.POSITION_TYPE_NAME.value,
             "ZPosition": TypeName.POSITION_TYPE_NAME.value,
             "ZPositionFront": TypeName.POSITION_TYPE_NAME.value,
@@ -440,14 +443,44 @@ class Break(Action):
             "NEnd": TypeName.COUNT_TYPE_NAME.value,
         }
 
+        self.move_east_west = self.dir == "east" or self.dir == "west"
+        if self.move_east_west:
+            self.x_front = "XPositionFront"
+            self.z_front = "ZPosition"
+        else:
+            self.x_front = "XPosition"
+            self.z_front = "ZPositionFront"
+
+
     def construct_parameters(self):
         self.parameters = ""
         for key in self.param_names.keys():
+            if(
+                key == "XPositionFront"
+                and (not self.move_east_west)
+            ):
+                continue
+            elif (
+                key == "ZPositionFront"
+                and (self.move_east_west)
+            ):
+                continue
+
             self.parameters += f"{self.param_names[key]} - {self.param_types[key]} "
 
         self.parameters = self.parameters.strip()
 
+
+
     def construct_preconditions(self):
+        if self.move_east_west:
+            back = "XPosition"
+            front = "XPositionFront"
+        else:
+            back = "ZPosition"
+            front = "ZPositionFront"
+
+
         self.preconditions = pddl_and(
             AtXLocationPredicate.to_precondition(
                 self.param_names["Agent"], self.param_names["XPosition"]
@@ -459,16 +492,19 @@ class Break(Action):
                 self.param_names["Agent"], self.param_names["ZPosition"]
             ),
             AtXLocationPredicate.to_precondition(
-                self.param_names["Block"], self.param_names["XPosition"]
+                self.param_names["Block"], self.param_names[self.x_front]
             ),
             AtYLocationPredicate.to_precondition(
                 self.param_names["Block"], self.param_names["YPosition"]
             ),
             AtZLocationPredicate.to_precondition(
-                self.param_names["Block"], self.param_names["ZPositionFront"]
+                self.param_names["Block"], self.param_names[self.z_front]
             ),
             AreSequentialPredicate.to_precondition(
-                self.param_names["ZPositionFront"], self.param_names["ZPosition"]
+                self.param_names[front], self.param_names[back]
+            ) if self.dir == "north" or self.dir =="west" else 
+            AreSequentialPredicate.to_precondition(
+                self.param_names[back], self.param_names[front]
             ),
             f'({BlockPresentPredicate.var_name} {self.param_names["Block"]})',
             AreSequentialPredicate.to_precondition(
@@ -489,7 +525,7 @@ class Break(Action):
             pddl_not(f'({BlockPresentPredicate.var_name} {self.param_names["Block"]})'),
             pddl_not(
                 AtXLocationPredicate.to_precondition(
-                    self.param_names["Block"], self.param_names["XPosition"]
+                    self.param_names["Block"], self.param_names[self.x_front]
                 )
             ),
             pddl_not(
@@ -499,7 +535,7 @@ class Break(Action):
             ),
             pddl_not(
                 AtZLocationPredicate.to_precondition(
-                    self.param_names["Block"], self.param_names["ZPositionFront"]
+                    self.param_names["Block"], self.param_names[self.z_front ]
                 )
             ),
             pddl_not(
@@ -527,17 +563,19 @@ class Break(Action):
 
 
 class Place(Action):
-    def __init__(self, block: str) -> None:
+    def __init__(self, block: str, dir: str) -> None:
         super().__init__()
         # separate the names of blocks and items in pddl
         self.block = block + "-block"
         self.item = block
-        self.action_name = "place-" + block
+        self.action_name = "place-" + block + "-" + dir
+        self.dir = dir
 
         self.param_names = {
             "Agent": "?ag",
             "Block": "?b",
             "XPosition": "?x",
+            "XPositionFront": "?x_front",
             "YPosition": "?y",
             "YPositionDown": "?y_down",
             "ZPosition": "?z",
@@ -550,6 +588,7 @@ class Place(Action):
             "Agent": TypeName.AGENT_TYPE_NAME.value,
             "Block": self.block,
             "XPosition": TypeName.POSITION_TYPE_NAME.value,
+            "XPositionFront": TypeName.POSITION_TYPE_NAME.value,
             "YPosition": TypeName.POSITION_TYPE_NAME.value,
             "YPositionDown": TypeName.POSITION_TYPE_NAME.value,
             "ZPosition": TypeName.POSITION_TYPE_NAME.value,
@@ -558,18 +597,44 @@ class Place(Action):
             "NEnd": TypeName.COUNT_TYPE_NAME.value,
         }
 
+        self.move_east_west = self.dir == "east" or self.dir == "west"
+        if self.move_east_west:
+            self.x_front = "XPositionFront"
+            self.z_front = "ZPosition"
+        else:
+            self.x_front = "XPosition"
+            self.z_front = "ZPositionFront"
+
     def construct_parameters(self):
         self.parameters = ""
         for key in self.param_names.keys():
+            if(
+                key == "XPositionFront"
+                and (not self.move_east_west)
+            ):
+                continue
+            elif (
+                key == "ZPositionFront"
+                and (self.move_east_west)
+            ):
+                continue
+
             self.parameters += f"{self.param_names[key]} - {self.param_types[key]} "
 
         self.parameters = self.parameters.strip()
 
     def construct_preconditions(self):
+        if self.move_east_west:
+            back = "XPosition"
+            front = "XPositionFront"
+        else:
+            back = "ZPosition"
+            front = "ZPositionFront"
+
         # todo: add support for multiple directions - can use similar logic to what we used for Move
         block_var = "?bl"
         self.preconditions = pddl_and(
-            # There must be a block one down and one in front of use, for support for the block we are placing
+            # There must be a block one down and one in front of us, for support for the block we are placing
             pddl_exists(
                 {TypeName.BLOCK_TYPE_NAME.value: block_var},
                 pddl_and(
@@ -583,7 +648,7 @@ class Place(Action):
                         self.param_names["Agent"], self.param_names["ZPosition"]
                     ),
                     AtXLocationPredicate.to_precondition(
-                        block_var, self.param_names["XPosition"]
+                        block_var, self.param_names[self.x_front]
                     ),
                     # There must be a block underneath
                     AtYLocationPredicate.to_precondition(
@@ -591,7 +656,7 @@ class Place(Action):
                     ),
                     # The block must be in front of us
                     AtZLocationPredicate.to_precondition(
-                        block_var, self.param_names["ZPositionFront"]
+                        block_var, self.param_names[self.z_front]
                     ),
                 ),
             ),
@@ -610,14 +675,14 @@ class Place(Action):
                             self.param_names["Agent"], self.param_names["ZPosition"]
                         ),
                         AtXLocationPredicate.to_precondition(
-                            block_var, self.param_names["XPosition"]
+                            block_var, self.param_names[self.x_front]
                         ),
                         AtYLocationPredicate.to_precondition(
                             block_var, self.param_names["YPosition"]
                         ),
                         AtZLocationPredicate.to_precondition(
                             block_var,
-                            self.param_names["ZPositionFront"],
+                            self.param_names[self.z_front],
                         ),
                     ),
                 )
@@ -627,7 +692,10 @@ class Place(Action):
                 self.param_names["YPositionDown"], self.param_names["YPosition"]
             ),
             AreSequentialPredicate.to_precondition(
-                self.param_names["ZPositionFront"], self.param_names["ZPosition"]
+                self.param_names[front], self.param_names[back]
+            ) if dir == "north" or dir =="west" else 
+            AreSequentialPredicate.to_precondition(
+                self.param_names[back], self.param_names[front]
             ),
             AreSequentialPredicate.to_precondition(
                 self.param_names["NEnd"], self.param_names["NStart"]
@@ -644,13 +712,13 @@ class Place(Action):
         self.effects = pddl_and(
             f'({BlockPresentPredicate.var_name} {self.param_names["Block"]})',
             AtXLocationPredicate.to_precondition(
-                self.param_names["Block"], self.param_names["XPosition"]
+                self.param_names["Block"], self.param_names[self.x_front]
             ),
             AtYLocationPredicate.to_precondition(
                 self.param_names["Block"], self.param_names["YPosition"]
             ),
             AtZLocationPredicate.to_precondition(
-                self.param_names["Block"], self.param_names["ZPositionFront"]
+                self.param_names["Block"], self.param_names[self.z_front]
             ),
             pddl_not(
                 AgentHasNItemsPredicate.to_precondition(

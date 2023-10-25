@@ -9,19 +9,19 @@
 	dirt-block grass_block-block log-block - destructible-block
 )
 (:predicates
-	(agent-has-n-dirt ?ag - agent ?n - count)
+	(agent-has-n-grass_block ?ag - agent ?n - count)
 	(agent-has-n-log ?ag - agent ?n - count)
+	(at-y ?l - locatable ?y - position)
 	(agent-has-n-obsidian ?ag - agent ?n - count)
-	(at-x ?l - locatable ?x - position)
+	(item-present ?i - item)
+	(are-seq ?x1 - int ?x2 - int)
+	(block-present ?b - block)
 	(agent-alive ?ag - agent)
 	(goal-achieved ?ag - agent)
-	(block-present ?b - block)
-	(item-present ?i - item)
+	(agent-has-n-dirt ?ag - agent ?n - count)
+	(at-x ?l - locatable ?x - position)
 	(at-z ?l - locatable ?z - position)
-	(agent-has-n-grass_block ?ag - agent ?n - count)
 	(not-equal ?x1 - int ?x2 - int)
-	(are-seq ?x1 - int ?x2 - int)
-	(at-y ?l - locatable ?y - position)
 )
 
 (:action move-north
@@ -123,6 +123,171 @@
 ) (at-z ?ag ?z_end)
  (not (at-y ?ag ?y_down)
 ) (at-y ?ag ?y_2_down)
+)
+)
+
+
+(:action break-dirt
+	:parameters (?ag - agent ?b - dirt-block ?x - position ?y - position ?z - position ?z_front - position ?n_start - count ?n_end - count)
+	:precondition (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?b ?x)
+ (at-y ?b ?y)
+ (at-z ?b ?z_front)
+ (are-seq ?z_front ?z)
+ (block-present ?b) (are-seq ?n_start ?n_end)
+ (agent-has-n-dirt ?ag ?n_start)
+)
+	:effect (and 
+(not (block-present ?b)) (not (at-x ?b ?x)
+) (not (at-y ?b ?y)
+) (not (at-z ?b ?z_front)
+) (not (agent-has-n-dirt ?ag ?n_start)
+) (agent-has-n-dirt ?ag ?n_end)
+)
+)
+
+
+(:action place-dirt-north
+	:parameters (?ag - agent ?b - dirt-block ?x - position ?y - position ?y_down - position ?z - position ?z_front - position ?n_start - count ?n_end - count)
+	:precondition (and 
+(exists (?bl - block) (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?bl ?x)
+ (at-y ?bl ?y_down)
+ (at-z ?bl ?z_front)
+)) (not (exists (?bl - block) (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?bl ?x)
+ (at-y ?bl ?y)
+ (at-z ?bl ?z_front)
+))) (are-seq ?y_down ?y)
+ (are-seq ?z ?z_front)
+ (are-seq ?n_end ?n_start)
+ (agent-has-n-dirt ?ag ?n_start)
+)
+	:effect (and 
+(block-present ?b) (at-x ?b ?x)
+ (at-y ?b ?y)
+ (at-z ?b ?z_front)
+ (not (agent-has-n-dirt ?ag ?n_start)
+) (agent-has-n-dirt ?ag ?n_end)
+)
+)
+
+
+(:action break-grass_block
+	:parameters (?ag - agent ?b - grass_block-block ?x - position ?y - position ?z - position ?z_front - position ?n_start - count ?n_end - count)
+	:precondition (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?b ?x)
+ (at-y ?b ?y)
+ (at-z ?b ?z_front)
+ (are-seq ?z_front ?z)
+ (block-present ?b) (are-seq ?n_start ?n_end)
+ (agent-has-n-grass_block ?ag ?n_start)
+)
+	:effect (and 
+(not (block-present ?b)) (not (at-x ?b ?x)
+) (not (at-y ?b ?y)
+) (not (at-z ?b ?z_front)
+) (not (agent-has-n-grass_block ?ag ?n_start)
+) (agent-has-n-grass_block ?ag ?n_end)
+)
+)
+
+
+(:action place-grass_block-north
+	:parameters (?ag - agent ?b - grass_block-block ?x - position ?y - position ?y_down - position ?z - position ?z_front - position ?n_start - count ?n_end - count)
+	:precondition (and 
+(exists (?bl - block) (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?bl ?x)
+ (at-y ?bl ?y_down)
+ (at-z ?bl ?z_front)
+)) (not (exists (?bl - block) (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?bl ?x)
+ (at-y ?bl ?y)
+ (at-z ?bl ?z_front)
+))) (are-seq ?y_down ?y)
+ (are-seq ?z ?z_front)
+ (are-seq ?n_end ?n_start)
+ (agent-has-n-grass_block ?ag ?n_start)
+)
+	:effect (and 
+(block-present ?b) (at-x ?b ?x)
+ (at-y ?b ?y)
+ (at-z ?b ?z_front)
+ (not (agent-has-n-grass_block ?ag ?n_start)
+) (agent-has-n-grass_block ?ag ?n_end)
+)
+)
+
+
+(:action break-log
+	:parameters (?ag - agent ?b - log-block ?x - position ?y - position ?z - position ?z_front - position ?n_start - count ?n_end - count)
+	:precondition (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?b ?x)
+ (at-y ?b ?y)
+ (at-z ?b ?z_front)
+ (are-seq ?z_front ?z)
+ (block-present ?b) (are-seq ?n_start ?n_end)
+ (agent-has-n-log ?ag ?n_start)
+)
+	:effect (and 
+(not (block-present ?b)) (not (at-x ?b ?x)
+) (not (at-y ?b ?y)
+) (not (at-z ?b ?z_front)
+) (not (agent-has-n-log ?ag ?n_start)
+) (agent-has-n-log ?ag ?n_end)
+)
+)
+
+
+(:action place-log-north
+	:parameters (?ag - agent ?b - log-block ?x - position ?y - position ?y_down - position ?z - position ?z_front - position ?n_start - count ?n_end - count)
+	:precondition (and 
+(exists (?bl - block) (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?bl ?x)
+ (at-y ?bl ?y_down)
+ (at-z ?bl ?z_front)
+)) (not (exists (?bl - block) (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?bl ?x)
+ (at-y ?bl ?y)
+ (at-z ?bl ?z_front)
+))) (are-seq ?y_down ?y)
+ (are-seq ?z ?z_front)
+ (are-seq ?n_end ?n_start)
+ (agent-has-n-log ?ag ?n_start)
+)
+	:effect (and 
+(block-present ?b) (at-x ?b ?x)
+ (at-y ?b ?y)
+ (at-z ?b ?z_front)
+ (not (agent-has-n-log ?ag ?n_start)
+) (agent-has-n-log ?ag ?n_end)
 )
 )
 
@@ -230,6 +395,171 @@
 )
 
 
+(:action break-dirt
+	:parameters (?ag - agent ?b - dirt-block ?x - position ?y - position ?z - position ?z_front - position ?n_start - count ?n_end - count)
+	:precondition (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?b ?x)
+ (at-y ?b ?y)
+ (at-z ?b ?z_front)
+ (are-seq ?z ?z_front)
+ (block-present ?b) (are-seq ?n_start ?n_end)
+ (agent-has-n-dirt ?ag ?n_start)
+)
+	:effect (and 
+(not (block-present ?b)) (not (at-x ?b ?x)
+) (not (at-y ?b ?y)
+) (not (at-z ?b ?z_front)
+) (not (agent-has-n-dirt ?ag ?n_start)
+) (agent-has-n-dirt ?ag ?n_end)
+)
+)
+
+
+(:action place-dirt-south
+	:parameters (?ag - agent ?b - dirt-block ?x - position ?y - position ?y_down - position ?z - position ?z_front - position ?n_start - count ?n_end - count)
+	:precondition (and 
+(exists (?bl - block) (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?bl ?x)
+ (at-y ?bl ?y_down)
+ (at-z ?bl ?z_front)
+)) (not (exists (?bl - block) (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?bl ?x)
+ (at-y ?bl ?y)
+ (at-z ?bl ?z_front)
+))) (are-seq ?y_down ?y)
+ (are-seq ?z ?z_front)
+ (are-seq ?n_end ?n_start)
+ (agent-has-n-dirt ?ag ?n_start)
+)
+	:effect (and 
+(block-present ?b) (at-x ?b ?x)
+ (at-y ?b ?y)
+ (at-z ?b ?z_front)
+ (not (agent-has-n-dirt ?ag ?n_start)
+) (agent-has-n-dirt ?ag ?n_end)
+)
+)
+
+
+(:action break-grass_block
+	:parameters (?ag - agent ?b - grass_block-block ?x - position ?y - position ?z - position ?z_front - position ?n_start - count ?n_end - count)
+	:precondition (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?b ?x)
+ (at-y ?b ?y)
+ (at-z ?b ?z_front)
+ (are-seq ?z ?z_front)
+ (block-present ?b) (are-seq ?n_start ?n_end)
+ (agent-has-n-grass_block ?ag ?n_start)
+)
+	:effect (and 
+(not (block-present ?b)) (not (at-x ?b ?x)
+) (not (at-y ?b ?y)
+) (not (at-z ?b ?z_front)
+) (not (agent-has-n-grass_block ?ag ?n_start)
+) (agent-has-n-grass_block ?ag ?n_end)
+)
+)
+
+
+(:action place-grass_block-south
+	:parameters (?ag - agent ?b - grass_block-block ?x - position ?y - position ?y_down - position ?z - position ?z_front - position ?n_start - count ?n_end - count)
+	:precondition (and 
+(exists (?bl - block) (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?bl ?x)
+ (at-y ?bl ?y_down)
+ (at-z ?bl ?z_front)
+)) (not (exists (?bl - block) (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?bl ?x)
+ (at-y ?bl ?y)
+ (at-z ?bl ?z_front)
+))) (are-seq ?y_down ?y)
+ (are-seq ?z ?z_front)
+ (are-seq ?n_end ?n_start)
+ (agent-has-n-grass_block ?ag ?n_start)
+)
+	:effect (and 
+(block-present ?b) (at-x ?b ?x)
+ (at-y ?b ?y)
+ (at-z ?b ?z_front)
+ (not (agent-has-n-grass_block ?ag ?n_start)
+) (agent-has-n-grass_block ?ag ?n_end)
+)
+)
+
+
+(:action break-log
+	:parameters (?ag - agent ?b - log-block ?x - position ?y - position ?z - position ?z_front - position ?n_start - count ?n_end - count)
+	:precondition (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?b ?x)
+ (at-y ?b ?y)
+ (at-z ?b ?z_front)
+ (are-seq ?z ?z_front)
+ (block-present ?b) (are-seq ?n_start ?n_end)
+ (agent-has-n-log ?ag ?n_start)
+)
+	:effect (and 
+(not (block-present ?b)) (not (at-x ?b ?x)
+) (not (at-y ?b ?y)
+) (not (at-z ?b ?z_front)
+) (not (agent-has-n-log ?ag ?n_start)
+) (agent-has-n-log ?ag ?n_end)
+)
+)
+
+
+(:action place-log-south
+	:parameters (?ag - agent ?b - log-block ?x - position ?y - position ?y_down - position ?z - position ?z_front - position ?n_start - count ?n_end - count)
+	:precondition (and 
+(exists (?bl - block) (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?bl ?x)
+ (at-y ?bl ?y_down)
+ (at-z ?bl ?z_front)
+)) (not (exists (?bl - block) (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?bl ?x)
+ (at-y ?bl ?y)
+ (at-z ?bl ?z_front)
+))) (are-seq ?y_down ?y)
+ (are-seq ?z ?z_front)
+ (are-seq ?n_end ?n_start)
+ (agent-has-n-log ?ag ?n_start)
+)
+	:effect (and 
+(block-present ?b) (at-x ?b ?x)
+ (at-y ?b ?y)
+ (at-z ?b ?z_front)
+ (not (agent-has-n-log ?ag ?n_start)
+) (agent-has-n-log ?ag ?n_end)
+)
+)
+
+
 (:action move-east
 	:parameters (?ag - agent ?z - position ?x_start - position ?x_end - position ?y_up - position ?y_down - position)
 	:precondition (and 
@@ -333,6 +663,171 @@
 )
 
 
+(:action break-dirt
+	:parameters (?ag - agent ?b - dirt-block ?x - position ?x_front - position ?y - position ?z - position ?n_start - count ?n_end - count)
+	:precondition (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?b ?x_front)
+ (at-y ?b ?y)
+ (at-z ?b ?z)
+ (are-seq ?x ?x_front)
+ (block-present ?b) (are-seq ?n_start ?n_end)
+ (agent-has-n-dirt ?ag ?n_start)
+)
+	:effect (and 
+(not (block-present ?b)) (not (at-x ?b ?x_front)
+) (not (at-y ?b ?y)
+) (not (at-z ?b ?z)
+) (not (agent-has-n-dirt ?ag ?n_start)
+) (agent-has-n-dirt ?ag ?n_end)
+)
+)
+
+
+(:action place-dirt-east
+	:parameters (?ag - agent ?b - dirt-block ?x - position ?x_front - position ?y - position ?y_down - position ?z - position ?n_start - count ?n_end - count)
+	:precondition (and 
+(exists (?bl - block) (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?bl ?x_front)
+ (at-y ?bl ?y_down)
+ (at-z ?bl ?z)
+)) (not (exists (?bl - block) (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?bl ?x_front)
+ (at-y ?bl ?y)
+ (at-z ?bl ?z)
+))) (are-seq ?y_down ?y)
+ (are-seq ?x ?x_front)
+ (are-seq ?n_end ?n_start)
+ (agent-has-n-dirt ?ag ?n_start)
+)
+	:effect (and 
+(block-present ?b) (at-x ?b ?x_front)
+ (at-y ?b ?y)
+ (at-z ?b ?z)
+ (not (agent-has-n-dirt ?ag ?n_start)
+) (agent-has-n-dirt ?ag ?n_end)
+)
+)
+
+
+(:action break-grass_block
+	:parameters (?ag - agent ?b - grass_block-block ?x - position ?x_front - position ?y - position ?z - position ?n_start - count ?n_end - count)
+	:precondition (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?b ?x_front)
+ (at-y ?b ?y)
+ (at-z ?b ?z)
+ (are-seq ?x ?x_front)
+ (block-present ?b) (are-seq ?n_start ?n_end)
+ (agent-has-n-grass_block ?ag ?n_start)
+)
+	:effect (and 
+(not (block-present ?b)) (not (at-x ?b ?x_front)
+) (not (at-y ?b ?y)
+) (not (at-z ?b ?z)
+) (not (agent-has-n-grass_block ?ag ?n_start)
+) (agent-has-n-grass_block ?ag ?n_end)
+)
+)
+
+
+(:action place-grass_block-east
+	:parameters (?ag - agent ?b - grass_block-block ?x - position ?x_front - position ?y - position ?y_down - position ?z - position ?n_start - count ?n_end - count)
+	:precondition (and 
+(exists (?bl - block) (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?bl ?x_front)
+ (at-y ?bl ?y_down)
+ (at-z ?bl ?z)
+)) (not (exists (?bl - block) (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?bl ?x_front)
+ (at-y ?bl ?y)
+ (at-z ?bl ?z)
+))) (are-seq ?y_down ?y)
+ (are-seq ?x ?x_front)
+ (are-seq ?n_end ?n_start)
+ (agent-has-n-grass_block ?ag ?n_start)
+)
+	:effect (and 
+(block-present ?b) (at-x ?b ?x_front)
+ (at-y ?b ?y)
+ (at-z ?b ?z)
+ (not (agent-has-n-grass_block ?ag ?n_start)
+) (agent-has-n-grass_block ?ag ?n_end)
+)
+)
+
+
+(:action break-log
+	:parameters (?ag - agent ?b - log-block ?x - position ?x_front - position ?y - position ?z - position ?n_start - count ?n_end - count)
+	:precondition (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?b ?x_front)
+ (at-y ?b ?y)
+ (at-z ?b ?z)
+ (are-seq ?x ?x_front)
+ (block-present ?b) (are-seq ?n_start ?n_end)
+ (agent-has-n-log ?ag ?n_start)
+)
+	:effect (and 
+(not (block-present ?b)) (not (at-x ?b ?x_front)
+) (not (at-y ?b ?y)
+) (not (at-z ?b ?z)
+) (not (agent-has-n-log ?ag ?n_start)
+) (agent-has-n-log ?ag ?n_end)
+)
+)
+
+
+(:action place-log-east
+	:parameters (?ag - agent ?b - log-block ?x - position ?x_front - position ?y - position ?y_down - position ?z - position ?n_start - count ?n_end - count)
+	:precondition (and 
+(exists (?bl - block) (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?bl ?x_front)
+ (at-y ?bl ?y_down)
+ (at-z ?bl ?z)
+)) (not (exists (?bl - block) (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?bl ?x_front)
+ (at-y ?bl ?y)
+ (at-z ?bl ?z)
+))) (are-seq ?y_down ?y)
+ (are-seq ?x ?x_front)
+ (are-seq ?n_end ?n_start)
+ (agent-has-n-log ?ag ?n_start)
+)
+	:effect (and 
+(block-present ?b) (at-x ?b ?x_front)
+ (at-y ?b ?y)
+ (at-z ?b ?z)
+ (not (agent-has-n-log ?ag ?n_start)
+) (agent-has-n-log ?ag ?n_end)
+)
+)
+
+
 (:action move-west
 	:parameters (?ag - agent ?z - position ?x_start - position ?x_end - position ?y_up - position ?y_down - position)
 	:precondition (and 
@@ -432,6 +927,171 @@
 ) (at-x ?ag ?x_end)
  (not (at-y ?ag ?y_down)
 ) (at-y ?ag ?y_2_down)
+)
+)
+
+
+(:action break-dirt
+	:parameters (?ag - agent ?b - dirt-block ?x - position ?x_front - position ?y - position ?z - position ?n_start - count ?n_end - count)
+	:precondition (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?b ?x_front)
+ (at-y ?b ?y)
+ (at-z ?b ?z)
+ (are-seq ?x_front ?x)
+ (block-present ?b) (are-seq ?n_start ?n_end)
+ (agent-has-n-dirt ?ag ?n_start)
+)
+	:effect (and 
+(not (block-present ?b)) (not (at-x ?b ?x_front)
+) (not (at-y ?b ?y)
+) (not (at-z ?b ?z)
+) (not (agent-has-n-dirt ?ag ?n_start)
+) (agent-has-n-dirt ?ag ?n_end)
+)
+)
+
+
+(:action place-dirt-west
+	:parameters (?ag - agent ?b - dirt-block ?x - position ?x_front - position ?y - position ?y_down - position ?z - position ?n_start - count ?n_end - count)
+	:precondition (and 
+(exists (?bl - block) (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?bl ?x_front)
+ (at-y ?bl ?y_down)
+ (at-z ?bl ?z)
+)) (not (exists (?bl - block) (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?bl ?x_front)
+ (at-y ?bl ?y)
+ (at-z ?bl ?z)
+))) (are-seq ?y_down ?y)
+ (are-seq ?x ?x_front)
+ (are-seq ?n_end ?n_start)
+ (agent-has-n-dirt ?ag ?n_start)
+)
+	:effect (and 
+(block-present ?b) (at-x ?b ?x_front)
+ (at-y ?b ?y)
+ (at-z ?b ?z)
+ (not (agent-has-n-dirt ?ag ?n_start)
+) (agent-has-n-dirt ?ag ?n_end)
+)
+)
+
+
+(:action break-grass_block
+	:parameters (?ag - agent ?b - grass_block-block ?x - position ?x_front - position ?y - position ?z - position ?n_start - count ?n_end - count)
+	:precondition (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?b ?x_front)
+ (at-y ?b ?y)
+ (at-z ?b ?z)
+ (are-seq ?x_front ?x)
+ (block-present ?b) (are-seq ?n_start ?n_end)
+ (agent-has-n-grass_block ?ag ?n_start)
+)
+	:effect (and 
+(not (block-present ?b)) (not (at-x ?b ?x_front)
+) (not (at-y ?b ?y)
+) (not (at-z ?b ?z)
+) (not (agent-has-n-grass_block ?ag ?n_start)
+) (agent-has-n-grass_block ?ag ?n_end)
+)
+)
+
+
+(:action place-grass_block-west
+	:parameters (?ag - agent ?b - grass_block-block ?x - position ?x_front - position ?y - position ?y_down - position ?z - position ?n_start - count ?n_end - count)
+	:precondition (and 
+(exists (?bl - block) (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?bl ?x_front)
+ (at-y ?bl ?y_down)
+ (at-z ?bl ?z)
+)) (not (exists (?bl - block) (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?bl ?x_front)
+ (at-y ?bl ?y)
+ (at-z ?bl ?z)
+))) (are-seq ?y_down ?y)
+ (are-seq ?x ?x_front)
+ (are-seq ?n_end ?n_start)
+ (agent-has-n-grass_block ?ag ?n_start)
+)
+	:effect (and 
+(block-present ?b) (at-x ?b ?x_front)
+ (at-y ?b ?y)
+ (at-z ?b ?z)
+ (not (agent-has-n-grass_block ?ag ?n_start)
+) (agent-has-n-grass_block ?ag ?n_end)
+)
+)
+
+
+(:action break-log
+	:parameters (?ag - agent ?b - log-block ?x - position ?x_front - position ?y - position ?z - position ?n_start - count ?n_end - count)
+	:precondition (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?b ?x_front)
+ (at-y ?b ?y)
+ (at-z ?b ?z)
+ (are-seq ?x_front ?x)
+ (block-present ?b) (are-seq ?n_start ?n_end)
+ (agent-has-n-log ?ag ?n_start)
+)
+	:effect (and 
+(not (block-present ?b)) (not (at-x ?b ?x_front)
+) (not (at-y ?b ?y)
+) (not (at-z ?b ?z)
+) (not (agent-has-n-log ?ag ?n_start)
+) (agent-has-n-log ?ag ?n_end)
+)
+)
+
+
+(:action place-log-west
+	:parameters (?ag - agent ?b - log-block ?x - position ?x_front - position ?y - position ?y_down - position ?z - position ?n_start - count ?n_end - count)
+	:precondition (and 
+(exists (?bl - block) (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?bl ?x_front)
+ (at-y ?bl ?y_down)
+ (at-z ?bl ?z)
+)) (not (exists (?bl - block) (and 
+(at-x ?ag ?x)
+ (at-y ?ag ?y)
+ (at-z ?ag ?z)
+ (at-x ?bl ?x_front)
+ (at-y ?bl ?y)
+ (at-z ?bl ?z)
+))) (are-seq ?y_down ?y)
+ (are-seq ?x ?x_front)
+ (are-seq ?n_end ?n_start)
+ (agent-has-n-log ?ag ?n_start)
+)
+	:effect (and 
+(block-present ?b) (at-x ?b ?x_front)
+ (at-y ?b ?y)
+ (at-z ?b ?z)
+ (not (agent-has-n-log ?ag ?n_start)
+) (agent-has-n-log ?ag ?n_end)
 )
 )
 
@@ -705,171 +1365,6 @@
 ) (not (at-z ?i ?z)
 ) (agent-has-n-obsidian ?ag ?n_end)
  (not (item-present ?i)))
-)
-
-
-(:action break-dirt
-	:parameters (?ag - agent ?b - dirt-block ?x - position ?y - position ?z - position ?z_front - position ?n_start - count ?n_end - count)
-	:precondition (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?b ?x)
- (at-y ?b ?y)
- (at-z ?b ?z_front)
- (are-seq ?z_front ?z)
- (block-present ?b) (are-seq ?n_start ?n_end)
- (agent-has-n-dirt ?ag ?n_start)
-)
-	:effect (and 
-(not (block-present ?b)) (not (at-x ?b ?x)
-) (not (at-y ?b ?y)
-) (not (at-z ?b ?z_front)
-) (not (agent-has-n-dirt ?ag ?n_start)
-) (agent-has-n-dirt ?ag ?n_end)
-)
-)
-
-
-(:action place-dirt
-	:parameters (?ag - agent ?b - dirt-block ?x - position ?y - position ?y_down - position ?z - position ?z_front - position ?n_start - count ?n_end - count)
-	:precondition (and 
-(exists (?bl - block) (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?bl ?x)
- (at-y ?bl ?y_down)
- (at-z ?bl ?z_front)
-)) (not (exists (?bl - block) (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?bl ?x)
- (at-y ?bl ?y)
- (at-z ?bl ?z_front)
-))) (are-seq ?y_down ?y)
- (are-seq ?z_front ?z)
- (are-seq ?n_end ?n_start)
- (agent-has-n-dirt ?ag ?n_start)
-)
-	:effect (and 
-(block-present ?b) (at-x ?b ?x)
- (at-y ?b ?y)
- (at-z ?b ?z_front)
- (not (agent-has-n-dirt ?ag ?n_start)
-) (agent-has-n-dirt ?ag ?n_end)
-)
-)
-
-
-(:action break-grass_block
-	:parameters (?ag - agent ?b - grass_block-block ?x - position ?y - position ?z - position ?z_front - position ?n_start - count ?n_end - count)
-	:precondition (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?b ?x)
- (at-y ?b ?y)
- (at-z ?b ?z_front)
- (are-seq ?z_front ?z)
- (block-present ?b) (are-seq ?n_start ?n_end)
- (agent-has-n-grass_block ?ag ?n_start)
-)
-	:effect (and 
-(not (block-present ?b)) (not (at-x ?b ?x)
-) (not (at-y ?b ?y)
-) (not (at-z ?b ?z_front)
-) (not (agent-has-n-grass_block ?ag ?n_start)
-) (agent-has-n-grass_block ?ag ?n_end)
-)
-)
-
-
-(:action place-grass_block
-	:parameters (?ag - agent ?b - grass_block-block ?x - position ?y - position ?y_down - position ?z - position ?z_front - position ?n_start - count ?n_end - count)
-	:precondition (and 
-(exists (?bl - block) (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?bl ?x)
- (at-y ?bl ?y_down)
- (at-z ?bl ?z_front)
-)) (not (exists (?bl - block) (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?bl ?x)
- (at-y ?bl ?y)
- (at-z ?bl ?z_front)
-))) (are-seq ?y_down ?y)
- (are-seq ?z_front ?z)
- (are-seq ?n_end ?n_start)
- (agent-has-n-grass_block ?ag ?n_start)
-)
-	:effect (and 
-(block-present ?b) (at-x ?b ?x)
- (at-y ?b ?y)
- (at-z ?b ?z_front)
- (not (agent-has-n-grass_block ?ag ?n_start)
-) (agent-has-n-grass_block ?ag ?n_end)
-)
-)
-
-
-(:action break-log
-	:parameters (?ag - agent ?b - log-block ?x - position ?y - position ?z - position ?z_front - position ?n_start - count ?n_end - count)
-	:precondition (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?b ?x)
- (at-y ?b ?y)
- (at-z ?b ?z_front)
- (are-seq ?z_front ?z)
- (block-present ?b) (are-seq ?n_start ?n_end)
- (agent-has-n-log ?ag ?n_start)
-)
-	:effect (and 
-(not (block-present ?b)) (not (at-x ?b ?x)
-) (not (at-y ?b ?y)
-) (not (at-z ?b ?z_front)
-) (not (agent-has-n-log ?ag ?n_start)
-) (agent-has-n-log ?ag ?n_end)
-)
-)
-
-
-(:action place-log
-	:parameters (?ag - agent ?b - log-block ?x - position ?y - position ?y_down - position ?z - position ?z_front - position ?n_start - count ?n_end - count)
-	:precondition (and 
-(exists (?bl - block) (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?bl ?x)
- (at-y ?bl ?y_down)
- (at-z ?bl ?z_front)
-)) (not (exists (?bl - block) (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?bl ?x)
- (at-y ?bl ?y)
- (at-z ?bl ?z_front)
-))) (are-seq ?y_down ?y)
- (are-seq ?z_front ?z)
- (are-seq ?n_end ?n_start)
- (agent-has-n-log ?ag ?n_start)
-)
-	:effect (and 
-(block-present ?b) (at-x ?b ?x)
- (at-y ?b ?y)
- (at-z ?b ?z_front)
- (not (agent-has-n-log ?ag ?n_start)
-) (agent-has-n-log ?ag ?n_end)
-)
 )
 
 
