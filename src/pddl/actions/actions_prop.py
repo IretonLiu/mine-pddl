@@ -693,7 +693,7 @@ class Place(Action):
             ),
             AreSequentialPredicate.to_precondition(
                 self.param_names[front], self.param_names[back]
-            ) if dir == "north" or dir =="west" else 
+            ) if self.dir == "north" or self.dir =="west" else 
             AreSequentialPredicate.to_precondition(
                 self.param_names[back], self.param_names[front]
             ),
