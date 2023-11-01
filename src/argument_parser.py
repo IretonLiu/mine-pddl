@@ -75,6 +75,13 @@ def get_args_parser():
         "--video-name", type=str, default="plan_video", help="Name of the video"
     )
 
+    parser.add_argument(
+        "--print-valid-types",
+        action="store_true",
+        help="Print block and item types that can be specified in the YAML config",
+    )
+    parser.set_defaults(print_valid_types=False)
+
     # args to generate/process PDDL
     parser.add_argument(
         "--domain-file",

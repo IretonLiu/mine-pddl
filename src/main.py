@@ -158,7 +158,10 @@ if __name__ == "__main__":
     parser = get_args_parser()
     args = parser.parse_args()
 
-    main(args)
+    if args.print_valid_types:
+        print_extracted_types_xsd(get_valid_block_and_item_types())
+    else:
+        main(args)
 
 
 """
