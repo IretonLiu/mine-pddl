@@ -1,4 +1,5 @@
 # This YAML file will only be used to specify the initial state of the world, and the goal state of the world
+# Block and item variants are not currently supported
 
 # intialise all block positions
 blocks:
@@ -14,7 +15,6 @@ blocks:
     type: log
 
 # initialise all floating items in the world
-# for variant refer to https://minecraft-ids.grahamedgecombe.com/
 items:
   - position:
       x: '500'
@@ -22,17 +22,13 @@ items:
       z: '5'
     quantity: 1
     type: diamond
-    variant: null
 
 # specify the agnents initial inventory
-# for variant refer to https://minecraft-ids.grahamedgecombe.com/
 inventory:
-  - name: log
+  - type: log
     quantity: '64'
-    variant: '0'
-  - name: obsidian
+  - type: obsidian
     quantity: '64'
-    variant: '0'
 
 # specify the goal: can be specific blocks placed at specific locations or agent having specific items in the inventory
 goal:
@@ -43,7 +39,5 @@ goal:
         z: '-2'
       type: log
   inventory:
-    - name: log
+    - type: log
       quantity: '1'
-      type: oak-log
-      variant: oak

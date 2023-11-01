@@ -43,8 +43,8 @@ def yaml_inventory_to_inventory_item(inventory: list[dict]) -> list:
         inventory_item_list.append(
             InventoryItem(
                 slot=i,
-                name=item["name"],
-                variant=item["variant"],
+                name=item["type"],
+                variant=item["variant"] if "variant" in item else None,
                 quantity=item["quantity"],
             )
         )

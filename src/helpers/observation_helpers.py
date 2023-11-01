@@ -60,6 +60,44 @@ def get_invalid_inventory_types():
     return invalid_inventory_types
 
 
+def get_valid_block_and_item_types():
+    import xml.etree.ElementTree as ET
+
+    tree = ET.parse("src/Types.xsd")
+    root = tree.getroot()
+
+    # list of the types we are interested in for the inventory
+    valid_parent_types = [
+        "ItemType",
+        "BlockType",
+    ]
+
+    # create a dictionary to store the parent types and their variations
+    valid_types = dict.fromkeys(valid_parent_types, [])
+
+    # loop through the high-level types
+    for child in root:
+        # if the parent type is of interest, carry on
+        if child.attrib["name"] in valid_parent_types:
+            for c in child:
+                if "restriction" in c.tag:
+                    for enumeration in c:
+                        valid_types[child.attrib["name"]].append(
+                            enumeration.attrib["value"]
+                        )
+
+    return valid_types
+
+
+def print_extracted_types_xsd(types: Dict[str, List[str]]):
+    # print out the type parent name followed by the specific names under that parent
+    print("The following are valid types given the overarching parent type.")
+    for parent_type, child_types in types.items():
+        print(f"\n{parent_type}:")
+        for child_type in child_types:
+            print(f"\t{child_type}")
+
+
 def extract_blocks(obs):
     """
     pass in the observation returned from minedojo
