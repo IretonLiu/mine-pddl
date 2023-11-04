@@ -1,4 +1,5 @@
-from typing import List, Optional
+from typing import Optional
+
 from pddl.operators import *
 
 # from pddl.pddl_types.base_pddl_types import *
@@ -19,7 +20,7 @@ class Function:
         assert self.var_name is not None
 
         out = "("
-        if not label is None:
+        if label is not None:
             out += f"{self.var_name.format(label)} "
         else:
             out += f"{self.var_name} "
@@ -34,7 +35,7 @@ class Function:
         assert self.value is not None
 
         full_var_name = ""
-        if not label is None:
+        if label is not None:
             full_var_name = self.var_name.format(label)
         else:
             full_var_name = self.var_name
@@ -71,7 +72,7 @@ class InventoryFunction(Function):
         assert self.var_name is not None
 
         full_var_name = ""
-        if not label is None:
+        if label is not None:
             full_var_name = self.var_name.format(label)
         else:
             full_var_name = self.var_name
