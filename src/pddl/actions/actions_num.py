@@ -1,9 +1,7 @@
-from typing import List, Optional
-from pddl.pddl_types.types_names import TypeName
-from pddl.pddl_types.named_pddl_types import NamedBlockType, NamedItemType
-from pddl.operators import *
-from pddl.predicates import *
 from pddl.functions import *
+from pddl.operators import *
+from pddl.pddl_types.types_names import TypeName
+from pddl.predicates import *
 
 
 class Action:
@@ -121,50 +119,6 @@ class Move(Action):
                 "1",
             )
         self.effects = pddl_and(effect)
-
-    def to_pddl(self):
-        self.construct_preconditions()
-        self.construct_effects()
-        out = f"(:action {self.action_name}\n"
-        out += f"\t:parameters ({' '.join([f'{v} - {k}' for k, v in self.parameters.items()])})\n"
-        out += f"\t:precondition {self.preconditions}\n"
-        out += f"\t:effect {self.effects}\n"
-        out += ")\n"
-        return out
-
-
-class Pickup(Action):
-    def __init__(self, item: str) -> None:
-        super().__init__()
-        self.item = item
-        self.action_name = "pickup-" + item
-        self.parameters = {TypeName.AGENT_TYPE_NAME.value: "?ag", item: "?i"}
-
-    def construct_preconditions(self):
-        self.preconditions = pddl_and(
-            f"({ItemPresentPredicate.var_name} {self.parameters[self.item]})",
-            pddl_equal(
-                f"({XPositionFunction.var_name} {self.parameters[self.item]})",
-                f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-            ),
-            pddl_equal(
-                f"({YPositionFunction.var_name} {self.parameters[self.item]})",
-                f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-            ),
-            pddl_equal(
-                f"({ZPositionFunction.var_name} {self.parameters[self.item]})",
-                f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-            ),
-        )
-
-    def construct_effects(self):
-        self.effects = pddl_and(
-            pddl_increase(
-                f"({InventoryFunction.var_name.format(self.item)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                "1",
-            ),
-            pddl_not(f"({ItemPresentPredicate.var_name} {self.parameters[self.item]})"),
-        )
 
     def to_pddl(self):
         self.construct_preconditions()
@@ -295,6 +249,8 @@ class MoveAndPickup(Action):
         out += ")\n"
         return out
 
+"""
+left this out for now
 
 class Drop(Action):
     def __init__(self, item: str) -> None:
@@ -345,11 +301,13 @@ class Drop(Action):
         out += f"\t:effect {self.effects}\n"
         out += ")\n"
         return out
-
+"""
 
 class Break(Action):
-    def __init__(self, block: str) -> None:
+    def __init__(self, block: str, dir: str) -> None:
+        # todo: dir is a temporary parameter for now - we still need to add in multiple directions
         super().__init__()
+        self.dir = dir
         self.block = block + "-block"
         self.item = block
         self.action_name = "break-" + block
@@ -398,9 +356,11 @@ class Break(Action):
 
 
 class Place(Action):
-    def __init__(self, block: str) -> None:
+    def __init__(self, block: str, dir:str) -> None:
+        # todo: dir is a temporary parameter for now - we still need to add in multiple directions
         super().__init__()
         # separate the names of blocks and items in pddl
+        self.dir = dir
         self.block = block + "-block"
         self.item = block
         self.action_name = "place-" + block
@@ -483,8 +443,10 @@ class Place(Action):
 
 class JumpUp(Action):
     # jumps up one block forward
-    def __init__(self) -> None:
+    def __init__(self, dir: str) -> None:
+        # todo: dir is a temporary parameter for now - we still need to add in multiple directions
         super().__init__()
+        self.dir = dir
         self.action_name = "jump-up"
         self.parameters = {TypeName.AGENT_TYPE_NAME.value: "?ag"}
 
@@ -543,8 +505,10 @@ class JumpUp(Action):
 
 class JumpDown(Action):
     # jumps up one block forward
-    def __init__(self) -> None:
+    def __init__(self, dir: str) -> None:
+        # todo: dir is a temporary parameter for now - we still need to add in multiple directions
         super().__init__()
+        self.dir = dir
         self.action_name = "jump-down"
         self.parameters = {TypeName.AGENT_TYPE_NAME.value: "?ag"}
 

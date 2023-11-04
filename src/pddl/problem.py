@@ -1,16 +1,14 @@
-from typing import List, Dict, Any, Tuple
+from typing import Any, Dict, List, Tuple
 
-from numpy import isin
+from helpers import *
 from helpers.prop_helper import generate_initial_seq_predicates
 from pddl.domain import Domain
-from pddl.pddl_types.named_pddl_types import NamedBlockType, NamedItemType
-from pddl.pddl_types.base_pddl_types import AgentType
-from pddl.pddl_types.special_pddl_types import PositionType, CountType
 from pddl.functions import *
 from pddl.operators import *
-from pddl.pddl_types.types_names import TypeName
+from pddl.pddl_types.base_pddl_types import AgentType
+from pddl.pddl_types.named_pddl_types import NamedBlockType, NamedItemType
+from pddl.pddl_types.special_pddl_types import CountType, PositionType
 from pddl.predicates import *
-from helpers import *
 
 # (define (problem <title>)
 #     (:domain <domain-name>)
@@ -34,6 +32,7 @@ class Problem:
         domain: Domain,
         obs_range: Tuple[int, int, int],
         max_inventory_stack: int,
+        use_propositional: bool,
         objects: List = [],
         init: List = [],
         goal: List = [],
@@ -45,6 +44,7 @@ class Problem:
         self.goal = goal
         self.obs_range = obs_range
         self.max_inventory_stack = max_inventory_stack
+        self.use_propositional = use_propositional
 
     def initialize_problem(self):
         for function in self.domain.functions:
@@ -81,7 +81,7 @@ class Problem:
         self.postition_objects = []
         self.count_objects = []
         max_range = max(self.obs_range)
-        output += f"\t"
+        output += "\t"
         for i in range(
             -max_range // 2 - 1, max_range // 2 + 1 + 1
         ):  # add a buffer of 1 to either side of the position range
@@ -92,7 +92,7 @@ class Problem:
         output += f"- {PositionType.type_name}\n"
 
         # add the count objects
-        output += f"\t"
+        output += "\t"
         for i in range(self.max_inventory_stack + 1):
             output += f"{CountType.construct_problem_object(i)} "
             self.count_objects.append(CountType.construct_problem_object(i))

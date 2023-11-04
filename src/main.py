@@ -1,13 +1,17 @@
 import handlers.entities as handlers
-from helpers import execution_helper, yaml_helper
-from helpers.observation_helpers import *
-from helpers.video_helper import VideoHelper
-import minedojo
-from pddl.actions import *
-from pddl.domain import Domain
-from pddl.functions import *
-from pddl.problem import Problem
+import minedojo  # type: ignore
 from argument_parser import get_args_parser
+from helpers import execution_helper, yaml_helper
+from helpers.observation_helpers import (
+    extract_blocks,
+    extract_entities,
+    extract_inventory,
+    get_valid_block_and_item_types,
+    print_extracted_types_xsd,
+)
+from helpers.video_helper import VideoHelper
+from pddl.domain import Domain
+from pddl.problem import Problem
 import time
 
 """
@@ -29,10 +33,10 @@ import time
 def main(args):
     # todo: process the agent's inventory - will go into the items dict
 
-    world_config = yaml_helper.load_yaml("worlds/example.yaml")
+    world_config = yaml_helper.load_yaml(args.world_config)
 
-    max_inventory_stack = 64
-    ranges = (8, 4, 8)
+    max_inventory_stack = args.max_inventory_stack
+    ranges = args.observation_range
     voxel_size = dict(
         xmin=-ranges[0] // 2,
         ymin=-ranges[1] // 2,
@@ -44,9 +48,9 @@ def main(args):
 
     env = minedojo.make(
         args.world_name,
-        image_size=(1024, 1024),
-        world_seed="Enter the Nether",
-        start_position=dict(x=0.5, y=4, z=0.5, yaw=0, pitch=0),
+        image_size=args.window_size,
+        world_seed=args.world_seed,
+        start_position=args.agent_start_position,
         use_voxel=True,
         # spawn_mobs=False,
         voxel_size=voxel_size,
@@ -79,20 +83,21 @@ def main(args):
     items, agent = extract_entities(obs)
     blocks = extract_blocks(obs)
     inventory = extract_inventory(obs, items, agent)
-    domain = Domain("first_world", max_inventory_stack)
+    domain = Domain(args.domain_name, max_inventory_stack, use_propositional=args.pddl_type == "propositional")
 
     domain.to_pddl(
         items,
         blocks,
-        file_path="./problems/our/domain_prop3.pddl",
+        file_path=args.domain_file,
         goal=world_config["goal"],
     )
 
     problem = Problem(
-        "first_world_problem",
+        args.problem_name,
         domain,
         ranges,
         max_inventory_stack,
+        use_propositional=args.pddl_type == "propositional",
     )
 
     problem.to_pddl(
@@ -100,7 +105,7 @@ def main(args):
         items,
         blocks,
         goal_yaml=world_config["goal"],
-        file_path="./problems/our/problem_prop3.pddl",
+        file_path=args.problem_file,
     )
 
     print(obs["entities"])
@@ -114,7 +119,7 @@ def main(args):
         continue
 
     print(obs["entities"])
-# action_sequence = execution_helper.read_plan("./problems/our/plan.pddl")
+# action_sequence = execution_helper.read_plan(args.plan_file)
     action_sequence = [
         "move-south",
         "move-south",
