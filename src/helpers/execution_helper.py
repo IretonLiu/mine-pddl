@@ -5,6 +5,8 @@ import numpy as np
 from pddl.pddl_types.base_pddl_types import AgentType
 from pddl.functions import XPositionFunction, YPositionFunction, ZPositionFunction
 
+# TODO: If we ever implement drop, we need to remember that dropped items don't get the NBT tag for presistance
+
 
 def read_plan(plan_path: str):
     """

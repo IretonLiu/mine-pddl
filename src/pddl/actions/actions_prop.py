@@ -1217,7 +1217,7 @@ class CheckGoal(Action):
                     AgentHasNItemsPredicate.to_precondition(
                         self.parameters[TypeName.AGENT_TYPE_NAME.value],
                         CountType.construct_problem_object(i),
-                        item_type=item["name"],
+                        item_type=item["type"],
                     )
                 )
             item_pddl += pddl_or(*args)
