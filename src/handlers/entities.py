@@ -1,5 +1,3 @@
-import numpy as np
-
 from minedojo.sim import spaces
 from minedojo.sim.handlers.translation import KeymapTranslationHandler
 

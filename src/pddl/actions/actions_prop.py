@@ -1,11 +1,18 @@
-from typing import List, Optional
 
-from pddl.pddl_types.types_names import TypeName
-from pddl.pddl_types.named_pddl_types import NamedBlockType, NamedItemType
+from pddl.operators import pddl_and, pddl_exists, pddl_not, pddl_or
 from pddl.pddl_types.special_pddl_types import CountType, PositionType
-from pddl.operators import *
-from pddl.predicates import *
-from pddl.functions import *
+from pddl.pddl_types.types_names import TypeName
+from pddl.predicates import (
+    AgentAlivePredicate,
+    AgentHasNItemsPredicate,
+    AreSequentialPredicate,
+    AtXLocationPredicate,
+    AtYLocationPredicate,
+    AtZLocationPredicate,
+    BlockPresentPredicate,
+    GoalAchievedPredicate,
+    ItemPresentPredicate,
+)
 
 # TODO: add direction that we are facing as a parameter to the move action
 

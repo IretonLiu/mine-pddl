@@ -1,6 +1,5 @@
-from pddl.predicates import *
 from pddl.pddl_types.base_pddl_types import ObjectType
-from pddl.pddl_types.types_names import TypeName
+from pddl.predicates import AreSequentialPredicate, NotEqualPredicate
 
 
 # A pddl type used to count the number of objects of a certain type
@@ -8,17 +7,20 @@ from pddl.pddl_types.types_names import TypeName
 class IntType(ObjectType):
     type_name = "int"
 
-    def __init__(self):
-        super().__init__()
-        self.predicates[NotEqualPredicate] = NotEqualPredicate()
-        self.predicates[AreSequentialPredicate] = AreSequentialPredicate()
+    def __init__(self, use_propositional: bool = True):
+        # set use_propositional to True by default because this should only be used for propositional pddl
+        super().__init__(use_propositional)
+
+        if self.use_propositional:
+            self.predicates[NotEqualPredicate] = NotEqualPredicate()
+            self.predicates[AreSequentialPredicate] = AreSequentialPredicate()
 
 
 class PositionType(IntType):
     type_name = "position"
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, use_propositional: bool = True):
+        super().__init__(use_propositional)
 
     @staticmethod
     def construct_problem_object(num: int):
@@ -28,8 +30,8 @@ class PositionType(IntType):
 class CountType(IntType):
     type_name = "count"
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, use_propositional: bool = True):
+        super().__init__(use_propositional)
 
     @staticmethod
     def construct_problem_object(num: int):

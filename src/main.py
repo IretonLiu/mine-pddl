@@ -1,3 +1,4 @@
+
 import handlers.entities as handlers
 import minedojo  # type: ignore
 from argument_parser import get_args_parser
@@ -12,7 +13,6 @@ from helpers.observation_helpers import (
 from helpers.video_helper import VideoHelper
 from pddl.domain import Domain
 from pddl.problem import Problem
-import time
 
 """
 - get inventory thing working
@@ -63,6 +63,8 @@ def main(args):
         allow_mob_spawn=False,
     )
 
+    use_propositional = args.pddl_type == "propositional"
+
     env.env.env.env.env._sim_spec._obs_handlers.append(
         handlers.EntityObservation(ranges)
     )
@@ -80,10 +82,10 @@ def main(args):
         obs, reward, done, info = env.step(env.action_space.no_op())
 
     video_helper.save_image(obs["rgb"])
-    items, agent = extract_entities(obs)
-    blocks = extract_blocks(obs)
-    inventory = extract_inventory(obs, items, agent)
-    domain = Domain(args.domain_name, max_inventory_stack, use_propositional=args.pddl_type == "propositional")
+    items, agent = extract_entities(obs, use_propositional)
+    blocks = extract_blocks(obs, use_propositional)
+    inventory = extract_inventory(obs, items, agent, use_propositional)
+    domain = Domain(args.domain_name, max_inventory_stack, use_propositional=use_propositional)
 
     domain.to_pddl(
         items,
@@ -97,29 +99,29 @@ def main(args):
         domain,
         ranges,
         max_inventory_stack,
-        use_propositional=args.pddl_type == "propositional",
+        use_propositional=use_propositional,
     )
 
     problem.to_pddl(
         agent,
         items,
         blocks,
-        goal_yaml=world_config["goal"],
         file_path=args.problem_file,
     )
 
-    print(obs["entities"])
-    # timer for 6 minutes
-    # TODO: REmove this :)
-    start_time = time.time()
-    while True:
-        # if the time difference is greater than 5 minutes
-        if time.time() - start_time >= 1000:
-            break
-        continue
+    # print(obs["entities"])
+    # # timer for 6 minutes
+    # # TODO: REmove this :)
+    # start_time = time.time()
+    # while True:
+    #     # if the time difference is greater than 5 minutes
+    #     if time.time() - start_time >= 1000:
+    #         break
+    #     continue
 
-    print(obs["entities"])
-# action_sequence = execution_helper.read_plan(args.plan_file)
+    # print(obs["entities"])
+
+    # action_sequence = execution_helper.read_plan(args.plan_file)
     action_sequence = [
         "move-south",
         "move-south",
@@ -149,9 +151,9 @@ def main(args):
 
         # update the observations we are working with
         video_helper.save_image(obs["rgb"])
-        items, agent = extract_entities(obs)
-        blocks = extract_blocks(obs)
-        inventory = extract_inventory(obs, items, agent)
+        items, agent = extract_entities(obs, use_propositional)
+        blocks = extract_blocks(obs, use_propositional)
+        inventory = extract_inventory(obs, items, agent, use_propositional)
 
     print(
         "plan successful: ",
