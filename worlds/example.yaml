@@ -2,6 +2,8 @@
 # Block and item variants are not currently supported
 
 # intialise all block positions
+name: "First Problem"
+
 blocks:
   - position:
       x: '100'
@@ -17,11 +19,19 @@ blocks:
 # initialise all floating items in the world
 items:
   - position:
-      x: '500'
-      y: '4'
+      x: '1'
+      y: '5'
       z: '5'
     quantity: 1
     type: diamond
+    persist: 1
+  - position:
+      x: '-1'
+      y: '5'
+      z: '5'
+    quantity: 1
+    type: log
+    persist: 0
 
 # specify the agnents initial inventory
 inventory:

@@ -3,13 +3,12 @@ from helpers import execution_helper, yaml_helper
 from helpers.observation_helpers import *
 from helpers.video_helper import VideoHelper
 import minedojo
-import numpy as np
 from pddl.actions import *
 from pddl.domain import Domain
 from pddl.functions import *
-from pddl.pddl_types.named_pddl_types import NamedBlockType, NamedItemType
 from pddl.problem import Problem
 from argument_parser import get_args_parser
+import time
 
 """
 - get inventory thing working
@@ -104,7 +103,18 @@ def main(args):
         file_path="./problems/our/problem_prop3.pddl",
     )
 
-    # action_sequence = execution_helper.read_plan("./problems/our/plan.pddl")
+    print(obs["entities"])
+    # timer for 6 minutes
+    # TODO: REmove this :)
+    start_time = time.time()
+    while True:
+        # if the time difference is greater than 5 minutes
+        if time.time() - start_time >= 1000:
+            break
+        continue
+
+    print(obs["entities"])
+# action_sequence = execution_helper.read_plan("./problems/our/plan.pddl")
     action_sequence = [
         "move-south",
         "move-south",
