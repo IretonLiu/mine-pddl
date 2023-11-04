@@ -4,8 +4,18 @@ NOTE: in order for the default argument to be type-converted, it needs to be a s
 """
 
 import argparse
+from argparse import ArgumentDefaultsHelpFormatter
+from operator import attrgetter
 from typing import Dict, Tuple
 
+
+class HelpFormatter(ArgumentDefaultsHelpFormatter):
+    """
+    Sort the arguments alphabetically, and also print the default values
+    """
+    def add_arguments(self, actions):
+        actions = sorted(actions, key=attrgetter('option_strings'))
+        super(HelpFormatter, self).add_arguments(actions)
 
 def coords_3d(arg: str) -> Tuple[int, int, int]:
     # check if have ( and ) and remove them
@@ -73,7 +83,7 @@ def no_spaces(arg: str) -> str:
     return arg.replace(" ", "_")
 
 def get_args_parser():
-    parser = argparse.ArgumentParser("Mine-PDDL", add_help=True)
+    parser = argparse.ArgumentParser("Mine-PDDL", add_help=True, formatter_class=HelpFormatter)
 
     # General stuff
     parser.add_argument(
