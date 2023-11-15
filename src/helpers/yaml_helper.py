@@ -61,13 +61,12 @@ def yaml_items_to_cmd(items: list[dict]) -> list:
 
     commands = []
     for item in items:
-        cmd = '/summon Item {} {} {} {{Item:{{id:"minecraft:{}",Count:{},PersistenceRequired:{}}}}}'.format(
+        cmd = '/summon Item {} {} {} {{Item:{{id:"minecraft:{}",Count:{}}}}}'.format(
             item["position"]["x"],
             item["position"]["y"],
             item["position"]["z"],
             item["type"],
             item["quantity"],
-            item['persist']
         )
         commands.append(cmd)
 

@@ -72,6 +72,7 @@ def main(args):
     for cmd in item_commands:
         env.execute_cmd(cmd)
 
+
     for i in range(10):
         obs, reward, done, info = env.step(env.action_space.no_op())
 
@@ -114,7 +115,7 @@ def main(args):
         continue
 
     print(obs["entities"])
-# action_sequence = execution_helper.read_plan("./problems/our/plan.pddl")
+    # action_sequence = execution_helper.read_plan("./problems/our/plan.pddl")
     action_sequence = [
         "move-south",
         "move-south",
@@ -139,6 +140,7 @@ def main(args):
             action_str, agent=agent, env=env, inventory=inventory
         )
         obs, reward, done, info = env.step(action)
+        env.execute_cmd("/entitydata @e[type=item] {Age:-32768}")
         for i in range(5):
             obs, reward, done, info = env.step(env.action_space.no_op())
 

@@ -1,14 +1,14 @@
-from typing import Dict, List, Optional, Any
 import inspect
-import pddl.pddl_types.base_pddl_types as base_pddl_types
-import pddl.pddl_types.special_pddl_types as special_pddl_types
-import pddl.pddl_types.named_pddl_types as named_pddl_types
-from pddl.functions import InventoryFunction
 from collections import defaultdict
+from typing import Any, Dict, List, Optional
 
-# from pddl.actions.actions_num import *
+import pddl.actions.actions_num as actions_num
+import pddl.actions.actions_prop as actions_prop
+import pddl.pddl_types.base_pddl_types as base_pddl_types
+import pddl.pddl_types.named_pddl_types as named_pddl_types
+import pddl.pddl_types.special_pddl_types as special_pddl_types
+from pddl.functions import InventoryFunction
 from pddl.predicates import AgentHasNItemsPredicate
-from pddl.actions.actions_prop import *
 
 
 class Domain:
@@ -16,6 +16,7 @@ class Domain:
         self,
         name: str,
         max_inventory_stack: int,
+        use_propositional: bool
     ):
         self.name = name
         self.max_inventory_stack = max_inventory_stack
@@ -25,6 +26,7 @@ class Domain:
         self.functions = []
         self.actions = []
         self.requirements = []
+        self.use_propositional = use_propositional
 
     def construct_types(
         self,
@@ -33,7 +35,11 @@ class Domain:
     ):
         types_dict = defaultdict(list)
         all_pddl_types = inspect.getmembers(base_pddl_types)
-        all_pddl_types.extend(inspect.getmembers(special_pddl_types))
+
+        if self.use_propositional:
+            # the special types defines the propositional-specific types
+            all_pddl_types.extend(inspect.getmembers(special_pddl_types))
+
         # print all the classes in the pddl.pddl_types.base_pddl_types module without classes from their own imports
         for name, cls in all_pddl_types:
             if inspect.isclass(cls) and (
@@ -69,7 +75,7 @@ class Domain:
             key = types_queue.pop(0)
             if key not in types_dict:
                 continue
-            types_str += f"\t"
+            types_str += "\t"
             for value in types_dict[key]:
                 types_str += f"{value} "
                 types_queue.append(value)
@@ -152,8 +158,12 @@ class Domain:
         # items is only meaningful if we are processing functions (i.e. process_predicates is false) <- not true for propositional pddl
 
         # get the pddl representation for the types - is a list
+        # only include special_pddl_types if we are processing propositional pddl
+        types_list: List[Any] = [base_pddl_types]
+        if self.use_propositional:
+            types_list.append(special_pddl_types)
         pddl_strings = self.get_pddl_strings(
-            [base_pddl_types, special_pddl_types], process_predicates, items, blocks
+            types_list, process_predicates, items, blocks
         )
         pddl_strings.extend(
             self.get_pddl_strings([named_pddl_types], process_predicates, items, blocks)
@@ -189,22 +199,41 @@ class Domain:
         blocks: Dict[str, List[named_pddl_types.NamedBlockType]],
         goal: Dict[str, List[Dict[str, Any]]],
     ):
+        if self.use_propositional:
+            module = actions_prop
+        else:
+            module = actions_num
+        
         directions = ["north", "south", "east", "west"]
 
         for dir in directions:
-            self.actions.append(Move(dir))
-            self.actions.append(JumpUp(dir))
-            self.actions.append(JumpDown(dir))
+            # todo: remove this when we get the muti-directional support for numerical pddl
+            if not self.use_propositional and dir in directions[1:]:
+                break
+            # todo: end remove
+
+            self.actions.append(module.Move(dir))
+            self.actions.append(module.JumpUp(dir))
+            self.actions.append(module.JumpDown(dir))
             for block in blocks:
-                self.actions.append(Break(block, dir))
-                self.actions.append(Place(block, dir))
+                self.actions.append(module.Break(block, dir))
+                self.actions.append(module.Place(block, dir))
 
         for item in items:
             for dir in directions:
-                self.actions.append(MoveAndPickup(dir, item))
+                # todo: remove this when we get the muti-directional support for numerical pddl
+                if not self.use_propositional and dir in directions[1:]:
+                    break
+                # todo: end remove
+                
+                self.actions.append(module.MoveAndPickup(dir, item))
 
+        # handling check goal is special depending on what type of pddl we are using
+        if self.use_propositional:
+            self.actions.append(actions_prop.CheckGoal(goal, self.max_inventory_stack))
+        else:
+            self.actions.append(actions_num.CheckGoal(goal))
 
-        self.actions.append(CheckGoal(goal, self.max_inventory_stack))
 
         action_str = ""
         for action in self.actions:
@@ -219,10 +248,11 @@ class Domain:
         file_path: str,
     ):
         pddl = f"(define (domain {self.name})\n"
-        pddl += "(:requirements :typing :negative-preconditions :universal-preconditions :existential-preconditions)\n"
+        pddl += "(:requirements :typing {} :negative-preconditions :universal-preconditions :existential-preconditions)\n".format("" if self.use_propositional else ":fluents")
         pddl += self.construct_types(items, blocks) + "\n"
         pddl += self.construct_predicates(items, blocks) + "\n"
-        # pddl += self.construct_functions(items, blocks) + "\n"
+        if not self.use_propositional:
+            pddl += self.construct_functions(items, blocks) + "\n"
         pddl += self.construct_actions(items, blocks, goal) + "\n"
         pddl += ")"
 
