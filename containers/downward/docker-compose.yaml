@@ -1,0 +1,15 @@
+version: "3"
+services:
+  downward:
+    build: .
+    image: downward 
+    volumes:
+      -  ../../output:/workspace/downward/examples
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]
+

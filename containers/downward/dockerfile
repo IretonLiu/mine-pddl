@@ -1,0 +1,9 @@
+FROM aibasel/downward
+
+
+RUN mkdir -p /workspace/downward/pddl
+
+
+ENTRYPOINT [ "/workspace/downward/fast-downward.py" ]
+
+

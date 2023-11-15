@@ -1,0 +1,14 @@
+version: "3"
+services:
+  enhsp19:
+    build: .
+    image: enhsp19 
+    volumes:
+      -  ../examples:/root/enhsp19/examples
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]
