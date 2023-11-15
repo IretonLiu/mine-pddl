@@ -12,12 +12,7 @@ from pddl.predicates import AgentHasNItemsPredicate
 
 
 class Domain:
-    def __init__(
-        self,
-        name: str,
-        max_inventory_stack: int,
-        use_propositional: bool
-    ):
+    def __init__(self, name: str, max_inventory_stack: int, use_propositional: bool):
         self.name = name
         self.max_inventory_stack = max_inventory_stack
         self.types = None
@@ -203,7 +198,7 @@ class Domain:
             module = actions_prop
         else:
             module = actions_num
-        
+
         directions = ["north", "south", "east", "west"]
 
         for dir in directions:
@@ -225,7 +220,7 @@ class Domain:
                 if not self.use_propositional and dir in directions[1:]:
                     break
                 # todo: end remove
-                
+
                 self.actions.append(module.MoveAndPickup(dir, item))
 
         # handling check goal is special depending on what type of pddl we are using
@@ -233,7 +228,6 @@ class Domain:
             self.actions.append(actions_prop.CheckGoal(goal, self.max_inventory_stack))
         else:
             self.actions.append(actions_num.CheckGoal(goal))
-
 
         action_str = ""
         for action in self.actions:
@@ -248,7 +242,9 @@ class Domain:
         file_path: str,
     ):
         pddl = f"(define (domain {self.name})\n"
-        pddl += "(:requirements :typing {} :negative-preconditions :universal-preconditions :existential-preconditions)\n".format("" if self.use_propositional else ":fluents")
+        pddl += "(:requirements :typing {} :negative-preconditions :universal-preconditions :existential-preconditions)\n".format(
+            "" if self.use_propositional else ":fluents"
+        )
         pddl += self.construct_types(items, blocks) + "\n"
         pddl += self.construct_predicates(items, blocks) + "\n"
         if not self.use_propositional:

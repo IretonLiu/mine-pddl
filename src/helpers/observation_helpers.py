@@ -1,5 +1,5 @@
 from typing import Dict, List, Tuple
- 
+
 import numpy as np
 from pddl.functions import XPositionFunction, YPositionFunction, ZPositionFunction
 from pddl.pddl_types.base_pddl_types import AgentType
@@ -131,7 +131,11 @@ def extract_blocks(obs, use_propositional: bool):
                     + np.array(player_pos)
                 )
 
-                named_block = NamedBlockType(use_propositional,block_name)
+                # skip the block if it is below ground level, i.e. y = 3 or below
+                if absolute_pos[1] <= 2:
+                    continue
+
+                named_block = NamedBlockType(use_propositional, block_name)
 
                 named_block.functions[XPositionFunction].set_value(absolute_pos[0])
                 named_block.functions[YPositionFunction].set_value(absolute_pos[1])
