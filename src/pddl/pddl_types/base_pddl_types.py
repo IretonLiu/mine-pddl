@@ -1,8 +1,21 @@
-from typing import List
+from pddl.functions import (
+    BlockHitsFunction,
+    InventoryFunction,
+    XPositionFunction,
+    YPositionFunction,
+    ZPositionFunction,
+)
 from pddl.pddl_types.types_names import TypeName
-from pddl.functions import *
-from pddl.predicates import *
-
+from pddl.predicates import (
+    AgentAlivePredicate,
+    AgentHasNItemsPredicate,
+    AtXLocationPredicate,
+    AtYLocationPredicate,
+    AtZLocationPredicate,
+    BlockPresentPredicate,
+    GoalAchievedPredicate,
+    ItemPresentPredicate,
+)
 
 # TODO: check if items despawn + how to turn off
 # TODO: pass in name instead of hardcoding
@@ -12,10 +25,11 @@ name_dict = {"object": "object"}
 class ObjectType:
     type_name = TypeName.OBJECT_TYPE_NAME.value
 
-    def __init__(self):
+    def __init__(self, use_propositional: bool):
         self.name = "obj"
         self.functions = {}  # TODO: Make functions a dictionary
         self.predicates = {}
+        self.use_propositional = use_propositional
 
     def to_string(self):
         return f"{self.name} - {self.type_name}"
@@ -24,38 +38,43 @@ class ObjectType:
 class LocatableType(ObjectType):
     type_name = TypeName.LOCATABLE_TYPE_NAME.value
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, use_propositional: bool):
+        super().__init__(use_propositional)
         self.var_name = "l"
         self.functions[XPositionFunction] = XPositionFunction()
         self.functions[YPositionFunction] = YPositionFunction()
         self.functions[ZPositionFunction] = ZPositionFunction()
 
-        self.predicates[AtXLocationPredicate] = AtXLocationPredicate()
-        self.predicates[AtYLocationPredicate] = AtYLocationPredicate()
-        self.predicates[AtZLocationPredicate] = AtZLocationPredicate()
-        # self.functions.append(PositionFunction(self, LocatableType.type_name))
+        # these are only useful for propositional pddl - functions are included all the time
+        if self.use_propositional:
+            self.predicates[AtXLocationPredicate] = AtXLocationPredicate()
+            self.predicates[AtYLocationPredicate] = AtYLocationPredicate()
+            self.predicates[AtZLocationPredicate] = AtZLocationPredicate()
 
 
 class AgentType(LocatableType):
     type_name = TypeName.AGENT_TYPE_NAME.value
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, use_propositional: bool):
+        super().__init__(use_propositional)
         self.var_name = "ag"
         self.name = "steve"
+
         self.functions[InventoryFunction] = InventoryFunction()
         self.predicates[AgentAlivePredicate] = AgentAlivePredicate() 
         self.predicates[GoalAchievedPredicate] = GoalAchievedPredicate()
-        self.predicates[AgentHasNItemsPredicate] = AgentHasNItemsPredicate()
+
+        # these are only useful for propositional pddl - functions are included all the time
+        if self.use_propositional:
+            self.predicates[AgentHasNItemsPredicate] = AgentHasNItemsPredicate()
 
 
 
 class ItemType(LocatableType):
     type_name = TypeName.ITEM_TYPE_NAME.value
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, use_propositional: bool):
+        super().__init__(use_propositional)
         self.var_name = "itm"
         self.predicates[ItemPresentPredicate] = ItemPresentPredicate()
 
@@ -63,8 +82,8 @@ class ItemType(LocatableType):
 class BlockType(LocatableType):
     type_name = TypeName.BLOCK_TYPE_NAME.value
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, use_propositional: bool):
+        super().__init__(use_propositional)
         self.var_name = "blk"
         self.predicates[BlockPresentPredicate] = BlockPresentPredicate()
 
@@ -72,8 +91,8 @@ class BlockType(LocatableType):
 class DestructibleBlockType(BlockType):
     type_name = TypeName.DESTRUCTIBLE_BLOCK_TYPE_NAME.value
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, use_propositional: bool):
+        super().__init__(use_propositional)
         self.var_name = "dblk"
         self.functions[BlockHitsFunction] = BlockHitsFunction()
 
@@ -81,9 +100,9 @@ class DestructibleBlockType(BlockType):
 class BedrockType(BlockType):
     type_name = TypeName.BEDROCK_TYPE_NAME.value
 
-    def __init__(self):
+    def __init__(self, use_propositional: bool):
         self.var_name = "bed"
-        super().__init__()
+        super().__init__(use_propositional)
 
 
 # (:types

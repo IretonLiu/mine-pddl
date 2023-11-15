@@ -1,7 +1,4 @@
-from typing import List
 from pddl.pddl_types.types_names import TypeName
-
-# TODO : add more ?
 
 
 class Predicate:

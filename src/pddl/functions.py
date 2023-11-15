@@ -1,8 +1,6 @@
 from typing import Optional
 
-from pddl.operators import *
-
-# from pddl.pddl_types.base_pddl_types import *
+from pddl.operators import pddl_and, pddl_equal
 from pddl.pddl_types.types_names import TypeName
 
 

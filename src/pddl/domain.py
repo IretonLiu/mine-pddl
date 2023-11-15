@@ -106,7 +106,7 @@ class Domain:
             # don't do recursive imports
             if inspect.isclass(cls) and cls.__module__ in module_names:
                 # create the object
-                obj = cls()
+                obj = cls(self.use_propositional)
 
                 # get the predicate/function string
                 # handle duplicate predicates/functions existing across different classes - this is done later

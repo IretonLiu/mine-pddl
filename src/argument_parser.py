@@ -1,6 +1,21 @@
+"""
+NOTE: in order for the default argument to be type-converted, it needs to be a string
+
+"""
+
 import argparse
+from argparse import ArgumentDefaultsHelpFormatter
+from operator import attrgetter
 from typing import Dict, Tuple
 
+
+class HelpFormatter(ArgumentDefaultsHelpFormatter):
+    """
+    Sort the arguments alphabetically, and also print the default values
+    """
+    def add_arguments(self, actions):
+        actions = sorted(actions, key=attrgetter('option_strings'))
+        super(HelpFormatter, self).add_arguments(actions)
 
 def coords_3d(arg: str) -> Tuple[int, int, int]:
     # check if have ( and ) and remove them
@@ -68,7 +83,7 @@ def no_spaces(arg: str) -> str:
     return arg.replace(" ", "_")
 
 def get_args_parser():
-    parser = argparse.ArgumentParser("Mine-PDDL", add_help=True)
+    parser = argparse.ArgumentParser("Mine-PDDL", add_help=True, formatter_class=HelpFormatter)
 
     # General stuff
     parser.add_argument(
@@ -106,6 +121,26 @@ def get_args_parser():
     )
     parser.set_defaults(print_valid_types=False)
 
+    # what task do we want to do
+    parser.add_argument(
+        "--generate-pddl",
+        action="store_true",
+        help="Generate Domain and Problem PDDL files from the world config",
+    )
+    parser.set_defaults(generate_pddl=False)
+    parser.add_argument(
+        "--generate-plan",
+        action="store_true",
+        help="Generate a plan from the PDDL files",
+    )
+    parser.set_defaults(generate_plan=False)
+    parser.add_argument(
+        "--execute-plan",
+        action="store_true",
+        help="Execute the plan in the world",
+    )
+    parser.set_defaults(execute_plan=False)
+
     # args to generate/process PDDL
     parser.add_argument(
         "--domain-name",
@@ -122,13 +157,13 @@ def get_args_parser():
     parser.add_argument(
         "--domain-file",
         type=str,
-        default="./problems/our/domain_prop3.pddl",
+        default="./problems/our/domain.pddl",
         help="path to the PDDL domain file (note that this may be overwritten)",
     )
     parser.add_argument(
         "--problem-file",
         type=str,
-        default="./problems/our/problem_prop3.pddl",
+        default="./problems/our/problem.pddl",
         help="path to the PDDL problem file (note that this may be overwritten)",
     )
     parser.add_argument(
@@ -156,13 +191,13 @@ def get_args_parser():
     parser.add_argument(
         "--observation-range",
         type=coords_3d,  # this a type conversion function
-        default=(8, 4, 8),
+        default="(8, 4, 8)",
         help="observation range of the agent in the form (x, y, z). Each component is the total range in that direction, where the agent is at the center",
     )
     parser.add_argument(
         "--agent-start-position",
         type=agent_start_position,
-        default=(0.5, 4, 0.5),
+        default="(0.5, 4, 0.5)",
         help="agent start position in the form (x, y, z), where x, y, z are numbers",
     )
 

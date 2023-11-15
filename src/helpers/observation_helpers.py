@@ -1,10 +1,10 @@
 from typing import Dict, List, Tuple
  
 import numpy as np
-from pddl.functions import *
+from pddl.functions import XPositionFunction, YPositionFunction, ZPositionFunction
 from pddl.pddl_types.base_pddl_types import AgentType
 from pddl.pddl_types.named_pddl_types import NamedBlockType, NamedItemType
-from pddl.predicates import *
+from pddl.predicates import AgentAlivePredicate, GoalAchievedPredicate
 
 rename = {"wood": "log"}
 
@@ -99,7 +99,7 @@ def print_extracted_types_xsd(types: Dict[str, List[str]]):
             print(f"\t{child_type}")
 
 
-def extract_blocks(obs):
+def extract_blocks(obs, use_propositional: bool):
     """
     pass in the observation returned from minedojo
     returns a dict of blocks (key is their block name, value is a NamedBlockType)
@@ -131,7 +131,7 @@ def extract_blocks(obs):
                     + np.array(player_pos)
                 )
 
-                named_block = NamedBlockType(block_name)
+                named_block = NamedBlockType(use_propositional,block_name)
 
                 named_block.functions[XPositionFunction].set_value(absolute_pos[0])
                 named_block.functions[YPositionFunction].set_value(absolute_pos[1])
@@ -157,7 +157,7 @@ def extract_blocks(obs):
     return blocks
 
 
-def extract_entities(obs) -> Tuple[Dict, AgentType]:
+def extract_entities(obs, use_propositional: bool) -> Tuple[Dict, AgentType]:
     """
     pass in the observation returned from minedojo
     returns a dict of items (key is their item name, value is a NamedItemType)
@@ -169,7 +169,7 @@ def extract_entities(obs) -> Tuple[Dict, AgentType]:
     entities = obs["entities"]
 
     items = {}
-    agent = AgentType()
+    agent = AgentType(use_propositional)
     have_processed_agent = False
     # process the entity data to get all the items
     for entity in entities:
@@ -184,6 +184,7 @@ def extract_entities(obs) -> Tuple[Dict, AgentType]:
             and entity["name"] != "MineDojoAgent0"
         ):
             named_item = NamedItemType(
+                use_propositional,
                 item_name=entity["name"],
                 variation=entity["variant"] if "variant" in entity else "",
                 quantity=int(entity["quantity"]),
@@ -235,7 +236,7 @@ def extract_entities(obs) -> Tuple[Dict, AgentType]:
     return items, agent
 
 
-def extract_inventory(obs, items, agent):
+def extract_inventory(obs, items, agent, use_propositional: bool):
     """
     pass in the inventory of the agent into the list of items
     """
@@ -246,6 +247,7 @@ def extract_inventory(obs, items, agent):
         if name == "air":
             continue
         named_item = NamedItemType(
+            use_propositional,
             item_name=name,
             variation=inventory["variant"][i],
             quantity=int(inventory["quantity"][i]),

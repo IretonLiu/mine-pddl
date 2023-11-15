@@ -1,4 +1,4 @@
-from typing import List, Tuple, Dict
+from typing import Dict
 
 # TODO: catch invalid arguments
 
@@ -12,7 +12,7 @@ def pddl_or(*args):
 
 
 def pddl_exists(arguments: Dict, *args):
-    out = f"(exists ("
+    out = "(exists ("
     for arg in arguments:
         out += f"{arguments[arg]} - {arg}"
     out += f") {' '.join(args)})"

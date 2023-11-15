@@ -1,28 +1,40 @@
-from typing import Any, Dict, List, Tuple
+from typing import Dict, List, Tuple
 
-from helpers import *
 from helpers.prop_helper import generate_initial_seq_predicates
 from pddl.domain import Domain
-from pddl.functions import *
-from pddl.operators import *
+from pddl.functions import (
+    InventoryFunction,
+    XPositionFunction,
+    YPositionFunction,
+    ZPositionFunction,
+)
 from pddl.pddl_types.base_pddl_types import AgentType
 from pddl.pddl_types.named_pddl_types import NamedBlockType, NamedItemType
 from pddl.pddl_types.special_pddl_types import CountType, PositionType
-from pddl.predicates import *
+from pddl.predicates import (
+    AgentHasNItemsPredicate,
+    AtLocationPredicate,
+    AtXLocationPredicate,
+    AtYLocationPredicate,
+    AtZLocationPredicate,
+    GoalAchievedPredicate,
+)
 
-# (define (problem <title>)
-#     (:domain <domain-name>)
-#     (:objects
-#         <object-list>
-#     )
+"""
+(define (problem <title>)
+    (:domain <domain-name>)
+    (:objects
+        <object-list>
+    )
 
-#     (:init
-#         <predicates>
-#     )
-#     (:goal
-#         <predicates>
-#     )
-# )
+    (:init
+        <predicates>
+    )
+    (:goal
+        <predicates>
+    )
+)
+"""
 
 
 class Problem:
@@ -40,15 +52,10 @@ class Problem:
         self.name = name
         self.domain = domain
         self.objects = objects
-        self.init = init
         self.goal = goal
         self.obs_range = obs_range
         self.max_inventory_stack = max_inventory_stack
         self.use_propositional = use_propositional
-
-    def initialize_problem(self):
-        for function in self.domain.functions:
-            self.init.append(function.var_name)
 
     def construct_objects(
         self,
@@ -77,26 +84,27 @@ class Problem:
                 # add the temp string to the object string
                 output += f"\t{temp}\n"
 
-        # add the position objects
-        self.postition_objects = []
-        self.count_objects = []
-        max_range = max(self.obs_range)
-        output += "\t"
-        for i in range(
-            -max_range // 2 - 1, max_range // 2 + 1 + 1
-        ):  # add a buffer of 1 to either side of the position range
-            # todo: could double the range, but that would add in quite a bit of complexity
-            output += f"{PositionType.construct_problem_object(i)} "
-            self.postition_objects.append(PositionType.construct_problem_object(i))
+        if self.use_propositional:
+            # add the position objects
+            self.postition_objects = []
+            self.count_objects = []
+            max_range = max(self.obs_range)
+            output += "\t"
+            for i in range(
+                -max_range // 2 - 1, max_range // 2 + 1 + 1
+            ):  # add a buffer of 1 to either side of the position range
+                # todo: could double the range, but that would add in quite a bit of complexity
+                output += f"{PositionType.construct_problem_object(i)} "
+                self.postition_objects.append(PositionType.construct_problem_object(i))
 
-        output += f"- {PositionType.type_name}\n"
+            output += f"- {PositionType.type_name}\n"
 
-        # add the count objects
-        output += "\t"
-        for i in range(self.max_inventory_stack + 1):
-            output += f"{CountType.construct_problem_object(i)} "
-            self.count_objects.append(CountType.construct_problem_object(i))
-        output += f"- {CountType.type_name}\n"
+            # add the count objects
+            output += "\t"
+            for i in range(self.max_inventory_stack + 1):
+                output += f"{CountType.construct_problem_object(i)} "
+                self.count_objects.append(CountType.construct_problem_object(i))
+            output += f"- {CountType.type_name}\n"
 
         return output + ")"
 
@@ -109,13 +117,15 @@ class Problem:
         # for each state variable, loop through predicates and functions
         output_list = []
 
-        # process int type objects
-        output_list.extend(generate_initial_seq_predicates(self.postition_objects))
-        output_list.extend(generate_initial_seq_predicates(self.count_objects))
+        if self.use_propositional:
+            # process int type objects
+            output_list.extend(generate_initial_seq_predicates(self.postition_objects))
+            output_list.extend(generate_initial_seq_predicates(self.count_objects))
 
         # process agent
         for predicate in agent.predicates.values():
             if isinstance(predicate, AgentHasNItemsPredicate):
+                # this will only be called for propositional pddl
                 for key in items:
                     item = items[key]
                     for i in item:
@@ -136,6 +146,7 @@ class Problem:
                                 )
                             )
             elif isinstance(predicate, AtLocationPredicate):
+                # this will also only be called for propositional pddl
                 position = float("inf")
                 if isinstance(predicate, AtXLocationPredicate):
                     position = int(agent.functions[XPositionFunction].value)
@@ -149,27 +160,29 @@ class Problem:
                     )
                 )
             else:
+                # this is general to both propositional and numerical pddl
                 output_list.append(predicate.to_problem(agent.name))
 
-        # for function in agent.functions.values():
-        #     # special case
-        #     if isinstance(function, InventoryFunction):
-        #         for key in items:
-        #             # items is a dict, so item is the key
-        #             item = items[key]
-        #             for i in item:
-        #                 if i.in_inventory:
-        #                     output_list.append(
-        #                         function.to_problem(
-        #                             agent.name, label=key, quantity=i.quantity
-        #                         )
-        #                     )
-        #                 else:
-        #                     output_list.append(
-        #                         function.to_problem(agent.name, label=key, quantity=0)
-        #                     )
-        #     else:
-        #         output_list.append(function.to_problem(agent.name))
+        if not self.use_propositional:
+            for function in agent.functions.values():
+                # special case
+                if isinstance(function, InventoryFunction):
+                    for key in items:
+                        # items is a dict, so item is the key
+                        item = items[key]
+                        for i in item:
+                            if i.in_inventory:
+                                output_list.append(
+                                    function.to_problem(
+                                        agent.name, label=key, quantity=i.quantity
+                                    )
+                                )
+                            else:
+                                output_list.append(
+                                    function.to_problem(agent.name, label=key, quantity=0)
+                                )
+                else:
+                    output_list.append(function.to_problem(agent.name))
 
         # process items, blocks
         to_process = [blocks, items]
@@ -181,6 +194,7 @@ class Problem:
                     # process the predicates
                     for predicate in entity.predicates.values():
                         if isinstance(predicate, AtLocationPredicate):
+                            # this will also only be called for propositional pddl
                             position = float("inf")
                             if isinstance(predicate, AtXLocationPredicate):
                                 position = int(
@@ -203,11 +217,13 @@ class Problem:
                                 )
                             )
                         else:
+                            # this is general to both propositional and numerical pddl
                             output_list.append(predicate.to_problem(f"{name}{j}"))
 
-                    # process the functions
-                    # for function in entity.functions.values():
-                    #     output_list.append(function.to_problem(f"{name}{j}"))
+                    # process the functions - for numerical
+                    if not self.use_propositional:
+                        for function in entity.functions.values():
+                            output_list.append(function.to_problem(f"{name}{j}"))
 
         # TODO: fix fomatting
         output = "(:init\n\t"
@@ -215,10 +231,10 @@ class Problem:
         output += "\n)"
         return output
 
-    def construct_goal(self, goal_yaml: Dict[str, List[Dict[str, Any]]]):
+    def construct_goal(self, agent: AgentType):
         # goal_yaml is a dict of lists of dicts
         output = "(:goal"
-        output += f"\n\t(and ({GoalAchievedPredicate.var_name} steve)\n\t\t"
+        output += f"\n\t(and {GoalAchievedPredicate.to_precondition(agent.name)})\n\t\t"
         output += "\n))"
         return output
 
@@ -227,14 +243,13 @@ class Problem:
         agent,
         items: Dict[str, List[NamedItemType]],
         blocks: Dict[str, List[NamedBlockType]],
-        goal_yaml: Dict[str, List[Dict[str, str]]],
         file_path: str,
     ):
         pddl = f"(define (problem {self.name})\n"
         pddl += f"\t(:domain {self.domain.name})\n"
         pddl += f"{self.construct_objects(agent, items, blocks)}\n"
         pddl += f"{self.construct_initial_state(agent, items, blocks)}\n"
-        pddl += f"{self.construct_goal(goal_yaml)}\n"
+        pddl += f"{self.construct_goal(agent)}\n"
         pddl += ")"
         with open(file_path, "w") as file:
             file.write(pddl)
