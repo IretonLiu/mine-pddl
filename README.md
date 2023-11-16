@@ -112,3 +112,55 @@ python src/main.py \
     --max-inventory-stack 64 \
     --observation-range "(8, 4, 8)"
 ```
+
+## Using the provided planners
+
+Two planners have been provided:
+
+- Propositional Planner: Fast Downward
+- Numerical Planner: enhsp19
+
+They will be bulit and run using Docker and the Docker Compose plugin, which can be installed using these instructions: [https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
+
+> [!IMPORTANT]
+> `<path to domain file>` and `<path to problem file>` are relative to the root directory
+
+### enhsp19
+
+1. Navigate to the enhsp19 directory
+
+    ```shell
+    cd containers/enhsp19
+    ```
+
+2. Build the image
+
+    ```shell
+    docker compose build
+    ```
+
+3. Run the planner
+
+    ```shell
+    docker compose run enhsp19 -o pddl/<path to domain file> -f pddl/<path to problem file>
+    ```
+
+### Fast Downward
+
+1. Navigate to the Fast Downward directory
+
+    ```shell
+    cd containers/downward
+    ```
+
+2. Build the image
+
+    ```shell
+    docker compose build
+    ```
+
+3. Run the planner
+
+    ```shell
+    docker compose run downward --alias lama-first pddl/<path to domain file> pddl/<path to problem file>
+    ```
