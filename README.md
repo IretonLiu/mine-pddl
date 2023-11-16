@@ -1,6 +1,6 @@
-# MineDojo-PDDL
+# MinePlanner
 
-MinePlanneris a framework to streamline benchmarking planning agents in Minecraft. You can specify the customised world in a YAML file, then use the framework to generate the corresponding Domain and Problem PDDL files, generate a plan using your planning agent of choice, and finally visualising the plan in Minecraft.
+MinePlanner is a framework to streamline benchmarking planning agents in Minecraft. You can specify the customised world in a YAML file, then use the framework to generate the corresponding Domain and Problem PDDL files, generate a plan using your planning agent of choice, and finally visualising the plan in Minecraft.
 
 ## Getting Started
 
@@ -61,7 +61,7 @@ python src/main.py --print-valid-types
 
 ## Running
 
-There a 3 main tasks that MinePlannercan perform:
+There a 3 main tasks that MinePlanner can perform:
 
 1. Generate PDDL (`--generate-pddl`): use a YAML config file to generate the Domain and Problem PDDL files.
 2. Generate plan (`--generate-plan`): run the specified planning agent, using the specified Domain and Problem files. This is currently not supported: the planner will need to be run manually, but we include instructions for running two basic plannres.
