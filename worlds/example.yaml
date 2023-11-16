@@ -5,7 +5,6 @@
 name: "First Problem"
 
 # intialise all block positions
-
 blocks:
   - position:
       x: '100'

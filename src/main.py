@@ -1,3 +1,4 @@
+import os
 
 import handlers.entities as handlers
 import minedojo  # type: ignore
@@ -84,6 +85,11 @@ def generate_or_execute_pddl(args):
     inventory = extract_inventory(obs, items, agent, use_propositional)
 
     if args.generate_pddl:
+        # make sure the paths exist
+        for filepath in [args.domain_file, args.problem_file]:
+            # get the directory path, excluding the file name
+            os.makedirs(os.path.dirname(filepath), exist_ok=True)
+
         # create the domain file
         domain = Domain(args.domain_name, max_inventory_stack, use_propositional=use_propositional)
         domain.to_pddl(
