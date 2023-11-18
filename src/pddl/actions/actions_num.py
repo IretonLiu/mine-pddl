@@ -213,21 +213,12 @@ class MoveAndPickup(Action):
             # preconditions for items
             pddl_and(
                 f"({ItemPresentPredicate.var_name} {self.parameters[self.item]})",
-                pddl_equal(
-                    f"({XPositionFunction.var_name} {self.parameters[self.item]})",
-                    f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                ),
+                x_equality("i"),
                 pddl_equal(
                     f"({YPositionFunction.var_name} {self.parameters[self.item]})",
                     f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
                 ),
-                pddl_equal(
-                    f"({ZPositionFunction.var_name} {self.parameters[self.item]})",
-                    pddl_add(
-                        f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                        "-1",
-                    ),
-                ),
+                z_equality("i"),
             ),
             # preconditions for movement
             pddl_not(

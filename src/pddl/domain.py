@@ -211,11 +211,6 @@ class Domain:
 
         for item in items:
             for dir in directions:
-                # todo: remove this when we get the muti-directional support for numerical pddl
-                if not self.use_propositional and dir in directions[1:]:
-                    break
-                # todo: end remove
-
                 self.actions.append(module.MoveAndPickup(dir, item))
 
         # handling check goal is special depending on what type of pddl we are using

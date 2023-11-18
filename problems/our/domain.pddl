@@ -8,21 +8,21 @@
 	grass_block-block log-block - destructible-block
 )
 (:predicates
+	(agent-alive ?ag - agent)
+	(item-present ?i - item)
 	(goal-achieved ?ag - agent)
 	(block-present ?b - block)
-	(item-present ?i - item)
-	(agent-alive ?ag - agent)
 )
 (:functions
-	(z ?l - locatable )
-	(block-hits ?b - destructible-block )
-	(agent-num-oak-log ?ag - agent )
-	(x ?l - locatable )
-	(agent-num-obsidian ?ag - agent )
 	(agent-num-grass_block ?ag - agent )
+	(agent-num-log ?ag - agent )
+	(x ?l - locatable )
+	(agent-num-oak-log ?ag - agent )
+	(block-hits ?b - destructible-block )
+	(agent-num-obsidian ?ag - agent )
+	(z ?l - locatable )
 	(y ?l - locatable )
 	(agent-num-diamond ?ag - agent )
-	(agent-num-log ?ag - agent )
 )
 
 (:action move-north
@@ -324,6 +324,39 @@
 )
 
 
+(:action move-south-and-pickup-diamond-south
+	:parameters (?ag - agent ?i - diamond)
+	:precondition (and 
+(and 
+(item-present ?i) (= (x ?i) (x ?ag)) (= (y ?i) (y ?ag)) (= (z ?i) (+ (z ?ag) 1))) (not (exists (?b - block) (and 
+(= (x ?b) (x ?ag)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (+ (z ?ag) 1))))))
+	:effect (and 
+(increase (agent-num-diamond ?ag) 1) (not (item-present ?i)) (increase (z ?ag) 1))
+)
+
+
+(:action move-east-and-pickup-diamond-east
+	:parameters (?ag - agent ?i - diamond)
+	:precondition (and 
+(and 
+(item-present ?i) (= (x ?i) (+ (x ?ag) 1)) (= (y ?i) (y ?ag)) (= (z ?i) (z ?ag))) (not (exists (?b - block) (and 
+(= (x ?b) (+ (x ?ag) 1)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (z ?ag))))))
+	:effect (and 
+(increase (agent-num-diamond ?ag) 1) (not (item-present ?i)) (increase (x ?ag) 1))
+)
+
+
+(:action move-west-and-pickup-diamond-west
+	:parameters (?ag - agent ?i - diamond)
+	:precondition (and 
+(and 
+(item-present ?i) (= (x ?i) (+ (x ?ag) -1)) (= (y ?i) (y ?ag)) (= (z ?i) (z ?ag))) (not (exists (?b - block) (and 
+(= (x ?b) (+ (x ?ag) -1)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (z ?ag))))))
+	:effect (and 
+(increase (agent-num-diamond ?ag) 1) (not (item-present ?i)) (decrease (x ?ag) 1))
+)
+
+
 (:action move-north-and-pickup-oak-log-north
 	:parameters (?ag - agent ?i - oak-log)
 	:precondition (and 
@@ -332,6 +365,39 @@
 (= (x ?b) (x ?ag)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (+ (z ?ag) -1))))))
 	:effect (and 
 (increase (agent-num-oak-log ?ag) 1) (not (item-present ?i)) (decrease (z ?ag) 1))
+)
+
+
+(:action move-south-and-pickup-oak-log-south
+	:parameters (?ag - agent ?i - oak-log)
+	:precondition (and 
+(and 
+(item-present ?i) (= (x ?i) (x ?ag)) (= (y ?i) (y ?ag)) (= (z ?i) (+ (z ?ag) 1))) (not (exists (?b - block) (and 
+(= (x ?b) (x ?ag)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (+ (z ?ag) 1))))))
+	:effect (and 
+(increase (agent-num-oak-log ?ag) 1) (not (item-present ?i)) (increase (z ?ag) 1))
+)
+
+
+(:action move-east-and-pickup-oak-log-east
+	:parameters (?ag - agent ?i - oak-log)
+	:precondition (and 
+(and 
+(item-present ?i) (= (x ?i) (+ (x ?ag) 1)) (= (y ?i) (y ?ag)) (= (z ?i) (z ?ag))) (not (exists (?b - block) (and 
+(= (x ?b) (+ (x ?ag) 1)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (z ?ag))))))
+	:effect (and 
+(increase (agent-num-oak-log ?ag) 1) (not (item-present ?i)) (increase (x ?ag) 1))
+)
+
+
+(:action move-west-and-pickup-oak-log-west
+	:parameters (?ag - agent ?i - oak-log)
+	:precondition (and 
+(and 
+(item-present ?i) (= (x ?i) (+ (x ?ag) -1)) (= (y ?i) (y ?ag)) (= (z ?i) (z ?ag))) (not (exists (?b - block) (and 
+(= (x ?b) (+ (x ?ag) -1)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (z ?ag))))))
+	:effect (and 
+(increase (agent-num-oak-log ?ag) 1) (not (item-present ?i)) (decrease (x ?ag) 1))
 )
 
 
@@ -346,6 +412,39 @@
 )
 
 
+(:action move-south-and-pickup-log-south
+	:parameters (?ag - agent ?i - log)
+	:precondition (and 
+(and 
+(item-present ?i) (= (x ?i) (x ?ag)) (= (y ?i) (y ?ag)) (= (z ?i) (+ (z ?ag) 1))) (not (exists (?b - block) (and 
+(= (x ?b) (x ?ag)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (+ (z ?ag) 1))))))
+	:effect (and 
+(increase (agent-num-log ?ag) 1) (not (item-present ?i)) (increase (z ?ag) 1))
+)
+
+
+(:action move-east-and-pickup-log-east
+	:parameters (?ag - agent ?i - log)
+	:precondition (and 
+(and 
+(item-present ?i) (= (x ?i) (+ (x ?ag) 1)) (= (y ?i) (y ?ag)) (= (z ?i) (z ?ag))) (not (exists (?b - block) (and 
+(= (x ?b) (+ (x ?ag) 1)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (z ?ag))))))
+	:effect (and 
+(increase (agent-num-log ?ag) 1) (not (item-present ?i)) (increase (x ?ag) 1))
+)
+
+
+(:action move-west-and-pickup-log-west
+	:parameters (?ag - agent ?i - log)
+	:precondition (and 
+(and 
+(item-present ?i) (= (x ?i) (+ (x ?ag) -1)) (= (y ?i) (y ?ag)) (= (z ?i) (z ?ag))) (not (exists (?b - block) (and 
+(= (x ?b) (+ (x ?ag) -1)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (z ?ag))))))
+	:effect (and 
+(increase (agent-num-log ?ag) 1) (not (item-present ?i)) (decrease (x ?ag) 1))
+)
+
+
 (:action move-north-and-pickup-obsidian-north
 	:parameters (?ag - agent ?i - obsidian)
 	:precondition (and 
@@ -354,6 +453,39 @@
 (= (x ?b) (x ?ag)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (+ (z ?ag) -1))))))
 	:effect (and 
 (increase (agent-num-obsidian ?ag) 1) (not (item-present ?i)) (decrease (z ?ag) 1))
+)
+
+
+(:action move-south-and-pickup-obsidian-south
+	:parameters (?ag - agent ?i - obsidian)
+	:precondition (and 
+(and 
+(item-present ?i) (= (x ?i) (x ?ag)) (= (y ?i) (y ?ag)) (= (z ?i) (+ (z ?ag) 1))) (not (exists (?b - block) (and 
+(= (x ?b) (x ?ag)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (+ (z ?ag) 1))))))
+	:effect (and 
+(increase (agent-num-obsidian ?ag) 1) (not (item-present ?i)) (increase (z ?ag) 1))
+)
+
+
+(:action move-east-and-pickup-obsidian-east
+	:parameters (?ag - agent ?i - obsidian)
+	:precondition (and 
+(and 
+(item-present ?i) (= (x ?i) (+ (x ?ag) 1)) (= (y ?i) (y ?ag)) (= (z ?i) (z ?ag))) (not (exists (?b - block) (and 
+(= (x ?b) (+ (x ?ag) 1)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (z ?ag))))))
+	:effect (and 
+(increase (agent-num-obsidian ?ag) 1) (not (item-present ?i)) (increase (x ?ag) 1))
+)
+
+
+(:action move-west-and-pickup-obsidian-west
+	:parameters (?ag - agent ?i - obsidian)
+	:precondition (and 
+(and 
+(item-present ?i) (= (x ?i) (+ (x ?ag) -1)) (= (y ?i) (y ?ag)) (= (z ?i) (z ?ag))) (not (exists (?b - block) (and 
+(= (x ?b) (+ (x ?ag) -1)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (z ?ag))))))
+	:effect (and 
+(increase (agent-num-obsidian ?ag) 1) (not (item-present ?i)) (decrease (x ?ag) 1))
 )
 
 
