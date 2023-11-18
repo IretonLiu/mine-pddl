@@ -1,3 +1,5 @@
+from typing import Type, Union
+
 from pddl.functions import (
     InventoryFunction,
     XPositionFunction,
@@ -6,6 +8,7 @@ from pddl.functions import (
 )
 from pddl.operators import (
     pddl_add,
+    pddl_add_wrapper,
     pddl_and,
     pddl_assign,
     pddl_decrease,
@@ -49,18 +52,40 @@ class Move(Action):
     def construct_preconditions(self):
         directions = {"north": "-1", "south": "1", "east": "1", "west": "-1"}
         if self.dir == "east" or self.dir == "west":
+
             def x_equality(x):
-                return pddl_equal(f"({XPositionFunction.var_name} ?{x})", pddl_add(f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})", directions[self.dir]))
+                return pddl_equal(
+                    f"({XPositionFunction.var_name} ?{x})",
+                    pddl_add(
+                        f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                        directions[self.dir],
+                    ),
+                )
         else:
+
             def x_equality(x):
-                return pddl_equal(f"({XPositionFunction.var_name} ?{x})", f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})")
+                return pddl_equal(
+                    f"({XPositionFunction.var_name} ?{x})",
+                    f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                )
 
         if self.dir == "north" or self.dir == "south":
+
             def z_equality(x):
-                return pddl_equal(f"({ZPositionFunction.var_name} ?{x})", pddl_add(f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})", directions[self.dir]))
+                return pddl_equal(
+                    f"({ZPositionFunction.var_name} ?{x})",
+                    pddl_add(
+                        f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                        directions[self.dir],
+                    ),
+                )
         else:
+
             def z_equality(x):
-                return pddl_equal(f"({ZPositionFunction.var_name} ?{x})", f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})")
+                return pddl_equal(
+                    f"({ZPositionFunction.var_name} ?{x})",
+                    f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                )
 
         self.preconditions = pddl_and(
             f"({AgentAlivePredicate.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
@@ -143,24 +168,46 @@ class MoveAndPickup(Action):
         super().__init__()
         self.dir = dir
         self.item = item
-        self.action_name = f"move-{dir}-and-pickup-{item}"
+        self.action_name = f"move-{dir}-and-pickup-{item}-{dir}"
         self.parameters = {TypeName.AGENT_TYPE_NAME.value: "?ag", item: "?i"}
 
     def construct_preconditions(self):
         directions = {"north": "-1", "south": "1", "east": "1", "west": "-1"}
         if self.dir == "east" or self.dir == "west":
+
             def x_equality(x):
-                return pddl_equal(f"({XPositionFunction.var_name} ?{x})", pddl_add(f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})", directions[self.dir]))
+                return pddl_equal(
+                    f"({XPositionFunction.var_name} ?{x})",
+                    pddl_add(
+                        f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                        directions[self.dir],
+                    ),
+                )
         else:
+
             def x_equality(x):
-                return pddl_equal(f"({XPositionFunction.var_name} ?{x})", f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})")
+                return pddl_equal(
+                    f"({XPositionFunction.var_name} ?{x})",
+                    f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                )
 
         if self.dir == "north" or self.dir == "south":
+
             def z_equality(x):
-                return pddl_equal(f"({ZPositionFunction.var_name} ?{x})", pddl_add(f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})", directions[self.dir]))
+                return pddl_equal(
+                    f"({ZPositionFunction.var_name} ?{x})",
+                    pddl_add(
+                        f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                        directions[self.dir],
+                    ),
+                )
         else:
+
             def z_equality(x):
-                return pddl_equal(f"({ZPositionFunction.var_name} ?{x})", f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})")
+                return pddl_equal(
+                    f"({ZPositionFunction.var_name} ?{x})",
+                    f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                )
 
         self.preconditions = pddl_and(
             # preconditions for items
@@ -225,7 +272,7 @@ class MoveAndPickup(Action):
             )
         self.effects = pddl_and(
             pddl_increase(
-                f"({InventoryFunction.var_name.format(self.item)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                f"({InventoryFunction.var_name.format(self.item)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",  # type: ignore
                 "1",
             ),
             pddl_not(f"({ItemPresentPredicate.var_name} {self.parameters[self.item]})"),
@@ -242,87 +289,57 @@ class MoveAndPickup(Action):
         out += ")\n"
         return out
 
-"""
-left this out for now
-
-class Drop(Action):
-    def __init__(self, item: str) -> None:
-        super().__init__()
-        self.item = item
-        self.action_name = "drop-" + item
-        self.parameters = {TypeName.AGENT_TYPE_NAME.value: "?ag", item: "?i"}
-
-    def construct_preconditions(self):
-        self.preconditions = pddl_and(
-            pddl_ge(
-                f"({InventoryFunction.var_name.format(self.item)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                "1",
-            ),
-            pddl_not(f"({ItemPresentPredicate.var_name} {self.parameters[self.item]})"),
-        )
-
-    def construct_effects(self):
-        self.effects = pddl_and(
-            f"({ItemPresentPredicate.var_name} {self.parameters[self.item]})",
-            pddl_assign(
-                f"({XPositionFunction.var_name} {self.parameters[self.item]})",
-                f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-            ),
-            pddl_assign(
-                f"({YPositionFunction.var_name} {self.parameters[self.item]})",
-                f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-            ),
-            pddl_assign(
-                f"({ZPositionFunction.var_name} {self.parameters[self.item]})",
-                pddl_add(
-                    f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                    "-1",
-                ),
-            ),
-            pddl_decrease(
-                f"({InventoryFunction.var_name.format(self.item)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                "1",
-            ),
-        )
-
-    def to_pddl(self):
-        self.construct_preconditions()
-        self.construct_effects()
-        out = f"(:action {self.action_name}\n"
-        out += f"\t:parameters ({' '.join([f'{v} - {k}' for k, v in self.parameters.items()])})\n"
-        out += f"\t:precondition {self.preconditions}\n"
-        out += f"\t:effect {self.effects}\n"
-        out += ")\n"
-        return out
-"""
 
 class Break(Action):
     def __init__(self, block: str, dir: str) -> None:
-        # todo: dir is a temporary parameter for now - we still need to add in multiple directions
         super().__init__()
         self.dir = dir
         self.block = block + "-block"
         self.item = block
-        self.action_name = "break-" + block
+        self.action_name = "break-" + block + "-" + dir
         self.parameters = {TypeName.AGENT_TYPE_NAME.value: "?ag", self.block: "?b"}
 
+        self.break_east_west = self.dir == "east" or self.dir == "west"
+        self.break_pos_axis = self.dir == "south" or self.dir == "east"
+
     def construct_preconditions(self):
-        self.preconditions = pddl_and(
-            pddl_equal(
+        # set up default x and z equalities
+        x_equality = pddl_equal(
+            f"({XPositionFunction.var_name} {self.parameters[self.block]})",
+            f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+        )
+        z_equality = pddl_equal(
+            f"({ZPositionFunction.var_name} {self.parameters[self.block]})",
+            f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+        )
+
+        # are we operating in the east/west direction?
+        if self.break_east_west:
+            # operate in x dir
+            x_equality = pddl_equal(
                 f"({XPositionFunction.var_name} {self.parameters[self.block]})",
-                f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-            ),
+                pddl_add(
+                    f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                    "1" if self.break_pos_axis else "-1",
+                ),
+            )
+        else:
+            # operate in z dir
+            z_equality = pddl_equal(
+                f"({ZPositionFunction.var_name} {self.parameters[self.block]})",
+                pddl_add(
+                    f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                    "1" if self.break_pos_axis else "-1",
+                ),
+            )
+
+        self.preconditions = pddl_and(
+            x_equality,
             pddl_equal(
                 f"({YPositionFunction.var_name} {self.parameters[self.block]})",
                 f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
             ),
-            pddl_equal(
-                f"({ZPositionFunction.var_name} {self.parameters[self.block]})",
-                pddl_add(
-                    f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                    "-1",
-                ),
-            ),
+            z_equality,
             f"({BlockPresentPredicate.var_name} {self.parameters[self.block]})",
         )
 
@@ -332,7 +349,7 @@ class Break(Action):
                 f"({BlockPresentPredicate.var_name} {self.parameters[self.block]})"
             ),
             pddl_increase(
-                f"({InventoryFunction.var_name.format(self.item)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                f"({InventoryFunction.var_name.format(self.item)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",  # type: ignore
                 "1",
             ),
         )
@@ -349,76 +366,103 @@ class Break(Action):
 
 
 class Place(Action):
-    def __init__(self, block: str, dir:str) -> None:
-        # todo: dir is a temporary parameter for now - we still need to add in multiple directions
+    def __init__(self, block: str, dir: str) -> None:
         super().__init__()
         # separate the names of blocks and items in pddl
         self.dir = dir
         self.block = block + "-block"
         self.item = block
-        self.action_name = "place-" + block
+        self.action_name = "place-" + block + "-" + dir
         self.parameters = {TypeName.AGENT_TYPE_NAME.value: "?ag", self.block: "?b"}
 
+        self.place_east_west = self.dir == "east" or self.dir == "west"
+        self.place_pos_axis = self.dir == "south" or self.dir == "east"
+
     def construct_preconditions(self):
-        self.preconditions = pddl_and(
-            pddl_exists(
-                {TypeName.BLOCK_TYPE_NAME.value: "?bl"},
+        def block_exists_at_location(
+            block_name: str,
+            x_modifier: int = 0,
+            y_modifier: int = 0,
+            z_modifier: int = 0,
+        ) -> str:
+            return pddl_exists(
+                {TypeName.BLOCK_TYPE_NAME.value: block_name},
                 pddl_and(
                     pddl_equal(
-                        f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                        f"({XPositionFunction.var_name} ?bl)",
-                    ),  # There must be a block underneath
-                    pddl_equal(
-                        f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                        pddl_add(f"({YPositionFunction.var_name} ?bl)", "1"),
+                        f"({XPositionFunction.var_name} {block_name})",
+                        pddl_add_wrapper(
+                            f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                            x_modifier,
+                        ),
                     ),
                     pddl_equal(
-                        f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                        pddl_add(f"({ZPositionFunction.var_name} ?bl)", "1"),
+                        f"({YPositionFunction.var_name} {block_name})",
+                        pddl_add_wrapper(
+                            f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                            y_modifier,
+                        ),
+                    ),
+                    pddl_equal(
+                        f"({ZPositionFunction.var_name} {block_name})",
+                        pddl_add_wrapper(
+                            f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                            z_modifier,
+                        ),
                     ),
                 ),
-            ),  # There mustn't be a block at the same location
+            )
+
+        x_modifier = (1 if self.place_pos_axis else -1) if self.place_east_west else 0
+        z_modifier = (
+            (1 if self.place_pos_axis else -1) if not self.place_east_west else 0
+        )
+
+        self.preconditions = pddl_and(
+            block_exists_at_location(
+                "?bl",
+                x_modifier=x_modifier,
+                y_modifier=1,  # There must be a block underneath
+                z_modifier=z_modifier,
+            ),
             pddl_not(
-                pddl_exists(
-                    {TypeName.BLOCK_TYPE_NAME.value: "?bl"},
-                    pddl_and(
-                        pddl_equal(
-                            f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                            f"({XPositionFunction.var_name} ?bl)",
-                        ),
-                        pddl_equal(
-                            f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                            f"({YPositionFunction.var_name} ?bl)",
-                        ),
-                        pddl_equal(
-                            f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                            pddl_add(f"({ZPositionFunction.var_name} ?bl)", "1"),
-                        ),
-                    ),
-                )
+                # There mustn't be a block at the same location
+                block_exists_at_location(
+                    "?bl",
+                    x_modifier=x_modifier,
+                    z_modifier=z_modifier,
+                ),
             ),
         )
 
     def construct_effects(self):
+        def block_assign_at_location_component(
+            location_function: Union[
+                Type[XPositionFunction],
+                Type[YPositionFunction],
+                Type[ZPositionFunction],
+            ],
+            modifier: int = 0,
+        ) -> str:
+            return pddl_assign(
+                f"({location_function.var_name} {self.parameters[self.block]})",
+                pddl_add_wrapper(
+                    f"({location_function.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                    modifier,
+                ),
+            )
+
+        x_modifier = (1 if self.place_pos_axis else -1) if self.place_east_west else 0
+        z_modifier = (
+            (1 if self.place_pos_axis else -1) if not self.place_east_west else 0
+        )
+
         self.effects = pddl_and(
             f"({BlockPresentPredicate.var_name} {self.parameters[self.block]})",
-            pddl_assign(
-                f"({XPositionFunction.var_name} {self.parameters[self.block]})",
-                f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-            ),
-            pddl_assign(
-                f"({YPositionFunction.var_name} {self.parameters[self.block]})",
-                f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-            ),
-            pddl_assign(
-                f"({ZPositionFunction.var_name} {self.parameters[self.block]})",
-                pddl_add(
-                    f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                    "-1",
-                ),
-            ),
+            block_assign_at_location_component(XPositionFunction, x_modifier),
+            block_assign_at_location_component(YPositionFunction, 0),
+            block_assign_at_location_component(ZPositionFunction, z_modifier),
             pddl_decrease(
-                f"({InventoryFunction.var_name.format(self.item)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                f"({InventoryFunction.var_name.format(self.item)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",  # type: ignore
                 "1",
             ),
         )
@@ -597,7 +641,7 @@ class CheckGoal(Action):
         for item in inventory:
             # each item in the inventory needs to have at least the specified quantity
             item_pddl += pddl_ge(
-                f"({InventoryFunction.var_name.format(item['type'])} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                f"({InventoryFunction.var_name.format(item['type'])} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",  # type: ignore
                 str(item["quantity"]),
             )
 

@@ -202,11 +202,6 @@ class Domain:
         directions = ["north", "south", "east", "west"]
 
         for dir in directions:
-            # todo: remove this when we get the muti-directional support for numerical pddl
-            if not self.use_propositional and dir in directions[1:]:
-                break
-            # todo: end remove
-
             self.actions.append(module.Move(dir))
             self.actions.append(module.JumpUp(dir))
             self.actions.append(module.JumpDown(dir))

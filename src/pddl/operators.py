@@ -7,6 +7,15 @@ def pddl_and(*args):
     return f"(and \n{' '.join(args)})"
 
 
+def pddl_add_wrapper(first: str, second: int) -> str:
+    # special-case wrapper for when the second string is just a number
+    # if that number is 0, don't use pddl_add
+    if second == 0:
+        return first
+    else:
+        return pddl_add(first, str(second))
+
+
 def pddl_or(*args):
     return f"(or {' '.join(args)})"
 
