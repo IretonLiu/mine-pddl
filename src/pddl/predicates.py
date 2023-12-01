@@ -83,6 +83,10 @@ class GoalAchievedPredicate(Predicate):
     def to_precondition(agent: str):
         return f"({GoalAchievedPredicate.var_name} ?{agent})"
 
+    @staticmethod
+    def to_problem(agent: str):
+        return f"({GoalAchievedPredicate.var_name} {agent})"
+
 
 # for propositional logic
 class AreSequentialPredicate(Predicate):
@@ -144,7 +148,6 @@ class AtLocationPredicate(Predicate):
     @staticmethod
     def to_precondition(object: str, location: str):
         raise NotImplementedError("to_precondition not implemented for this predicate")
-
 
 
 class AtXLocationPredicate(AtLocationPredicate):

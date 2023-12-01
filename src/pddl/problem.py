@@ -179,7 +179,9 @@ class Problem:
                                 )
                             else:
                                 output_list.append(
-                                    function.to_problem(agent.name, label=key, quantity=0)
+                                    function.to_problem(
+                                        agent.name, label=key, quantity=0
+                                    )
                                 )
                 else:
                     output_list.append(function.to_problem(agent.name))
@@ -234,7 +236,7 @@ class Problem:
     def construct_goal(self, agent: AgentType):
         # goal_yaml is a dict of lists of dicts
         output = "(:goal"
-        output += f"\n\t(and {GoalAchievedPredicate.to_precondition(agent.name)})\n\t\t"
+        output += f"\n\t(and {GoalAchievedPredicate.to_problem(agent.name)})\n\t\t"
         output += "\n))"
         return output
 
