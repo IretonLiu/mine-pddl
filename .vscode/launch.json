@@ -8,6 +8,7 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
+            "args": ["--execute-plan"],
             "program": "${workspaceFolder}/src/main.py",
             "console": "integratedTerminal",
             "justMyCode": false

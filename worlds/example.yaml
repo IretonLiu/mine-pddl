@@ -7,9 +7,9 @@ name: "First Problem"
 # intialise all block positions
 blocks:
   - position:
-      x: '100'
+      x: '4'
       y: '4'
-      z: '4'
+      z: '0'
     type: obsidian
   - position:
       x: '4'

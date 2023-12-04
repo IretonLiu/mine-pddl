@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 from minedojo.sim.wrappers.ar_nn.ar_nn_wrapper import ARNNWrapper
 
 import numpy as np
@@ -29,14 +29,15 @@ def read_plan(plan_path: str):
 
 def move_command(
     env,
-    direction: str,
-    jump_dir: int,
+    action_args: List[str],
     agent: AgentType,
+    jump_dir: Optional[int] = 0,
 ):
     """
     Move the agent in the environment by using teleport command
     """
 
+    direction = action_args[-1]
     command = ""
     if direction == "south":
         command = "/tp @p {} {} {}".format(
@@ -66,10 +67,11 @@ def move_command(
     env.execute_cmd(command)
 
 
-def place_block(env, block_name: str, agent: AgentType) -> None:
+def place_block(env, action_args: List[str], agent: AgentType) -> None:
     """
     set the desired block to be one in front and one below the player
     """
+    block_name = action_args[1]
 
     # place the block in the world
     # example command: /setblock <x> <y> <z> <new block name> [variation] [oldBlockHandling:default=replace] [dataTag (for new block)]
@@ -89,10 +91,11 @@ def place_block(env, block_name: str, agent: AgentType) -> None:
     env.execute_cmd(command)
 
 
-def break_block(env, block_name: str, agent: AgentType) -> None:
+def break_block(env, action_args: List[str], agent: AgentType) -> None:
     """
     break a block in front of the agent
     """
+    block_name = action_args[1]
 
     # https://www.digminecraft.com/game_commands/setblock_command.php
     command = "/setblock {} {} {} {}".format(
@@ -111,28 +114,13 @@ def break_block(env, block_name: str, agent: AgentType) -> None:
     env.execute_cmd(command)
 
 
-def jump(env, direction, agent):
+def jump(env, action_args: List[str], direction: int, agent):
     """
+    just a wrapper for the move command
     direction up = tp one up and one in front
     direction down = tp one behind and one down
     """
-
-    if direction == "up":
-        command = "/tp @p {} {} {}".format(
-            agent.functions[XPositionFunction].value,
-            agent.functions[YPositionFunction].value + 1,
-            agent.functions[ZPositionFunction].value - 1,
-        )
-    elif direction == "down":
-        command = "/tp @p {} {} {}".format(
-            agent.functions[XPositionFunction].value,
-            agent.functions[YPositionFunction].value - 1,
-            agent.functions[ZPositionFunction].value + 1,
-        )
-    else:
-        raise ValueError("direction must be either 'up' or 'down'")
-
-    env.execute_cmd(command)
+    move_command(env, action_args, agent, direction)
 
 
 # def drop(env, item_name, inventory, action_vector):
@@ -151,57 +139,52 @@ def jump(env, direction, agent):
 #     return action_vector
 
 
-def get_prop_action_from_str(
-    action: str, agent: AgentType, env: ARNNWrapper, inventory: Optional[Dict] = None
-):
-    """
-    Formulate the action vector from the pddl action string
-    """
-    action_vector = env.action_space.no_op()
-    # split by first hyphen
-    action_name, action_args = action.split("-", 1)
-    if action_name == "move":
-        move_command(env, action_args, 0, agent)
-    elif action_name == "jumpup":
-        move_command(env, action_args, 1, agent)
-    elif action_name == "jumpdown":
-        move_command(env, action_args, -1, agent)
-    elif action_name == "place":
-        # eg action is "place-obsidian"
-        # action_args will be "obsidian"
-        place_block(env, action_args, agent)
-    elif action_name == "break":
-        break_block(env, action_args, agent)
-    elif action_name == "drop":
-        assert inventory is not None
-        action_vector[5] = 2
-        for i, name in enumerate(inventory["name"]):
-            if name == action_args:
-                action_vector[7] = i
-                break
-
-    return action_vector
-
-
 def get_action_from_str(
-    action: str, agent: AgentType, env: ARNNWrapper, inventory: Optional[Dict] = None
+    action: str,
+    agent: AgentType,
+    env: ARNNWrapper,
+    curr_dir: str,
+    inventory: Optional[Dict] = None,
 ):
     """
     Formulate the action vector from the pddl action string
     """
     action_vector = env.action_space.no_op()
     # split by first hyphen
-    action_name, action_args = action.split("-", 1)
+    # main action is the first part
+    # any items or blocks are the second part
+    # the direction is the last part
+    # direction is between -180 and 180
+    dir_to_yaw = {
+        "north": -180,
+        "south": 0,
+        "east": -90,
+        "west": 90,
+    }
+
+    action_args = action.split("-")
+    action_name = action_args[0]
+    action_dir = action_args[-1]
+
+
+    yaw = dir_to_yaw[action_dir]
+
+    exec_command = f"/tp @p ~ ~ ~ {yaw} 0"
+    env.execute_cmd(exec_command)
+    curr_dir = action_dir
+
     if action_name == "move":
-        move_command(env, action_args, 0, agent)
+        move_command(env, action_args, agent)
+    elif action_name == "jumpup":
+        jump(env, action_args, agent, 1)
+    elif action_name == "jumpdown":
+        jump(env, action_args, agent, -1)
     elif action_name == "place":
         # eg action is "place-obsidian"
         # action_args will be "obsidian"
         place_block(env, action_args, agent)
     elif action_name == "break":
         break_block(env, action_args, agent)
-    elif action_name == "jump":
-        jump(env, action_args, agent)
     elif action_name == "drop":
         assert inventory is not None
         action_vector[5] = 2
@@ -210,7 +193,37 @@ def get_action_from_str(
                 action_vector[7] = i
                 break
 
-    return action_vector
+    return action_vector, curr_dir
+
+
+# def get_action_from_str(
+#     action: str, agent: AgentType, env: ARNNWrapper, inventory: Optional[Dict] = None
+# ):
+#     """
+#     Formulate the action vector from the pddl action string
+#     """
+#     action_vector = env.action_space.no_op()
+#     # split by first hyphen
+#     action_name, action_args = action.split("-", 1)
+#     if action_name == "move":
+#         move_command(env, action_args, 0, agent)
+#     elif action_name == "place":
+#         # eg action is "place-obsidian"
+#         # action_args will be "obsidian"
+#         place_block(env, action_args, agent)
+#     elif action_name == "break":
+#         break_block(env, action_args, agent)
+#     elif action_name == "jump":
+#         jump(env, action_args, agent)
+#     elif action_name == "drop":
+#         assert inventory is not None
+#         action_vector[5] = 2
+#         for i, name in enumerate(inventory["name"]):
+#             if name == action_args:
+#                 action_vector[7] = i
+#                 break
+#
+#     return action_vector
 
 
 def check_goal_state(obs, voxel_size, goal):

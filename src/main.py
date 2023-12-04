@@ -91,7 +91,9 @@ def generate_or_execute_pddl(args):
             os.makedirs(os.path.dirname(filepath), exist_ok=True)
 
         # create the domain file
-        domain = Domain(args.domain_name, max_inventory_stack, use_propositional=use_propositional)
+        domain = Domain(
+            args.domain_name, max_inventory_stack, use_propositional=use_propositional
+        )
         domain.to_pddl(
             items,
             blocks,
@@ -118,12 +120,11 @@ def generate_or_execute_pddl(args):
         # create the video helper
         video_helper = VideoHelper(args.video_save_path)
         video_helper.save_image(obs["rgb"])
-
+        curr_dir = "south"
         # action_sequence = execution_helper.read_plan(args.plan_file)
         action_sequence = [
-            "move-south",
-            "move-south",
-            "place-obsidian",
+            "move-east",
+            # "place-obsidian",
             "move-north",
             "move-north",
             "move-north",
@@ -132,7 +133,7 @@ def generate_or_execute_pddl(args):
             "move-south",
             "move-south",
             "move-south",
-            "break-obsidian",
+            # "break-obsidian",
             "move-north",
             "move-north",
             "move-north",
@@ -140,15 +141,15 @@ def generate_or_execute_pddl(args):
         ]
         for action_str in action_sequence:
             # get the action vector
-            action = execution_helper.get_action_from_str(
-                action_str, agent=agent, env=env, inventory=inventory
+            action, curr_dir = execution_helper.get_action_from_str(
+                action_str, agent=agent, env=env, inventory=inventory, curr_dir=curr_dir
             )
             obs, reward, done, info = env.step(action)
             for i in range(5):
                 obs, reward, done, info = env.step(env.action_space.no_op())
 
             # update the video, if we are executing a plan
-            video_helper.save_image(obs["rgb"]) 
+            video_helper.save_image(obs["rgb"])
 
             # update the observations we are working with
             items, agent = extract_entities(obs, use_propositional)
@@ -164,7 +165,7 @@ def generate_or_execute_pddl(args):
         video_name = str(args.video_name)
         first = video_name.find(".")
         first = first if first != -1 else len(video_name)
-        video_helper.generate_video(video_name[:first] + ".mp4") 
+        video_helper.generate_video(video_name[:first] + ".mp4")
         print("Cleaning up...")
         video_helper.clean_up()
 
@@ -186,7 +187,9 @@ if __name__ == "__main__":
             args.execute_plan,
         ]
     ):
-        raise ValueError("Please choose at least one mode to run: set one of --generate-pddl, --generate-plan, --execute-plan")
+        raise ValueError(
+            "Please choose at least one mode to run: set one of --generate-pddl, --generate-plan, --execute-plan"
+        )
 
     if args.generate_plan:
         pass
@@ -194,7 +197,7 @@ if __name__ == "__main__":
         if args.generate_pddl:
             if args.pddl_type is None:
                 raise ValueError("specify the type of PDDL to generate")
-            
+
         generate_or_execute_pddl(args)
 
 
