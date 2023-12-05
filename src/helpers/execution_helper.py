@@ -161,11 +161,11 @@ def get_action_from_str(
     env.execute_cmd(exec_command)
     curr_dir = action_dir
 
-    if action_name == "move":
+    if "move" in action_name:
         move_command(env, action_args, agent)
-    elif action_name == "jumpup":
+    elif "jumpup" in action_name:
         jump(env, action_args, agent, 1)
-    elif action_name == "jumpdown":
+    elif "jumpdown" in action_name:
         jump(env, action_args, agent, -1)
     elif action_name == "place":
         # eg action is "place-obsidian"

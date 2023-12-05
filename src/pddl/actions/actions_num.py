@@ -27,6 +27,8 @@ from pddl.predicates import (
     ItemPresentPredicate,
 )
 
+# todo: refactor the block_or_items_exists_at_location function to be more general and less repeated
+
 
 class Action:
     def __init__(self) -> None:
@@ -603,10 +605,165 @@ class JumpUp(Action):
         return out
 
 
+class JumpUpAndPickup(Action):
+    # jumps up one block forward
+    def __init__(self, dir: str, item: str) -> None:
+        super().__init__()
+        self.dir = dir
+        self.item_to_pickup = item
+        self.action_name = f"jumpup_and_pickup-{item}-{dir}"
+        self.parameters = {TypeName.AGENT_TYPE_NAME.value: "?ag", item: "?i"}
+
+        self.jump_east_west = self.dir == "east" or self.dir == "west"
+        self.jump_pos_axis = self.dir == "south" or self.dir == "east"
+
+    def construct_preconditions(self):
+        def block_or_item_exists_at_location(
+            block_exists: bool,  # True for block; False for item
+            object_name: str,
+            x_modifier: int = 0,
+            y_modifier: int = 0,
+            z_modifier: int = 0,
+        ) -> str:
+            object_exists_typename = (
+                TypeName.BLOCK_TYPE_NAME.value
+                if block_exists
+                else TypeName.ITEM_TYPE_NAME.value
+            )
+            return pddl_exists(
+                {object_exists_typename: object_name},
+                pddl_and(
+                    pddl_equal(
+                        f"({XPositionFunction.var_name} {object_name})",
+                        pddl_add_wrapper(
+                            f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                            x_modifier,
+                        ),
+                    ),
+                    pddl_equal(
+                        f"({YPositionFunction.var_name} {object_name})",
+                        pddl_add_wrapper(
+                            f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                            y_modifier,
+                        ),
+                    ),
+                    pddl_equal(
+                        f"({ZPositionFunction.var_name} {object_name})",
+                        pddl_add_wrapper(
+                            f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                            z_modifier,
+                        ),
+                    ),
+                ),
+            )
+
+        x_modifier = (1 if self.jump_pos_axis else -1) if self.jump_east_west else 0
+        z_modifier = (1 if self.jump_pos_axis else -1) if not self.jump_east_west else 0
+
+        self.preconditions = pddl_and(
+            # There must be a block underneath and infront
+            block_or_item_exists_at_location(
+                True, "?bl", x_modifier=x_modifier, z_modifier=z_modifier
+            ),
+            # there must not be a block where we are landing nor above us currently (nor the level above that, to account for the agent's "double height")
+            pddl_not(
+                pddl_or(
+                    # where we are landing
+                    block_or_item_exists_at_location(
+                        True,
+                        "?bl",
+                        x_modifier=x_modifier,
+                        y_modifier=1,
+                        z_modifier=z_modifier,
+                    ),
+                    # above us currently
+                    block_or_item_exists_at_location(True, "?bl", y_modifier=1),
+                    # or the level above the previous two
+                    # where we are landing
+                    block_or_item_exists_at_location(
+                        True,
+                        "?bl",
+                        x_modifier=x_modifier,
+                        y_modifier=2,
+                        z_modifier=z_modifier,
+                    ),
+                    # above us currently
+                    block_or_item_exists_at_location(True, "?bl", y_modifier=2),
+                )
+            ),
+            # there must be an item where we are landing (of the correct type)
+            pddl_and(
+                f"({ItemPresentPredicate.var_name} {self.parameters[self.item_to_pickup]})",
+                pddl_equal(
+                    f"({XPositionFunction.var_name} {self.parameters[self.item_to_pickup]})",
+                    pddl_add_wrapper(
+                        f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                        x_modifier,
+                    ),
+                ),
+                pddl_equal(
+                    f"({YPositionFunction.var_name} {self.parameters[self.item_to_pickup]})",
+                    pddl_add_wrapper(
+                        f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                        1,
+                    ),
+                ),
+                pddl_equal(
+                    f"({ZPositionFunction.var_name} {self.parameters[self.item_to_pickup]})",
+                    pddl_add_wrapper(
+                        f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                        z_modifier,
+                    ),
+                ),
+            ),
+        )
+
+    def construct_effects(self):
+        position_function_to_change = (
+            XPositionFunction if self.jump_east_west else ZPositionFunction
+        )
+        position_modifier = 1 if self.jump_pos_axis else -1
+
+        self.effects = pddl_and(
+            # handle the update of the agent's position
+            pddl_assign(
+                f"({position_function_to_change.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                pddl_add(
+                    f"({position_function_to_change.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                    str(position_modifier),
+                ),
+            ),
+            pddl_assign(
+                f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                pddl_add(
+                    f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                    "1",
+                ),
+            ),
+            # handle the removal of the item from the world and the updating of the inventory
+            pddl_increase(
+                f"({InventoryFunction.var_name.format(self.item_to_pickup)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",  # type: ignore
+                "1",
+            ),
+            pddl_not(
+                f"({ItemPresentPredicate.var_name} {self.parameters[self.item_to_pickup]})"
+            ),
+        )
+
+    def to_pddl(self):
+        self.construct_preconditions()
+        self.construct_effects()
+        out = f"(:action {self.action_name}\n"
+        out += f"\t:parameters ({' '.join([f'{v} - {k}' for k, v in self.parameters.items()])})\n"
+        out += f"\t:precondition {self.preconditions}\n"
+        out += f"\t:effect {self.effects}\n"
+        out += ")\n"
+        return out
+
+
 class JumpDown(Action):
     # jumps up one block forward
     def __init__(self, dir: str) -> None:
-        # todo: account for item at the destination point
         super().__init__()
         self.dir = dir
         self.action_name = f"jumpdown-{dir}"
@@ -722,6 +879,162 @@ class JumpDown(Action):
                     f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
                     "-1",
                 ),
+            ),
+        )
+
+    def to_pddl(self):
+        self.construct_preconditions()
+        self.construct_effects()
+        out = f"(:action {self.action_name}\n"
+        out += f"\t:parameters ({' '.join([f'{v} - {k}' for k, v in self.parameters.items()])})\n"
+        out += f"\t:precondition {self.preconditions}\n"
+        out += f"\t:effect {self.effects}\n"
+        out += ")\n"
+        return out
+
+
+class JumpDownAndPickup(Action):
+    # jumps up one block forward
+    def __init__(self, dir: str, item: str) -> None:
+        super().__init__()
+        self.dir = dir
+        self.item_to_pickup = item
+        self.action_name = f"jumpdown_and_pickip-{item}-{dir}"
+        self.parameters = {TypeName.AGENT_TYPE_NAME.value: "?ag", item: "?i"}
+
+        self.jump_east_west = self.dir == "east" or self.dir == "west"
+        self.jump_pos_axis = self.dir == "south" or self.dir == "east"
+
+    def construct_preconditions(self):
+        def block_or_item_exists_at_location(
+            block_exists: bool,  # True for block; False for item
+            object_name: str,
+            x_modifier: int = 0,
+            y_modifier: int = 0,
+            z_modifier: int = 0,
+        ) -> str:
+            object_exists_typename = (
+                TypeName.BLOCK_TYPE_NAME.value
+                if block_exists
+                else TypeName.ITEM_TYPE_NAME.value
+            )
+            return pddl_exists(
+                {object_exists_typename: object_name},
+                pddl_and(
+                    pddl_equal(
+                        f"({XPositionFunction.var_name} {object_name})",
+                        pddl_add_wrapper(
+                            f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                            x_modifier,
+                        ),
+                    ),
+                    pddl_equal(
+                        f"({YPositionFunction.var_name} {object_name})",
+                        pddl_add_wrapper(
+                            f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                            y_modifier,
+                        ),
+                    ),
+                    pddl_equal(
+                        f"({ZPositionFunction.var_name} {object_name})",
+                        pddl_add_wrapper(
+                            f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                            z_modifier,
+                        ),
+                    ),
+                ),
+            )
+
+        x_modifier = (1 if self.jump_pos_axis else -1) if self.jump_east_west else 0
+        z_modifier = (1 if self.jump_pos_axis else -1) if not self.jump_east_west else 0
+
+        self.preconditions = pddl_and(
+            # There must be a block 2 underneath and infront
+            block_or_item_exists_at_location(
+                True, "?bl", x_modifier=x_modifier, y_modifier=-2, z_modifier=z_modifier
+            ),
+            # there must NOT be a block in front and 1 underneath, nor in line with the agent's legs or eyes
+            pddl_not(
+                pddl_or(
+                    block_or_item_exists_at_location(
+                        True,
+                        "?bl",
+                        x_modifier=x_modifier,
+                        y_modifier=1,  # agent eyeline
+                        z_modifier=z_modifier,
+                    ),
+                    block_or_item_exists_at_location(
+                        True,
+                        "?bl",
+                        x_modifier=x_modifier,
+                        y_modifier=0,  # agent's legs
+                        z_modifier=z_modifier,
+                    ),
+                    block_or_item_exists_at_location(
+                        True,
+                        "?bl",
+                        x_modifier=x_modifier,
+                        y_modifier=-1,  # 1 below the agent
+                        z_modifier=z_modifier,
+                    ),
+                )
+            ),
+            # there must be an item where we are landing (of the correct type)
+            pddl_and(
+                f"({ItemPresentPredicate.var_name} {self.parameters[self.item_to_pickup]})",
+                pddl_equal(
+                    f"({XPositionFunction.var_name} {self.parameters[self.item_to_pickup]})",
+                    pddl_add_wrapper(
+                        f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                        x_modifier,
+                    ),
+                ),
+                pddl_equal(
+                    f"({YPositionFunction.var_name} {self.parameters[self.item_to_pickup]})",
+                    pddl_add_wrapper(
+                        f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                        -1,
+                    ),
+                ),
+                pddl_equal(
+                    f"({ZPositionFunction.var_name} {self.parameters[self.item_to_pickup]})",
+                    pddl_add_wrapper(
+                        f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                        z_modifier,
+                    ),
+                ),
+            ),
+        )
+
+    def construct_effects(self):
+        position_function_to_change = (
+            XPositionFunction if self.jump_east_west else ZPositionFunction
+        )
+        position_modifier = 1 if self.jump_pos_axis else -1
+
+        self.effects = pddl_and(
+            # handle the movement
+            pddl_assign(
+                f"({position_function_to_change.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                pddl_add(
+                    f"({position_function_to_change.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                    str(position_modifier),
+                ),
+            ),
+            pddl_assign(
+                f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                pddl_add(
+                    f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                    "-1",
+                ),
+            ),
+            # handle the removal of the item from the world and the updating of the inventory
+            pddl_increase(
+                f"({InventoryFunction.var_name.format(self.item_to_pickup)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",  # type: ignore
+                "1",
+            ),
+            pddl_not(
+                f"({ItemPresentPredicate.var_name} {self.parameters[self.item_to_pickup]})"
             ),
         )
 
