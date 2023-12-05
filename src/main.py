@@ -31,6 +31,7 @@ from pddl.problem import Problem
 """
 
 # todo: unify the domain and problem views items and blocks (everything needs to be present in both items and blocks)
+# todo: also add in extra problem-file pddl objects for all the inventory contents
 
 
 def generate_or_execute_pddl(args):
@@ -74,9 +75,10 @@ def generate_or_execute_pddl(args):
 
     # create the items in the world
     obs = env.reset()
-    item_commands = yaml_helper.yaml_items_to_cmd(world_config["items"])
-    for cmd in item_commands:
-        env.execute_cmd(cmd)
+    if "items" in world_config:
+        item_commands = yaml_helper.yaml_items_to_cmd(world_config["items"])
+        for cmd in item_commands:
+            env.execute_cmd(cmd)
 
     # loop to allow time for the above commands to reflect in minecraft
     for i in range(10):

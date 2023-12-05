@@ -17,17 +17,13 @@ from pddl.predicates import (
     ItemPresentPredicate,
 )
 
-# TODO: check if items despawn + how to turn off
-# TODO: pass in name instead of hardcoding
-name_dict = {"object": "object"}
-
 
 class ObjectType:
     type_name = TypeName.OBJECT_TYPE_NAME.value
 
     def __init__(self, use_propositional: bool):
         self.name = "obj"
-        self.functions = {}  # TODO: Make functions a dictionary
+        self.functions = {}
         self.predicates = {}
         self.use_propositional = use_propositional
 
@@ -61,13 +57,12 @@ class AgentType(LocatableType):
         self.name = "steve"
 
         self.functions[InventoryFunction] = InventoryFunction()
-        self.predicates[AgentAlivePredicate] = AgentAlivePredicate() 
+        self.predicates[AgentAlivePredicate] = AgentAlivePredicate()
         self.predicates[GoalAchievedPredicate] = GoalAchievedPredicate()
 
         # these are only useful for propositional pddl - functions are included all the time
         if self.use_propositional:
             self.predicates[AgentHasNItemsPredicate] = AgentHasNItemsPredicate()
-
 
 
 class ItemType(LocatableType):

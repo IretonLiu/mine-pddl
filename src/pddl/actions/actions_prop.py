@@ -13,8 +13,6 @@ from pddl.predicates import (
     ItemPresentPredicate,
 )
 
-# TODO: add direction that we are facing as a parameter to the move action
-
 
 class Action:
     def __init__(self) -> None:
@@ -619,7 +617,6 @@ class Place(Action):
             back = "ZPosition"
             front = "ZPositionFront"
 
-        # todo: add support for multiple directions - can use similar logic to what we used for Move
         block_var = "?bl"
         self.preconditions = pddl_and(
             # There must be a block one down and one in front of us, for support for the block we are placing
@@ -1161,8 +1158,8 @@ class CheckGoal(Action):
         self.max_inventory_stack = max_inentory_stack
 
     def construct_preconditions(self):
-        blocks = self.goal["blocks"]
-        inventory = self.goal["inventory"]
+        blocks = self.goal["blocks"] if "blocks" in self.goal else []
+        inventory = self.goal["inventory"] if "inventory" in self.goal else []
 
         block_pddl = ""
         item_pddl = ""

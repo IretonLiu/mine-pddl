@@ -1,9 +1,9 @@
-from typing import Dict, Optional, List
-from minedojo.sim.wrappers.ar_nn.ar_nn_wrapper import ARNNWrapper
+from typing import Dict, List, Optional
 
 import numpy as np
-from pddl.pddl_types.base_pddl_types import AgentType
+from minedojo.sim.wrappers.ar_nn.ar_nn_wrapper import ARNNWrapper
 from pddl.functions import XPositionFunction, YPositionFunction, ZPositionFunction
+from pddl.pddl_types.base_pddl_types import AgentType
 
 # TODO: If we ever implement drop, we need to remember that dropped items don't get the NBT tag for presistance
 
@@ -123,22 +123,6 @@ def jump(env, action_args: List[str], direction: int, agent):
     move_command(env, action_args, agent, direction)
 
 
-# def drop(env, item_name, inventory, action_vector):
-#     """
-#     remove the item from the agent's inventory and spawn the item into the world
-#     """
-
-#     # equip the relevant inventory slot
-#     action_vector[5] = 5
-#     for i, name in enumerate(inventory["name"]):
-#         if name == item_name:
-#             action_vector[7] = i
-#             break
-#     env.step(action_vector)
-#     action_vector[5] = 2
-#     return action_vector
-
-
 def get_action_from_str(
     action: str,
     agent: AgentType,
@@ -168,11 +152,14 @@ def get_action_from_str(
     action_name = action_args[0]
     action_dir = action_args[-1]
 
-    if action_name != "checkgoal":
-        yaw = dir_to_yaw[action_dir]
-        exec_command = f"/tp @p ~ ~ ~ {yaw} 0"
-        env.execute_cmd(exec_command)
-        curr_dir = action_dir
+    if action_name == "checkgoal":
+        # check goal does nothing for the python actions, so we don't do anything here
+        return action_vector, curr_dir
+
+    yaw = dir_to_yaw[action_dir]
+    exec_command = f"/tp @p ~ ~ ~ {yaw} 0"
+    env.execute_cmd(exec_command)
+    curr_dir = action_dir
 
     if action_name == "move":
         move_command(env, action_args, agent)
@@ -195,36 +182,6 @@ def get_action_from_str(
                 break
 
     return action_vector, curr_dir
-
-
-# def get_action_from_str(
-#     action: str, agent: AgentType, env: ARNNWrapper, inventory: Optional[Dict] = None
-# ):
-#     """
-#     Formulate the action vector from the pddl action string
-#     """
-#     action_vector = env.action_space.no_op()
-#     # split by first hyphen
-#     action_name, action_args = action.split("-", 1)
-#     if action_name == "move":
-#         move_command(env, action_args, 0, agent)
-#     elif action_name == "place":
-#         # eg action is "place-obsidian"
-#         # action_args will be "obsidian"
-#         place_block(env, action_args, agent)
-#     elif action_name == "break":
-#         break_block(env, action_args, agent)
-#     elif action_name == "jump":
-#         jump(env, action_args, agent)
-#     elif action_name == "drop":
-#         assert inventory is not None
-#         action_vector[5] = 2
-#         for i, name in enumerate(inventory["name"]):
-#             if name == action_args:
-#                 action_vector[7] = i
-#                 break
-#
-#     return action_vector
 
 
 def check_goal_state(obs, voxel_size, goal):

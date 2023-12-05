@@ -744,8 +744,8 @@ class CheckGoal(Action):
         self.goal = goal
 
     def construct_preconditions(self):
-        blocks = self.goal["blocks"]
-        inventory = self.goal["inventory"]
+        blocks = self.goal["blocks"] if "blocks" in self.goal else []
+        inventory = self.goal["inventory"] if "inventory" in self.goal else []
 
         block_pddl = ""
         item_pddl = ""
