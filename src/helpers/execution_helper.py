@@ -162,16 +162,17 @@ def get_action_from_str(
         "west": 90,
     }
 
+    # action name convention: {action_name_no_hyphen}-{args}-{direction}
+    # only the checkgoal action does not have a direction
     action_args = action.split("-")
     action_name = action_args[0]
     action_dir = action_args[-1]
 
-
-    yaw = dir_to_yaw[action_dir]
-
-    exec_command = f"/tp @p ~ ~ ~ {yaw} 0"
-    env.execute_cmd(exec_command)
-    curr_dir = action_dir
+    if action_name != "checkgoal":
+        yaw = dir_to_yaw[action_dir]
+        exec_command = f"/tp @p ~ ~ ~ {yaw} 0"
+        env.execute_cmd(exec_command)
+        curr_dir = action_dir
 
     if action_name == "move":
         move_command(env, action_args, agent)

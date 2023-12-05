@@ -44,9 +44,7 @@ class Move(Action):
         super().__init__()
         self.dir = dir
         # self.item_to_pickup = item_to_pickup
-        self.action_name = (
-            "move-" + dir
-        )  # + "-only" if item_to_pickup is None else "-and-pickup-" + self.item_to_pickup.name
+        self.action_name = f"move-{dir}"
         self.parameters = {TypeName.AGENT_TYPE_NAME.value: "?ag"}
 
     def construct_preconditions(self):
@@ -61,6 +59,7 @@ class Move(Action):
                         directions[self.dir],
                     ),
                 )
+
         else:
 
             def x_equality(x):
@@ -79,6 +78,7 @@ class Move(Action):
                         directions[self.dir],
                     ),
                 )
+
         else:
 
             def z_equality(x):
@@ -168,7 +168,7 @@ class MoveAndPickup(Action):
         super().__init__()
         self.dir = dir
         self.item = item
-        self.action_name = f"move-{dir}-and-pickup-{item}-{dir}"
+        self.action_name = f"move_and_pickup-{item}-{dir}"
         self.parameters = {TypeName.AGENT_TYPE_NAME.value: "?ag", item: "?i"}
 
     def construct_preconditions(self):
@@ -183,6 +183,7 @@ class MoveAndPickup(Action):
                         directions[self.dir],
                     ),
                 )
+
         else:
 
             def x_equality(x):
@@ -201,6 +202,7 @@ class MoveAndPickup(Action):
                         directions[self.dir],
                     ),
                 )
+
         else:
 
             def z_equality(x):
@@ -287,7 +289,7 @@ class Break(Action):
         self.dir = dir
         self.block = block + "-block"
         self.item = block
-        self.action_name = "break-" + block + "-" + dir
+        self.action_name = f"break-{block}-{dir}"
         self.parameters = {TypeName.AGENT_TYPE_NAME.value: "?ag", self.block: "?b"}
 
         self.break_east_west = self.dir == "east" or self.dir == "west"
@@ -363,7 +365,7 @@ class Place(Action):
         self.dir = dir
         self.block = block + "-block"
         self.item = block
-        self.action_name = "place-" + block + "-" + dir
+        self.action_name = f"place-{block}-{dir}"
         self.parameters = {TypeName.AGENT_TYPE_NAME.value: "?ag", self.block: "?b"}
 
         self.place_east_west = self.dir == "east" or self.dir == "west"
@@ -472,43 +474,107 @@ class Place(Action):
 class JumpUp(Action):
     # jumps up one block forward
     def __init__(self, dir: str) -> None:
-        # todo: dir is a temporary parameter for now - we still need to add in multiple directions
+        # todo: account for item at the destination point
         super().__init__()
         self.dir = dir
-        self.action_name = "jump-up"
+        self.action_name = f"jumpup-{dir}"
         self.parameters = {TypeName.AGENT_TYPE_NAME.value: "?ag"}
 
+        self.jump_east_west = self.dir == "east" or self.dir == "west"
+        self.jump_pos_axis = self.dir == "south" or self.dir == "east"
+
     def construct_preconditions(self):
-        self.preconditions = pddl_and(
-            pddl_exists(
-                {TypeName.BLOCK_TYPE_NAME.value: "?bl"},
+        def block_or_item_exists_at_location(
+            block_exists: bool,  # True for block; False for item
+            object_name: str,
+            x_modifier: int = 0,
+            y_modifier: int = 0,
+            z_modifier: int = 0,
+        ) -> str:
+            object_exists_typename = (
+                TypeName.BLOCK_TYPE_NAME.value
+                if block_exists
+                else TypeName.ITEM_TYPE_NAME.value
+            )
+            return pddl_exists(
+                {object_exists_typename: object_name},
                 pddl_and(
                     pddl_equal(
-                        f"({XPositionFunction.var_name} ?bl)",
-                        f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                        f"({XPositionFunction.var_name} {object_name})",
+                        pddl_add_wrapper(
+                            f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                            x_modifier,
+                        ),
                     ),
                     pddl_equal(
-                        f"({YPositionFunction.var_name} ?bl)",
-                        f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                        f"({YPositionFunction.var_name} {object_name})",
+                        pddl_add_wrapper(
+                            f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                            y_modifier,
+                        ),
                     ),
                     pddl_equal(
-                        f"({ZPositionFunction.var_name} ?bl)",
-                        pddl_add(
+                        f"({ZPositionFunction.var_name} {object_name})",
+                        pddl_add_wrapper(
                             f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                            "-1",
+                            z_modifier,
                         ),
                     ),
                 ),
             )
-        )  # There must be a block underneath and infront
+
+        x_modifier = (1 if self.jump_pos_axis else -1) if self.jump_east_west else 0
+        z_modifier = (1 if self.jump_pos_axis else -1) if not self.jump_east_west else 0
+
+        self.preconditions = pddl_and(
+            # There must be a block underneath and infront
+            block_or_item_exists_at_location(
+                True, "?bl", x_modifier=x_modifier, z_modifier=z_modifier
+            ),
+            # there must not be a block where we are landing nor above us currently (nor the level above that, to account for the agent's "double height")
+            pddl_not(
+                pddl_or(
+                    # where we are landing
+                    block_or_item_exists_at_location(
+                        True,
+                        "?bl",
+                        x_modifier=x_modifier,
+                        y_modifier=1,
+                        z_modifier=z_modifier,
+                    ),
+                    # above us currently
+                    block_or_item_exists_at_location(True, "?bl", y_modifier=1),
+                    # or the level above the previous two
+                    # where we are landing
+                    block_or_item_exists_at_location(
+                        True,
+                        "?bl",
+                        x_modifier=x_modifier,
+                        y_modifier=2,
+                        z_modifier=z_modifier,
+                    ),
+                    # above us currently
+                    block_or_item_exists_at_location(True, "?bl", y_modifier=2),
+                )
+            ),
+            # there must not be an item where we are landing - we don't need to check above us because of gravity
+            pddl_not(
+                False, "?i", x_modifier=x_modifier, y_modifier=1, z_modifier=z_modifier
+            ),
+        )
 
     def construct_effects(self):
+        position_function_to_change = (
+            XPositionFunction if self.jump_east_west else ZPositionFunction
+        )
+        position_modifier = 1 if self.jump_pos_axis else -1
+
         self.effects = pddl_and(
             pddl_assign(
-                f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                f"({position_function_to_change.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
                 pddl_add(
-                    f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                    "-1",
+                    f"({position_function_to_change.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                    str(position_modifier),
                 ),
             ),
             pddl_assign(
@@ -534,48 +600,114 @@ class JumpUp(Action):
 class JumpDown(Action):
     # jumps up one block forward
     def __init__(self, dir: str) -> None:
-        # todo: dir is a temporary parameter for now - we still need to add in multiple directions
+        # todo: account for item at the destination point
         super().__init__()
         self.dir = dir
-        self.action_name = "jump-down"
+        self.action_name = f"jumpdown-{dir}"
         self.parameters = {TypeName.AGENT_TYPE_NAME.value: "?ag"}
 
+        self.jump_east_west = self.dir == "east" or self.dir == "west"
+        self.jump_pos_axis = self.dir == "south" or self.dir == "east"
+
     def construct_preconditions(self):
-        self.preconditions = pddl_and(
-            pddl_not(
-                pddl_exists(
-                    {TypeName.BLOCK_TYPE_NAME.value: "?bl"},
-                    pddl_and(
-                        pddl_equal(
-                            f"({XPositionFunction.var_name} ?bl)",
+        def block_or_item_exists_at_location(
+            block_exists: bool,  # True for block; False for item
+            object_name: str,
+            x_modifier: int = 0,
+            y_modifier: int = 0,
+            z_modifier: int = 0,
+        ) -> str:
+            object_exists_typename = (
+                TypeName.BLOCK_TYPE_NAME.value
+                if block_exists
+                else TypeName.ITEM_TYPE_NAME.value
+            )
+            return pddl_exists(
+                {object_exists_typename: object_name},
+                pddl_and(
+                    pddl_equal(
+                        f"({XPositionFunction.var_name} {object_name})",
+                        pddl_add_wrapper(
                             f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                        ),
-                        pddl_equal(
-                            f"({YPositionFunction.var_name} ?bl)",
-                            pddl_add(
-                                f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                                "-1",
-                            ),
-                        ),
-                        pddl_equal(
-                            f"({ZPositionFunction.var_name} ?bl)",
-                            pddl_add(
-                                f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                                "1",
-                            ),
+                            x_modifier,
                         ),
                     ),
-                )
+                    pddl_equal(
+                        f"({YPositionFunction.var_name} {object_name})",
+                        pddl_add_wrapper(
+                            f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                            y_modifier,
+                        ),
+                    ),
+                    pddl_equal(
+                        f"({ZPositionFunction.var_name} {object_name})",
+                        pddl_add_wrapper(
+                            f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                            z_modifier,
+                        ),
+                    ),
+                ),
             )
-        )  # There must be a block underneath and infront
+
+        x_modifier = (1 if self.jump_pos_axis else -1) if self.jump_east_west else 0
+        z_modifier = (1 if self.jump_pos_axis else -1) if not self.jump_east_west else 0
+
+        self.preconditions = pddl_and(
+            # There must be a block 2 underneath and infront
+            block_or_item_exists_at_location(
+                True, "?bl", x_modifier=x_modifier, y_modifier=-2, z_modifier=z_modifier
+            ),
+            # there must NOT be a block in front and 1 underneath, nor in line with the agent's legs or eyes
+            pddl_not(
+                pddl_or(
+                    block_or_item_exists_at_location(
+                        True,
+                        "?bl",
+                        x_modifier=x_modifier,
+                        y_modifier=1,  # agent eyeline
+                        z_modifier=z_modifier,
+                    ),
+                    block_or_item_exists_at_location(
+                        True,
+                        "?bl",
+                        x_modifier=x_modifier,
+                        y_modifier=0,  # agent's legs
+                        z_modifier=z_modifier,
+                    ),
+                    block_or_item_exists_at_location(
+                        True,
+                        "?bl",
+                        x_modifier=x_modifier,
+                        y_modifier=-1,  # 1 below the agent
+                        z_modifier=z_modifier,
+                    ),
+                )
+            ),
+            # there must not be an item anywhere on the "travel path"
+            # gravity exists, so we only need to check the landing spot
+            pddl_not(
+                block_or_item_exists_at_location(
+                    False,
+                    "?i",
+                    x_modifier=x_modifier,
+                    y_modifier=-1,
+                    z_modifier=z_modifier,
+                )
+            ),
+        )
 
     def construct_effects(self):
+        position_function_to_change = (
+            XPositionFunction if self.jump_east_west else ZPositionFunction
+        )
+        position_modifier = 1 if self.jump_pos_axis else -1
+
         self.effects = pddl_and(
             pddl_assign(
-                f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                f"({position_function_to_change.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
                 pddl_add(
-                    f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
-                    "1",
+                    f"({position_function_to_change.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                    str(position_modifier),
                 ),
             ),
             pddl_assign(
@@ -601,7 +733,7 @@ class JumpDown(Action):
 class CheckGoal(Action):
     # checks the goal achieved predicate of the agent
     def __init__(self, goal) -> None:
-        self.action_name = "check-goal"
+        self.action_name = "checkgoal"
         self.parameters = {TypeName.AGENT_TYPE_NAME.value: "?ag"}
         self.goal = goal
 

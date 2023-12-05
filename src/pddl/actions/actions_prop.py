@@ -1,4 +1,3 @@
-
 from pddl.operators import pddl_and, pddl_exists, pddl_not, pddl_or
 from pddl.pddl_types.special_pddl_types import CountType, PositionType
 from pddl.pddl_types.types_names import TypeName
@@ -32,10 +31,7 @@ class Move(Action):
     def __init__(self, dir: str) -> None:
         super().__init__()
         self.dir = dir
-        # self.item_to_pickup = item_to_pickup
-        self.action_name = (
-            "move-" + dir
-        )  # + "-only" if item_to_pickup is None else "-and-pickup-" + self.item_to_pickup.name
+        self.action_name = f"move-{dir}"
 
         # have separate dictionaries for parameter names and types, but such that a common key is used to index corresponding values in both
         # this is necessary because multiple parameters have different names but the same type
@@ -211,7 +207,7 @@ class MoveAndPickup(Action):
         super().__init__()
         self.dir = dir
         self.item = item
-        self.action_name = f"move-{dir}-and-pickup-{item}"
+        self.action_name = f"move_and_pickup-{item}-{dir}"
 
         self.param_name = {
             "Agent": "?ag",
@@ -423,7 +419,7 @@ class Break(Action):
         super().__init__()
         self.block = block + "-block"
         self.item = block
-        self.action_name = "break-" + block
+        self.action_name = f"break-{block}-{dir}"
         self.dir = dir
 
         self.param_names = {
@@ -458,26 +454,17 @@ class Break(Action):
             self.x_front = "XPosition"
             self.z_front = "ZPositionFront"
 
-
     def construct_parameters(self):
         self.parameters = ""
         for key in self.param_names.keys():
-            if(
-                key == "XPositionFront"
-                and (not self.move_east_west)
-            ):
+            if key == "XPositionFront" and (not self.move_east_west):
                 continue
-            elif (
-                key == "ZPositionFront"
-                and (self.move_east_west)
-            ):
+            elif key == "ZPositionFront" and (self.move_east_west):
                 continue
 
             self.parameters += f"{self.param_names[key]} - {self.param_types[key]} "
 
         self.parameters = self.parameters.strip()
-
-
 
     def construct_preconditions(self):
         if self.move_east_west:
@@ -486,7 +473,6 @@ class Break(Action):
         else:
             back = "ZPosition"
             front = "ZPositionFront"
-
 
         self.preconditions = pddl_and(
             AtXLocationPredicate.to_precondition(
@@ -509,8 +495,9 @@ class Break(Action):
             ),
             AreSequentialPredicate.to_precondition(
                 self.param_names[front], self.param_names[back]
-            ) if self.dir == "north" or self.dir =="west" else 
-            AreSequentialPredicate.to_precondition(
+            )
+            if self.dir == "north" or self.dir == "west"
+            else AreSequentialPredicate.to_precondition(
                 self.param_names[back], self.param_names[front]
             ),
             f'({BlockPresentPredicate.var_name} {self.param_names["Block"]})',
@@ -542,7 +529,7 @@ class Break(Action):
             ),
             pddl_not(
                 AtZLocationPredicate.to_precondition(
-                    self.param_names["Block"], self.param_names[self.z_front ]
+                    self.param_names["Block"], self.param_names[self.z_front]
                 )
             ),
             pddl_not(
@@ -575,7 +562,7 @@ class Place(Action):
         # separate the names of blocks and items in pddl
         self.block = block + "-block"
         self.item = block
-        self.action_name = "place-" + block + "-" + dir
+        self.action_name = f"place-{block}-{dir}"
         self.dir = dir
 
         self.param_names = {
@@ -615,15 +602,9 @@ class Place(Action):
     def construct_parameters(self):
         self.parameters = ""
         for key in self.param_names.keys():
-            if(
-                key == "XPositionFront"
-                and (not self.move_east_west)
-            ):
+            if key == "XPositionFront" and (not self.move_east_west):
                 continue
-            elif (
-                key == "ZPositionFront"
-                and (self.move_east_west)
-            ):
+            elif key == "ZPositionFront" and (self.move_east_west):
                 continue
 
             self.parameters += f"{self.param_names[key]} - {self.param_types[key]} "
@@ -700,8 +681,9 @@ class Place(Action):
             ),
             AreSequentialPredicate.to_precondition(
                 self.param_names[front], self.param_names[back]
-            ) if self.dir == "north" or self.dir =="west" else 
-            AreSequentialPredicate.to_precondition(
+            )
+            if self.dir == "north" or self.dir == "west"
+            else AreSequentialPredicate.to_precondition(
                 self.param_names[back], self.param_names[front]
             ),
             AreSequentialPredicate.to_precondition(
@@ -756,10 +738,8 @@ class JumpUp(Action):
     def __init__(self, dir: str) -> None:
         super().__init__()
         self.dir = dir
-        # self.item_to_pickup = item_to_pickup
-        self.action_name = (
-            "jumpup-" + dir
-        )  # + "-only" if item_to_pickup is None else "-and-pickup-" + self.item_to_pickup.name
+        # todo: account for item at destination of jump up and jump down
+        self.action_name = f"jumpup-{dir}"
 
         # have separate dictionaries for parameter names and types, but such that a common key is used to index corresponding values in both
         # this is necessary because multiple parameters have different names but the same type
@@ -877,7 +857,7 @@ class JumpUp(Action):
                     pddl_and(
                         f"({BlockPresentPredicate.var_name} {block_var})\n",
                         AtXLocationPredicate.to_precondition(block_var, x_end),
-                        # here we check that there is no block at the level of the agent (bottom) or the agent's eyeline (top)
+                        # check there is no block blocking the agent's "double height"
                         pddl_or(
                             AtYLocationPredicate.to_precondition(
                                 block_var, self.param_name["YPositionUp"]
@@ -965,10 +945,8 @@ class JumpDown(Action):
     def __init__(self, dir: str) -> None:
         super().__init__()
         self.dir = dir
-        # self.item_to_pickup = item_to_pickup
-        self.action_name = (
-            "jumpdown-" + dir
-        )  # + "-only" if item_to_pickup is None else "-and-pickup-" + self.item_to_pickup.name
+        # todo: account for item at the destination point
+        self.action_name = f"jumpdown-{dir}"
 
         # have separate dictionaries for parameter names and types, but such that a common key is used to index corresponding values in both
         # this is necessary because multiple parameters have different names but the same type
@@ -1177,7 +1155,7 @@ class JumpDown(Action):
 class CheckGoal(Action):
     # checks the goal achieved predicate of the agent
     def __init__(self, goal, max_inentory_stack: int) -> None:
-        self.action_name = "check-goal"
+        self.action_name = "checkgoal"  # this is the only action name that doesn't follow the convention
         self.parameters = {TypeName.AGENT_TYPE_NAME.value: "?ag"}
         self.goal = goal
         self.max_inventory_stack = max_inentory_stack
