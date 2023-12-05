@@ -476,7 +476,6 @@ class Place(Action):
 class JumpUp(Action):
     # jumps up one block forward
     def __init__(self, dir: str) -> None:
-        # todo: account for item at the destination point
         super().__init__()
         self.dir = dir
         self.action_name = f"jumpup-{dir}"
@@ -899,7 +898,7 @@ class JumpDownAndPickup(Action):
         super().__init__()
         self.dir = dir
         self.item_to_pickup = item
-        self.action_name = f"jumpdown_and_pickip-{item}-{dir}"
+        self.action_name = f"jumpdown_and_pickup-{item}-{dir}"
         self.parameters = {TypeName.AGENT_TYPE_NAME.value: "?ag", item: "?i"}
 
         self.jump_east_west = self.dir == "east" or self.dir == "west"

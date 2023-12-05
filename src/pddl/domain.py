@@ -209,9 +209,10 @@ class Domain:
                 self.actions.append(module.Break(block, dir))
                 self.actions.append(module.Place(block, dir))
 
-        for item in items:
-            for dir in directions:
+            for item in items:
                 self.actions.append(module.MoveAndPickup(dir, item))
+                self.actions.append(module.JumpUpAndPickup(dir, item))
+                self.actions.append(module.JumpDownAndPickup(dir, item))
 
         # handling check goal is special depending on what type of pddl we are using
         if self.use_propositional:
