@@ -86,18 +86,6 @@ class PositionFunction(Function):
     def to_precondition(self):
         return f"({self.var_name} ?l)"
 
-        # return "(= ({} {}) {})\n\t(= ({} {}) {})\n\t(= ({} {}) {})".format(
-        #     "x",
-        #     parent_object_name,
-        #     self.value[0],
-        #     "y",
-        #     parent_object_name,
-        #     self.value[1],
-        #     "z",
-        #     parent_object_name,
-        #     self.value[2],
-        # )
-
 
 class XPositionFunction(PositionFunction):
     var_name = "x"
