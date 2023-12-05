@@ -237,7 +237,7 @@ class Problem:
         # goal_yaml is a dict of lists of dicts
         output = "(:goal"
         output += f"\n\t(and {GoalAchievedPredicate.to_problem(agent.name)})\n\t\t"
-        output += "\n))"
+        output += "\n)"
         return output
 
     def to_pddl(

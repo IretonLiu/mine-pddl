@@ -1,1498 +1,616 @@
 (define (domain first_world)
-(:requirements :typing  :negative-preconditions :universal-preconditions :existential-preconditions)
+(:requirements :typing :fluents :negative-preconditions :universal-preconditions :existential-preconditions)
 (:types
-	locatable int - object
+	locatable - object
 	agent block item - locatable
-	count position - int
 	bedrock destructible-block - block
 	diamond oak-log log obsidian - item
-	grass_block-block log-block - destructible-block
+	grass_block-block obsidian-block log-block - destructible-block
 )
 (:predicates
-	(agent-has-n-oak-log ?ag - agent ?n - count)
-	(are-seq ?x1 - int ?x2 - int)
-	(agent-alive ?ag - agent)
-	(not-equal ?x1 - int ?x2 - int)
-	(agent-has-n-grass_block ?ag - agent ?n - count)
-	(agent-has-n-obsidian ?ag - agent ?n - count)
-	(block-present ?b - block)
-	(agent-has-n-log ?ag - agent ?n - count)
 	(item-present ?i - item)
-	(at-z ?l - locatable ?z - position)
-	(agent-has-n-diamond ?ag - agent ?n - count)
+	(block-present ?b - block)
 	(goal-achieved ?ag - agent)
-	(at-y ?l - locatable ?y - position)
-	(at-x ?l - locatable ?x - position)
+	(agent-alive ?ag - agent)
+)
+(:functions
+	(block-hits ?b - destructible-block )
+	(agent-num-diamond ?ag - agent )
+	(z ?l - locatable )
+	(agent-num-oak-log ?ag - agent )
+	(agent-num-log ?ag - agent )
+	(agent-num-obsidian ?ag - agent )
+	(y ?l - locatable )
+	(agent-num-grass_block ?ag - agent )
+	(x ?l - locatable )
 )
 
 (:action move-north
-	:parameters (?ag - agent ?x - position ?y_up - position ?y_down - position ?z_start - position ?z_end - position)
+	:parameters (?ag - agent)
 	:precondition (and 
-(agent-alive ?ag)
- (at-x ?ag ?x)
- (at-y ?ag ?y_down)
- (at-z ?ag ?z_start)
- (are-seq ?z_end ?z_start)
- (are-seq ?y_down ?y_up)
- (not (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x)
- (or (at-y ?b ?y_up)
- (at-y ?b ?y_down)
-) (at-z ?b ?z_end)
-))) (not (exists (?i - item) (and 
-(item-present ?i)
- (at-x ?i ?x)
- (at-y ?i ?y_down)
- (at-z ?i ?z_end)
-))))
+(agent-alive ?ag) (and 
+(not (exists (?b - block) (and 
+(= (x ?b) (x ?ag)) (or (= (y ?b) (+ (y ?ag) 1)) (= (y ?b) (y ?ag))) (= (z ?b) (+ (z ?ag) -1))))) (not (exists (?i - item) (and 
+(= (x ?i) (x ?ag)) (= (y ?i) (y ?ag)) (= (z ?i) (+ (z ?ag) -1)))))))
 	:effect (and 
-(not (at-z ?ag ?z_start)
-) (at-z ?ag ?z_end)
-)
+(decrease (z ?ag) 1))
 )
 
 
 (:action jumpup-north
-	:parameters (?ag - agent ?x - position ?y_up - position ?y_up_up - position ?y_down - position ?z_start - position ?z_end - position)
+	:parameters (?ag - agent)
 	:precondition (and 
-(agent-alive ?ag)
- (at-x ?ag ?x)
- (at-y ?ag ?y_down)
- (at-z ?ag ?z_start)
- (are-seq ?z_end ?z_start)
- (are-seq ?y_down ?y_up)
- (are-seq ?y_up ?y_up_up)
- (not (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x)
- (or (at-y ?b ?y_up)
- (at-y ?b ?y_up_up)
-) (at-z ?b ?z_end)
-))) (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x)
- (at-y ?b ?y_down)
- (at-z ?b ?z_end)
-)) (not (exists (?i - item) (and 
-(item-present ?i)
- (at-x ?i ?x)
- (or (at-y ?i ?y_down)
- (at-y ?i ?y_up)
-) (at-z ?i ?z_end)
-))))
+(exists (?bl - block) (and 
+(= (x ?bl) (x ?ag)) (= (y ?bl) (y ?ag)) (= (z ?bl) (+ (z ?ag) -1)))) (not (or (exists (?bl - block) (and 
+(= (x ?bl) (x ?ag)) (= (y ?bl) (+ (y ?ag) 1)) (= (z ?bl) (+ (z ?ag) -1)))) (exists (?bl - block) (and 
+(= (x ?bl) (x ?ag)) (= (y ?bl) (+ (y ?ag) 1)) (= (z ?bl) (z ?ag)))) (exists (?bl - block) (and 
+(= (x ?bl) (x ?ag)) (= (y ?bl) (+ (y ?ag) 2)) (= (z ?bl) (+ (z ?ag) -1)))) (exists (?bl - block) (and 
+(= (x ?bl) (x ?ag)) (= (y ?bl) (+ (y ?ag) 2)) (= (z ?bl) (z ?ag)))))) (not (exists (?i - item) (and 
+(= (x ?i) (x ?ag)) (= (y ?i) (+ (y ?ag) 1)) (= (z ?i) (+ (z ?ag) -1))))))
 	:effect (and 
-(not (at-z ?ag ?z_start)
-) (at-z ?ag ?z_end)
- (not (at-y ?ag ?y_down)
-) (at-y ?ag ?y_up)
-)
+(assign (z ?ag) (+ (z ?ag) -1)) (assign (y ?ag) (+ (y ?ag) 1)))
 )
 
 
 (:action jumpdown-north
-	:parameters (?ag - agent ?x - position ?y_up - position ?y_down - position ?y_2_down - position ?y_3_down - position ?z_start - position ?z_end - position)
+	:parameters (?ag - agent)
 	:precondition (and 
-(agent-alive ?ag)
- (at-x ?ag ?x)
- (at-y ?ag ?y_down)
- (at-z ?ag ?z_start)
- (are-seq ?z_end ?z_start)
- (are-seq ?y_3_down ?y_2_down)
- (are-seq ?y_2_down ?y_down)
- (are-seq ?y_down ?y_up)
- (not (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x)
- (or (at-y ?b ?y_up)
- (at-y ?b ?y_down)
- (at-y ?b ?y_2_down)
-) (at-z ?b ?z_end)
-))) (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x)
- (at-y ?b ?y_3_down)
- (at-z ?b ?z_end)
-)) (not (exists (?i - item) (and 
-(item-present ?i)
- (at-x ?i ?x)
- (or (at-y ?i ?y_2_down)
-) (at-z ?i ?z_end)
-))))
+(exists (?bl - block) (and 
+(= (x ?bl) (x ?ag)) (= (y ?bl) (+ (y ?ag) -2)) (= (z ?bl) (+ (z ?ag) -1)))) (not (or (exists (?bl - block) (and 
+(= (x ?bl) (x ?ag)) (= (y ?bl) (+ (y ?ag) 1)) (= (z ?bl) (+ (z ?ag) -1)))) (exists (?bl - block) (and 
+(= (x ?bl) (x ?ag)) (= (y ?bl) (y ?ag)) (= (z ?bl) (+ (z ?ag) -1)))) (exists (?bl - block) (and 
+(= (x ?bl) (x ?ag)) (= (y ?bl) (+ (y ?ag) -1)) (= (z ?bl) (+ (z ?ag) -1)))))) (not (exists (?i - item) (and 
+(= (x ?i) (x ?ag)) (= (y ?i) (+ (y ?ag) -1)) (= (z ?i) (+ (z ?ag) -1))))))
 	:effect (and 
-(not (at-z ?ag ?z_start)
-) (at-z ?ag ?z_end)
- (not (at-y ?ag ?y_down)
-) (at-y ?ag ?y_2_down)
-)
+(assign (z ?ag) (+ (z ?ag) -1)) (assign (y ?ag) (+ (y ?ag) -1)))
 )
 
 
-(:action break-grass_block
-	:parameters (?ag - agent ?b - grass_block-block ?x - position ?y - position ?z - position ?z_front - position ?n_start - count ?n_end - count)
+(:action break-grass_block-north
+	:parameters (?ag - agent ?b - grass_block-block)
 	:precondition (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?b ?x)
- (at-y ?b ?y)
- (at-z ?b ?z_front)
- (are-seq ?z_front ?z)
- (block-present ?b) (are-seq ?n_start ?n_end)
- (agent-has-n-grass_block ?ag ?n_start)
-)
+(= (x ?b) (x ?ag)) (= (y ?b) (y ?ag)) (= (z ?b) (+ (z ?ag) -1)) (block-present ?b))
 	:effect (and 
-(not (block-present ?b)) (not (at-x ?b ?x)
-) (not (at-y ?b ?y)
-) (not (at-z ?b ?z_front)
-) (not (agent-has-n-grass_block ?ag ?n_start)
-) (agent-has-n-grass_block ?ag ?n_end)
-)
+(not (block-present ?b)) (increase (agent-num-grass_block ?ag) 1))
 )
 
 
 (:action place-grass_block-north
-	:parameters (?ag - agent ?b - grass_block-block ?x - position ?y - position ?y_down - position ?z - position ?z_front - position ?n_start - count ?n_end - count)
+	:parameters (?ag - agent ?b - grass_block-block)
 	:precondition (and 
 (exists (?bl - block) (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?bl ?x)
- (at-y ?bl ?y_down)
- (at-z ?bl ?z_front)
-)) (not (exists (?bl - block) (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?bl ?x)
- (at-y ?bl ?y)
- (at-z ?bl ?z_front)
-))) (are-seq ?y_down ?y)
- (are-seq ?z_front ?z)
- (are-seq ?n_end ?n_start)
- (agent-has-n-grass_block ?ag ?n_start)
-)
+(= (x ?bl) (x ?ag)) (= (y ?bl) (+ (y ?ag) 1)) (= (z ?bl) (+ (z ?ag) -1)))) (not (exists (?bl - block) (and 
+(= (x ?bl) (x ?ag)) (= (y ?bl) (y ?ag)) (= (z ?bl) (+ (z ?ag) -1))))))
 	:effect (and 
-(block-present ?b) (at-x ?b ?x)
- (at-y ?b ?y)
- (at-z ?b ?z_front)
- (not (agent-has-n-grass_block ?ag ?n_start)
-) (agent-has-n-grass_block ?ag ?n_end)
-)
+(block-present ?b) (assign (x ?b) (x ?ag)) (assign (y ?b) (y ?ag)) (assign (z ?b) (+ (z ?ag) -1)) (decrease (agent-num-grass_block ?ag) 1))
 )
 
 
-(:action break-log
-	:parameters (?ag - agent ?b - log-block ?x - position ?y - position ?z - position ?z_front - position ?n_start - count ?n_end - count)
+(:action break-obsidian-north
+	:parameters (?ag - agent ?b - obsidian-block)
 	:precondition (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?b ?x)
- (at-y ?b ?y)
- (at-z ?b ?z_front)
- (are-seq ?z_front ?z)
- (block-present ?b) (are-seq ?n_start ?n_end)
- (agent-has-n-log ?ag ?n_start)
-)
+(= (x ?b) (x ?ag)) (= (y ?b) (y ?ag)) (= (z ?b) (+ (z ?ag) -1)) (block-present ?b))
 	:effect (and 
-(not (block-present ?b)) (not (at-x ?b ?x)
-) (not (at-y ?b ?y)
-) (not (at-z ?b ?z_front)
-) (not (agent-has-n-log ?ag ?n_start)
-) (agent-has-n-log ?ag ?n_end)
+(not (block-present ?b)) (increase (agent-num-obsidian ?ag) 1))
 )
+
+
+(:action place-obsidian-north
+	:parameters (?ag - agent ?b - obsidian-block)
+	:precondition (and 
+(exists (?bl - block) (and 
+(= (x ?bl) (x ?ag)) (= (y ?bl) (+ (y ?ag) 1)) (= (z ?bl) (+ (z ?ag) -1)))) (not (exists (?bl - block) (and 
+(= (x ?bl) (x ?ag)) (= (y ?bl) (y ?ag)) (= (z ?bl) (+ (z ?ag) -1))))))
+	:effect (and 
+(block-present ?b) (assign (x ?b) (x ?ag)) (assign (y ?b) (y ?ag)) (assign (z ?b) (+ (z ?ag) -1)) (decrease (agent-num-obsidian ?ag) 1))
+)
+
+
+(:action break-log-north
+	:parameters (?ag - agent ?b - log-block)
+	:precondition (and 
+(= (x ?b) (x ?ag)) (= (y ?b) (y ?ag)) (= (z ?b) (+ (z ?ag) -1)) (block-present ?b))
+	:effect (and 
+(not (block-present ?b)) (increase (agent-num-log ?ag) 1))
 )
 
 
 (:action place-log-north
-	:parameters (?ag - agent ?b - log-block ?x - position ?y - position ?y_down - position ?z - position ?z_front - position ?n_start - count ?n_end - count)
+	:parameters (?ag - agent ?b - log-block)
 	:precondition (and 
 (exists (?bl - block) (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?bl ?x)
- (at-y ?bl ?y_down)
- (at-z ?bl ?z_front)
-)) (not (exists (?bl - block) (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?bl ?x)
- (at-y ?bl ?y)
- (at-z ?bl ?z_front)
-))) (are-seq ?y_down ?y)
- (are-seq ?z_front ?z)
- (are-seq ?n_end ?n_start)
- (agent-has-n-log ?ag ?n_start)
-)
+(= (x ?bl) (x ?ag)) (= (y ?bl) (+ (y ?ag) 1)) (= (z ?bl) (+ (z ?ag) -1)))) (not (exists (?bl - block) (and 
+(= (x ?bl) (x ?ag)) (= (y ?bl) (y ?ag)) (= (z ?bl) (+ (z ?ag) -1))))))
 	:effect (and 
-(block-present ?b) (at-x ?b ?x)
- (at-y ?b ?y)
- (at-z ?b ?z_front)
- (not (agent-has-n-log ?ag ?n_start)
-) (agent-has-n-log ?ag ?n_end)
-)
+(block-present ?b) (assign (x ?b) (x ?ag)) (assign (y ?b) (y ?ag)) (assign (z ?b) (+ (z ?ag) -1)) (decrease (agent-num-log ?ag) 1))
 )
 
 
 (:action move-south
-	:parameters (?ag - agent ?x - position ?y_up - position ?y_down - position ?z_start - position ?z_end - position)
+	:parameters (?ag - agent)
 	:precondition (and 
-(agent-alive ?ag)
- (at-x ?ag ?x)
- (at-y ?ag ?y_down)
- (at-z ?ag ?z_start)
- (are-seq ?z_start ?z_end)
- (are-seq ?y_down ?y_up)
- (not (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x)
- (or (at-y ?b ?y_up)
- (at-y ?b ?y_down)
-) (at-z ?b ?z_end)
-))) (not (exists (?i - item) (and 
-(item-present ?i)
- (at-x ?i ?x)
- (at-y ?i ?y_down)
- (at-z ?i ?z_end)
-))))
+(agent-alive ?ag) (and 
+(not (exists (?b - block) (and 
+(= (x ?b) (x ?ag)) (or (= (y ?b) (+ (y ?ag) 1)) (= (y ?b) (y ?ag))) (= (z ?b) (+ (z ?ag) 1))))) (not (exists (?i - item) (and 
+(= (x ?i) (x ?ag)) (= (y ?i) (y ?ag)) (= (z ?i) (+ (z ?ag) 1)))))))
 	:effect (and 
-(not (at-z ?ag ?z_start)
-) (at-z ?ag ?z_end)
-)
+(increase (z ?ag) 1))
 )
 
 
 (:action jumpup-south
-	:parameters (?ag - agent ?x - position ?y_up - position ?y_up_up - position ?y_down - position ?z_start - position ?z_end - position)
+	:parameters (?ag - agent)
 	:precondition (and 
-(agent-alive ?ag)
- (at-x ?ag ?x)
- (at-y ?ag ?y_down)
- (at-z ?ag ?z_start)
- (are-seq ?z_start ?z_end)
- (are-seq ?y_down ?y_up)
- (are-seq ?y_up ?y_up_up)
- (not (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x)
- (or (at-y ?b ?y_up)
- (at-y ?b ?y_up_up)
-) (at-z ?b ?z_end)
-))) (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x)
- (at-y ?b ?y_down)
- (at-z ?b ?z_end)
-)) (not (exists (?i - item) (and 
-(item-present ?i)
- (at-x ?i ?x)
- (or (at-y ?i ?y_down)
- (at-y ?i ?y_up)
-) (at-z ?i ?z_end)
-))))
+(exists (?bl - block) (and 
+(= (x ?bl) (x ?ag)) (= (y ?bl) (y ?ag)) (= (z ?bl) (+ (z ?ag) 1)))) (not (or (exists (?bl - block) (and 
+(= (x ?bl) (x ?ag)) (= (y ?bl) (+ (y ?ag) 1)) (= (z ?bl) (+ (z ?ag) 1)))) (exists (?bl - block) (and 
+(= (x ?bl) (x ?ag)) (= (y ?bl) (+ (y ?ag) 1)) (= (z ?bl) (z ?ag)))) (exists (?bl - block) (and 
+(= (x ?bl) (x ?ag)) (= (y ?bl) (+ (y ?ag) 2)) (= (z ?bl) (+ (z ?ag) 1)))) (exists (?bl - block) (and 
+(= (x ?bl) (x ?ag)) (= (y ?bl) (+ (y ?ag) 2)) (= (z ?bl) (z ?ag)))))) (not (exists (?i - item) (and 
+(= (x ?i) (x ?ag)) (= (y ?i) (+ (y ?ag) 1)) (= (z ?i) (+ (z ?ag) 1))))))
 	:effect (and 
-(not (at-z ?ag ?z_start)
-) (at-z ?ag ?z_end)
- (not (at-y ?ag ?y_down)
-) (at-y ?ag ?y_up)
-)
+(assign (z ?ag) (+ (z ?ag) 1)) (assign (y ?ag) (+ (y ?ag) 1)))
 )
 
 
 (:action jumpdown-south
-	:parameters (?ag - agent ?x - position ?y_up - position ?y_down - position ?y_2_down - position ?y_3_down - position ?z_start - position ?z_end - position)
+	:parameters (?ag - agent)
 	:precondition (and 
-(agent-alive ?ag)
- (at-x ?ag ?x)
- (at-y ?ag ?y_down)
- (at-z ?ag ?z_start)
- (are-seq ?z_start ?z_end)
- (are-seq ?y_3_down ?y_2_down)
- (are-seq ?y_2_down ?y_down)
- (are-seq ?y_down ?y_up)
- (not (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x)
- (or (at-y ?b ?y_up)
- (at-y ?b ?y_down)
- (at-y ?b ?y_2_down)
-) (at-z ?b ?z_end)
-))) (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x)
- (at-y ?b ?y_3_down)
- (at-z ?b ?z_end)
-)) (not (exists (?i - item) (and 
-(item-present ?i)
- (at-x ?i ?x)
- (or (at-y ?i ?y_2_down)
-) (at-z ?i ?z_end)
-))))
+(exists (?bl - block) (and 
+(= (x ?bl) (x ?ag)) (= (y ?bl) (+ (y ?ag) -2)) (= (z ?bl) (+ (z ?ag) 1)))) (not (or (exists (?bl - block) (and 
+(= (x ?bl) (x ?ag)) (= (y ?bl) (+ (y ?ag) 1)) (= (z ?bl) (+ (z ?ag) 1)))) (exists (?bl - block) (and 
+(= (x ?bl) (x ?ag)) (= (y ?bl) (y ?ag)) (= (z ?bl) (+ (z ?ag) 1)))) (exists (?bl - block) (and 
+(= (x ?bl) (x ?ag)) (= (y ?bl) (+ (y ?ag) -1)) (= (z ?bl) (+ (z ?ag) 1)))))) (not (exists (?i - item) (and 
+(= (x ?i) (x ?ag)) (= (y ?i) (+ (y ?ag) -1)) (= (z ?i) (+ (z ?ag) 1))))))
 	:effect (and 
-(not (at-z ?ag ?z_start)
-) (at-z ?ag ?z_end)
- (not (at-y ?ag ?y_down)
-) (at-y ?ag ?y_2_down)
-)
+(assign (z ?ag) (+ (z ?ag) 1)) (assign (y ?ag) (+ (y ?ag) -1)))
 )
 
 
-(:action break-grass_block
-	:parameters (?ag - agent ?b - grass_block-block ?x - position ?y - position ?z - position ?z_front - position ?n_start - count ?n_end - count)
+(:action break-grass_block-south
+	:parameters (?ag - agent ?b - grass_block-block)
 	:precondition (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?b ?x)
- (at-y ?b ?y)
- (at-z ?b ?z_front)
- (are-seq ?z ?z_front)
- (block-present ?b) (are-seq ?n_start ?n_end)
- (agent-has-n-grass_block ?ag ?n_start)
-)
+(= (x ?b) (x ?ag)) (= (y ?b) (y ?ag)) (= (z ?b) (+ (z ?ag) 1)) (block-present ?b))
 	:effect (and 
-(not (block-present ?b)) (not (at-x ?b ?x)
-) (not (at-y ?b ?y)
-) (not (at-z ?b ?z_front)
-) (not (agent-has-n-grass_block ?ag ?n_start)
-) (agent-has-n-grass_block ?ag ?n_end)
-)
+(not (block-present ?b)) (increase (agent-num-grass_block ?ag) 1))
 )
 
 
 (:action place-grass_block-south
-	:parameters (?ag - agent ?b - grass_block-block ?x - position ?y - position ?y_down - position ?z - position ?z_front - position ?n_start - count ?n_end - count)
+	:parameters (?ag - agent ?b - grass_block-block)
 	:precondition (and 
 (exists (?bl - block) (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?bl ?x)
- (at-y ?bl ?y_down)
- (at-z ?bl ?z_front)
-)) (not (exists (?bl - block) (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?bl ?x)
- (at-y ?bl ?y)
- (at-z ?bl ?z_front)
-))) (are-seq ?y_down ?y)
- (are-seq ?z ?z_front)
- (are-seq ?n_end ?n_start)
- (agent-has-n-grass_block ?ag ?n_start)
-)
+(= (x ?bl) (x ?ag)) (= (y ?bl) (+ (y ?ag) 1)) (= (z ?bl) (+ (z ?ag) 1)))) (not (exists (?bl - block) (and 
+(= (x ?bl) (x ?ag)) (= (y ?bl) (y ?ag)) (= (z ?bl) (+ (z ?ag) 1))))))
 	:effect (and 
-(block-present ?b) (at-x ?b ?x)
- (at-y ?b ?y)
- (at-z ?b ?z_front)
- (not (agent-has-n-grass_block ?ag ?n_start)
-) (agent-has-n-grass_block ?ag ?n_end)
-)
+(block-present ?b) (assign (x ?b) (x ?ag)) (assign (y ?b) (y ?ag)) (assign (z ?b) (+ (z ?ag) 1)) (decrease (agent-num-grass_block ?ag) 1))
 )
 
 
-(:action break-log
-	:parameters (?ag - agent ?b - log-block ?x - position ?y - position ?z - position ?z_front - position ?n_start - count ?n_end - count)
+(:action break-obsidian-south
+	:parameters (?ag - agent ?b - obsidian-block)
 	:precondition (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?b ?x)
- (at-y ?b ?y)
- (at-z ?b ?z_front)
- (are-seq ?z ?z_front)
- (block-present ?b) (are-seq ?n_start ?n_end)
- (agent-has-n-log ?ag ?n_start)
-)
+(= (x ?b) (x ?ag)) (= (y ?b) (y ?ag)) (= (z ?b) (+ (z ?ag) 1)) (block-present ?b))
 	:effect (and 
-(not (block-present ?b)) (not (at-x ?b ?x)
-) (not (at-y ?b ?y)
-) (not (at-z ?b ?z_front)
-) (not (agent-has-n-log ?ag ?n_start)
-) (agent-has-n-log ?ag ?n_end)
+(not (block-present ?b)) (increase (agent-num-obsidian ?ag) 1))
 )
+
+
+(:action place-obsidian-south
+	:parameters (?ag - agent ?b - obsidian-block)
+	:precondition (and 
+(exists (?bl - block) (and 
+(= (x ?bl) (x ?ag)) (= (y ?bl) (+ (y ?ag) 1)) (= (z ?bl) (+ (z ?ag) 1)))) (not (exists (?bl - block) (and 
+(= (x ?bl) (x ?ag)) (= (y ?bl) (y ?ag)) (= (z ?bl) (+ (z ?ag) 1))))))
+	:effect (and 
+(block-present ?b) (assign (x ?b) (x ?ag)) (assign (y ?b) (y ?ag)) (assign (z ?b) (+ (z ?ag) 1)) (decrease (agent-num-obsidian ?ag) 1))
+)
+
+
+(:action break-log-south
+	:parameters (?ag - agent ?b - log-block)
+	:precondition (and 
+(= (x ?b) (x ?ag)) (= (y ?b) (y ?ag)) (= (z ?b) (+ (z ?ag) 1)) (block-present ?b))
+	:effect (and 
+(not (block-present ?b)) (increase (agent-num-log ?ag) 1))
 )
 
 
 (:action place-log-south
-	:parameters (?ag - agent ?b - log-block ?x - position ?y - position ?y_down - position ?z - position ?z_front - position ?n_start - count ?n_end - count)
+	:parameters (?ag - agent ?b - log-block)
 	:precondition (and 
 (exists (?bl - block) (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?bl ?x)
- (at-y ?bl ?y_down)
- (at-z ?bl ?z_front)
-)) (not (exists (?bl - block) (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?bl ?x)
- (at-y ?bl ?y)
- (at-z ?bl ?z_front)
-))) (are-seq ?y_down ?y)
- (are-seq ?z ?z_front)
- (are-seq ?n_end ?n_start)
- (agent-has-n-log ?ag ?n_start)
-)
+(= (x ?bl) (x ?ag)) (= (y ?bl) (+ (y ?ag) 1)) (= (z ?bl) (+ (z ?ag) 1)))) (not (exists (?bl - block) (and 
+(= (x ?bl) (x ?ag)) (= (y ?bl) (y ?ag)) (= (z ?bl) (+ (z ?ag) 1))))))
 	:effect (and 
-(block-present ?b) (at-x ?b ?x)
- (at-y ?b ?y)
- (at-z ?b ?z_front)
- (not (agent-has-n-log ?ag ?n_start)
-) (agent-has-n-log ?ag ?n_end)
-)
+(block-present ?b) (assign (x ?b) (x ?ag)) (assign (y ?b) (y ?ag)) (assign (z ?b) (+ (z ?ag) 1)) (decrease (agent-num-log ?ag) 1))
 )
 
 
 (:action move-east
-	:parameters (?ag - agent ?z - position ?x_start - position ?x_end - position ?y_up - position ?y_down - position)
+	:parameters (?ag - agent)
 	:precondition (and 
-(agent-alive ?ag)
- (at-x ?ag ?x_start)
- (at-y ?ag ?y_down)
- (at-z ?ag ?z)
- (are-seq ?x_start ?x_end)
- (are-seq ?y_down ?y_up)
- (not (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x_end)
- (or (at-y ?b ?y_up)
- (at-y ?b ?y_down)
-) (at-z ?b ?z)
-))) (not (exists (?i - item) (and 
-(item-present ?i)
- (at-x ?i ?x_end)
- (at-y ?i ?y_down)
- (at-z ?i ?z)
-))))
+(agent-alive ?ag) (and 
+(not (exists (?b - block) (and 
+(= (x ?b) (+ (x ?ag) 1)) (or (= (y ?b) (+ (y ?ag) 1)) (= (y ?b) (y ?ag))) (= (z ?b) (z ?ag))))) (not (exists (?i - item) (and 
+(= (x ?i) (+ (x ?ag) 1)) (= (y ?i) (y ?ag)) (= (z ?i) (z ?ag)))))))
 	:effect (and 
-(not (at-x ?ag ?x_start)
-) (at-x ?ag ?x_end)
-)
+(increase (x ?ag) 1))
 )
 
 
 (:action jumpup-east
-	:parameters (?ag - agent ?z - position ?x_start - position ?x_end - position ?y_up - position ?y_up_up - position ?y_down - position)
+	:parameters (?ag - agent)
 	:precondition (and 
-(agent-alive ?ag)
- (at-x ?ag ?x_start)
- (at-y ?ag ?y_down)
- (at-z ?ag ?z)
- (are-seq ?x_start ?x_end)
- (are-seq ?y_down ?y_up)
- (are-seq ?y_up ?y_up_up)
- (not (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x_end)
- (or (at-y ?b ?y_up)
- (at-y ?b ?y_up_up)
-) (at-z ?b ?z)
-))) (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x_end)
- (at-y ?b ?y_down)
- (at-z ?b ?z)
-)) (not (exists (?i - item) (and 
-(item-present ?i)
- (at-x ?i ?x_end)
- (or (at-y ?i ?y_down)
- (at-y ?i ?y_up)
-) (at-z ?i ?z)
-))))
+(exists (?bl - block) (and 
+(= (x ?bl) (+ (x ?ag) 1)) (= (y ?bl) (y ?ag)) (= (z ?bl) (z ?ag)))) (not (or (exists (?bl - block) (and 
+(= (x ?bl) (+ (x ?ag) 1)) (= (y ?bl) (+ (y ?ag) 1)) (= (z ?bl) (z ?ag)))) (exists (?bl - block) (and 
+(= (x ?bl) (x ?ag)) (= (y ?bl) (+ (y ?ag) 1)) (= (z ?bl) (z ?ag)))) (exists (?bl - block) (and 
+(= (x ?bl) (+ (x ?ag) 1)) (= (y ?bl) (+ (y ?ag) 2)) (= (z ?bl) (z ?ag)))) (exists (?bl - block) (and 
+(= (x ?bl) (x ?ag)) (= (y ?bl) (+ (y ?ag) 2)) (= (z ?bl) (z ?ag)))))) (not (exists (?i - item) (and 
+(= (x ?i) (+ (x ?ag) 1)) (= (y ?i) (+ (y ?ag) 1)) (= (z ?i) (z ?ag))))))
 	:effect (and 
-(not (at-x ?ag ?x_start)
-) (at-x ?ag ?x_end)
- (not (at-y ?ag ?y_down)
-) (at-y ?ag ?y_up)
-)
+(assign (x ?ag) (+ (x ?ag) 1)) (assign (y ?ag) (+ (y ?ag) 1)))
 )
 
 
 (:action jumpdown-east
-	:parameters (?ag - agent ?z - position ?x_start - position ?x_end - position ?y_up - position ?y_down - position ?y_2_down - position ?y_3_down - position)
+	:parameters (?ag - agent)
 	:precondition (and 
-(agent-alive ?ag)
- (at-x ?ag ?x_start)
- (at-y ?ag ?y_down)
- (at-z ?ag ?z)
- (are-seq ?x_start ?x_end)
- (are-seq ?y_3_down ?y_2_down)
- (are-seq ?y_2_down ?y_down)
- (are-seq ?y_down ?y_up)
- (not (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x_end)
- (or (at-y ?b ?y_up)
- (at-y ?b ?y_down)
- (at-y ?b ?y_2_down)
-) (at-z ?b ?z)
-))) (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x_end)
- (at-y ?b ?y_3_down)
- (at-z ?b ?z)
-)) (not (exists (?i - item) (and 
-(item-present ?i)
- (at-x ?i ?x_end)
- (or (at-y ?i ?y_2_down)
-) (at-z ?i ?z)
-))))
+(exists (?bl - block) (and 
+(= (x ?bl) (+ (x ?ag) 1)) (= (y ?bl) (+ (y ?ag) -2)) (= (z ?bl) (z ?ag)))) (not (or (exists (?bl - block) (and 
+(= (x ?bl) (+ (x ?ag) 1)) (= (y ?bl) (+ (y ?ag) 1)) (= (z ?bl) (z ?ag)))) (exists (?bl - block) (and 
+(= (x ?bl) (+ (x ?ag) 1)) (= (y ?bl) (y ?ag)) (= (z ?bl) (z ?ag)))) (exists (?bl - block) (and 
+(= (x ?bl) (+ (x ?ag) 1)) (= (y ?bl) (+ (y ?ag) -1)) (= (z ?bl) (z ?ag)))))) (not (exists (?i - item) (and 
+(= (x ?i) (+ (x ?ag) 1)) (= (y ?i) (+ (y ?ag) -1)) (= (z ?i) (z ?ag))))))
 	:effect (and 
-(not (at-x ?ag ?x_start)
-) (at-x ?ag ?x_end)
- (not (at-y ?ag ?y_down)
-) (at-y ?ag ?y_2_down)
-)
+(assign (x ?ag) (+ (x ?ag) 1)) (assign (y ?ag) (+ (y ?ag) -1)))
 )
 
 
-(:action break-grass_block
-	:parameters (?ag - agent ?b - grass_block-block ?x - position ?x_front - position ?y - position ?z - position ?n_start - count ?n_end - count)
+(:action break-grass_block-east
+	:parameters (?ag - agent ?b - grass_block-block)
 	:precondition (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?b ?x_front)
- (at-y ?b ?y)
- (at-z ?b ?z)
- (are-seq ?x ?x_front)
- (block-present ?b) (are-seq ?n_start ?n_end)
- (agent-has-n-grass_block ?ag ?n_start)
-)
+(= (x ?b) (+ (x ?ag) 1)) (= (y ?b) (y ?ag)) (= (z ?b) (z ?ag)) (block-present ?b))
 	:effect (and 
-(not (block-present ?b)) (not (at-x ?b ?x_front)
-) (not (at-y ?b ?y)
-) (not (at-z ?b ?z)
-) (not (agent-has-n-grass_block ?ag ?n_start)
-) (agent-has-n-grass_block ?ag ?n_end)
-)
+(not (block-present ?b)) (increase (agent-num-grass_block ?ag) 1))
 )
 
 
 (:action place-grass_block-east
-	:parameters (?ag - agent ?b - grass_block-block ?x - position ?x_front - position ?y - position ?y_down - position ?z - position ?n_start - count ?n_end - count)
+	:parameters (?ag - agent ?b - grass_block-block)
 	:precondition (and 
 (exists (?bl - block) (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?bl ?x_front)
- (at-y ?bl ?y_down)
- (at-z ?bl ?z)
-)) (not (exists (?bl - block) (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?bl ?x_front)
- (at-y ?bl ?y)
- (at-z ?bl ?z)
-))) (are-seq ?y_down ?y)
- (are-seq ?x ?x_front)
- (are-seq ?n_end ?n_start)
- (agent-has-n-grass_block ?ag ?n_start)
-)
+(= (x ?bl) (+ (x ?ag) 1)) (= (y ?bl) (+ (y ?ag) 1)) (= (z ?bl) (z ?ag)))) (not (exists (?bl - block) (and 
+(= (x ?bl) (+ (x ?ag) 1)) (= (y ?bl) (y ?ag)) (= (z ?bl) (z ?ag))))))
 	:effect (and 
-(block-present ?b) (at-x ?b ?x_front)
- (at-y ?b ?y)
- (at-z ?b ?z)
- (not (agent-has-n-grass_block ?ag ?n_start)
-) (agent-has-n-grass_block ?ag ?n_end)
-)
+(block-present ?b) (assign (x ?b) (+ (x ?ag) 1)) (assign (y ?b) (y ?ag)) (assign (z ?b) (z ?ag)) (decrease (agent-num-grass_block ?ag) 1))
 )
 
 
-(:action break-log
-	:parameters (?ag - agent ?b - log-block ?x - position ?x_front - position ?y - position ?z - position ?n_start - count ?n_end - count)
+(:action break-obsidian-east
+	:parameters (?ag - agent ?b - obsidian-block)
 	:precondition (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?b ?x_front)
- (at-y ?b ?y)
- (at-z ?b ?z)
- (are-seq ?x ?x_front)
- (block-present ?b) (are-seq ?n_start ?n_end)
- (agent-has-n-log ?ag ?n_start)
-)
+(= (x ?b) (+ (x ?ag) 1)) (= (y ?b) (y ?ag)) (= (z ?b) (z ?ag)) (block-present ?b))
 	:effect (and 
-(not (block-present ?b)) (not (at-x ?b ?x_front)
-) (not (at-y ?b ?y)
-) (not (at-z ?b ?z)
-) (not (agent-has-n-log ?ag ?n_start)
-) (agent-has-n-log ?ag ?n_end)
+(not (block-present ?b)) (increase (agent-num-obsidian ?ag) 1))
 )
+
+
+(:action place-obsidian-east
+	:parameters (?ag - agent ?b - obsidian-block)
+	:precondition (and 
+(exists (?bl - block) (and 
+(= (x ?bl) (+ (x ?ag) 1)) (= (y ?bl) (+ (y ?ag) 1)) (= (z ?bl) (z ?ag)))) (not (exists (?bl - block) (and 
+(= (x ?bl) (+ (x ?ag) 1)) (= (y ?bl) (y ?ag)) (= (z ?bl) (z ?ag))))))
+	:effect (and 
+(block-present ?b) (assign (x ?b) (+ (x ?ag) 1)) (assign (y ?b) (y ?ag)) (assign (z ?b) (z ?ag)) (decrease (agent-num-obsidian ?ag) 1))
+)
+
+
+(:action break-log-east
+	:parameters (?ag - agent ?b - log-block)
+	:precondition (and 
+(= (x ?b) (+ (x ?ag) 1)) (= (y ?b) (y ?ag)) (= (z ?b) (z ?ag)) (block-present ?b))
+	:effect (and 
+(not (block-present ?b)) (increase (agent-num-log ?ag) 1))
 )
 
 
 (:action place-log-east
-	:parameters (?ag - agent ?b - log-block ?x - position ?x_front - position ?y - position ?y_down - position ?z - position ?n_start - count ?n_end - count)
+	:parameters (?ag - agent ?b - log-block)
 	:precondition (and 
 (exists (?bl - block) (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?bl ?x_front)
- (at-y ?bl ?y_down)
- (at-z ?bl ?z)
-)) (not (exists (?bl - block) (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?bl ?x_front)
- (at-y ?bl ?y)
- (at-z ?bl ?z)
-))) (are-seq ?y_down ?y)
- (are-seq ?x ?x_front)
- (are-seq ?n_end ?n_start)
- (agent-has-n-log ?ag ?n_start)
-)
+(= (x ?bl) (+ (x ?ag) 1)) (= (y ?bl) (+ (y ?ag) 1)) (= (z ?bl) (z ?ag)))) (not (exists (?bl - block) (and 
+(= (x ?bl) (+ (x ?ag) 1)) (= (y ?bl) (y ?ag)) (= (z ?bl) (z ?ag))))))
 	:effect (and 
-(block-present ?b) (at-x ?b ?x_front)
- (at-y ?b ?y)
- (at-z ?b ?z)
- (not (agent-has-n-log ?ag ?n_start)
-) (agent-has-n-log ?ag ?n_end)
-)
+(block-present ?b) (assign (x ?b) (+ (x ?ag) 1)) (assign (y ?b) (y ?ag)) (assign (z ?b) (z ?ag)) (decrease (agent-num-log ?ag) 1))
 )
 
 
 (:action move-west
-	:parameters (?ag - agent ?z - position ?x_start - position ?x_end - position ?y_up - position ?y_down - position)
+	:parameters (?ag - agent)
 	:precondition (and 
-(agent-alive ?ag)
- (at-x ?ag ?x_start)
- (at-y ?ag ?y_down)
- (at-z ?ag ?z)
- (are-seq ?x_end ?x_start)
- (are-seq ?y_down ?y_up)
- (not (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x_end)
- (or (at-y ?b ?y_up)
- (at-y ?b ?y_down)
-) (at-z ?b ?z)
-))) (not (exists (?i - item) (and 
-(item-present ?i)
- (at-x ?i ?x_end)
- (at-y ?i ?y_down)
- (at-z ?i ?z)
-))))
+(agent-alive ?ag) (and 
+(not (exists (?b - block) (and 
+(= (x ?b) (+ (x ?ag) -1)) (or (= (y ?b) (+ (y ?ag) 1)) (= (y ?b) (y ?ag))) (= (z ?b) (z ?ag))))) (not (exists (?i - item) (and 
+(= (x ?i) (+ (x ?ag) -1)) (= (y ?i) (y ?ag)) (= (z ?i) (z ?ag)))))))
 	:effect (and 
-(not (at-x ?ag ?x_start)
-) (at-x ?ag ?x_end)
-)
+(decrease (x ?ag) 1))
 )
 
 
 (:action jumpup-west
-	:parameters (?ag - agent ?z - position ?x_start - position ?x_end - position ?y_up - position ?y_up_up - position ?y_down - position)
+	:parameters (?ag - agent)
 	:precondition (and 
-(agent-alive ?ag)
- (at-x ?ag ?x_start)
- (at-y ?ag ?y_down)
- (at-z ?ag ?z)
- (are-seq ?x_end ?x_start)
- (are-seq ?y_down ?y_up)
- (are-seq ?y_up ?y_up_up)
- (not (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x_end)
- (or (at-y ?b ?y_up)
- (at-y ?b ?y_up_up)
-) (at-z ?b ?z)
-))) (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x_end)
- (at-y ?b ?y_down)
- (at-z ?b ?z)
-)) (not (exists (?i - item) (and 
-(item-present ?i)
- (at-x ?i ?x_end)
- (or (at-y ?i ?y_down)
- (at-y ?i ?y_up)
-) (at-z ?i ?z)
-))))
+(exists (?bl - block) (and 
+(= (x ?bl) (+ (x ?ag) -1)) (= (y ?bl) (y ?ag)) (= (z ?bl) (z ?ag)))) (not (or (exists (?bl - block) (and 
+(= (x ?bl) (+ (x ?ag) -1)) (= (y ?bl) (+ (y ?ag) 1)) (= (z ?bl) (z ?ag)))) (exists (?bl - block) (and 
+(= (x ?bl) (x ?ag)) (= (y ?bl) (+ (y ?ag) 1)) (= (z ?bl) (z ?ag)))) (exists (?bl - block) (and 
+(= (x ?bl) (+ (x ?ag) -1)) (= (y ?bl) (+ (y ?ag) 2)) (= (z ?bl) (z ?ag)))) (exists (?bl - block) (and 
+(= (x ?bl) (x ?ag)) (= (y ?bl) (+ (y ?ag) 2)) (= (z ?bl) (z ?ag)))))) (not (exists (?i - item) (and 
+(= (x ?i) (+ (x ?ag) -1)) (= (y ?i) (+ (y ?ag) 1)) (= (z ?i) (z ?ag))))))
 	:effect (and 
-(not (at-x ?ag ?x_start)
-) (at-x ?ag ?x_end)
- (not (at-y ?ag ?y_down)
-) (at-y ?ag ?y_up)
-)
+(assign (x ?ag) (+ (x ?ag) -1)) (assign (y ?ag) (+ (y ?ag) 1)))
 )
 
 
 (:action jumpdown-west
-	:parameters (?ag - agent ?z - position ?x_start - position ?x_end - position ?y_up - position ?y_down - position ?y_2_down - position ?y_3_down - position)
+	:parameters (?ag - agent)
 	:precondition (and 
-(agent-alive ?ag)
- (at-x ?ag ?x_start)
- (at-y ?ag ?y_down)
- (at-z ?ag ?z)
- (are-seq ?x_end ?x_start)
- (are-seq ?y_3_down ?y_2_down)
- (are-seq ?y_2_down ?y_down)
- (are-seq ?y_down ?y_up)
- (not (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x_end)
- (or (at-y ?b ?y_up)
- (at-y ?b ?y_down)
- (at-y ?b ?y_2_down)
-) (at-z ?b ?z)
-))) (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x_end)
- (at-y ?b ?y_3_down)
- (at-z ?b ?z)
-)) (not (exists (?i - item) (and 
-(item-present ?i)
- (at-x ?i ?x_end)
- (or (at-y ?i ?y_2_down)
-) (at-z ?i ?z)
-))))
+(exists (?bl - block) (and 
+(= (x ?bl) (+ (x ?ag) -1)) (= (y ?bl) (+ (y ?ag) -2)) (= (z ?bl) (z ?ag)))) (not (or (exists (?bl - block) (and 
+(= (x ?bl) (+ (x ?ag) -1)) (= (y ?bl) (+ (y ?ag) 1)) (= (z ?bl) (z ?ag)))) (exists (?bl - block) (and 
+(= (x ?bl) (+ (x ?ag) -1)) (= (y ?bl) (y ?ag)) (= (z ?bl) (z ?ag)))) (exists (?bl - block) (and 
+(= (x ?bl) (+ (x ?ag) -1)) (= (y ?bl) (+ (y ?ag) -1)) (= (z ?bl) (z ?ag)))))) (not (exists (?i - item) (and 
+(= (x ?i) (+ (x ?ag) -1)) (= (y ?i) (+ (y ?ag) -1)) (= (z ?i) (z ?ag))))))
 	:effect (and 
-(not (at-x ?ag ?x_start)
-) (at-x ?ag ?x_end)
- (not (at-y ?ag ?y_down)
-) (at-y ?ag ?y_2_down)
-)
+(assign (x ?ag) (+ (x ?ag) -1)) (assign (y ?ag) (+ (y ?ag) -1)))
 )
 
 
-(:action break-grass_block
-	:parameters (?ag - agent ?b - grass_block-block ?x - position ?x_front - position ?y - position ?z - position ?n_start - count ?n_end - count)
+(:action break-grass_block-west
+	:parameters (?ag - agent ?b - grass_block-block)
 	:precondition (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?b ?x_front)
- (at-y ?b ?y)
- (at-z ?b ?z)
- (are-seq ?x_front ?x)
- (block-present ?b) (are-seq ?n_start ?n_end)
- (agent-has-n-grass_block ?ag ?n_start)
-)
+(= (x ?b) (+ (x ?ag) -1)) (= (y ?b) (y ?ag)) (= (z ?b) (z ?ag)) (block-present ?b))
 	:effect (and 
-(not (block-present ?b)) (not (at-x ?b ?x_front)
-) (not (at-y ?b ?y)
-) (not (at-z ?b ?z)
-) (not (agent-has-n-grass_block ?ag ?n_start)
-) (agent-has-n-grass_block ?ag ?n_end)
-)
+(not (block-present ?b)) (increase (agent-num-grass_block ?ag) 1))
 )
 
 
 (:action place-grass_block-west
-	:parameters (?ag - agent ?b - grass_block-block ?x - position ?x_front - position ?y - position ?y_down - position ?z - position ?n_start - count ?n_end - count)
+	:parameters (?ag - agent ?b - grass_block-block)
 	:precondition (and 
 (exists (?bl - block) (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?bl ?x_front)
- (at-y ?bl ?y_down)
- (at-z ?bl ?z)
-)) (not (exists (?bl - block) (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?bl ?x_front)
- (at-y ?bl ?y)
- (at-z ?bl ?z)
-))) (are-seq ?y_down ?y)
- (are-seq ?x_front ?x)
- (are-seq ?n_end ?n_start)
- (agent-has-n-grass_block ?ag ?n_start)
-)
+(= (x ?bl) (+ (x ?ag) -1)) (= (y ?bl) (+ (y ?ag) 1)) (= (z ?bl) (z ?ag)))) (not (exists (?bl - block) (and 
+(= (x ?bl) (+ (x ?ag) -1)) (= (y ?bl) (y ?ag)) (= (z ?bl) (z ?ag))))))
 	:effect (and 
-(block-present ?b) (at-x ?b ?x_front)
- (at-y ?b ?y)
- (at-z ?b ?z)
- (not (agent-has-n-grass_block ?ag ?n_start)
-) (agent-has-n-grass_block ?ag ?n_end)
-)
+(block-present ?b) (assign (x ?b) (+ (x ?ag) -1)) (assign (y ?b) (y ?ag)) (assign (z ?b) (z ?ag)) (decrease (agent-num-grass_block ?ag) 1))
 )
 
 
-(:action break-log
-	:parameters (?ag - agent ?b - log-block ?x - position ?x_front - position ?y - position ?z - position ?n_start - count ?n_end - count)
+(:action break-obsidian-west
+	:parameters (?ag - agent ?b - obsidian-block)
 	:precondition (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?b ?x_front)
- (at-y ?b ?y)
- (at-z ?b ?z)
- (are-seq ?x_front ?x)
- (block-present ?b) (are-seq ?n_start ?n_end)
- (agent-has-n-log ?ag ?n_start)
-)
+(= (x ?b) (+ (x ?ag) -1)) (= (y ?b) (y ?ag)) (= (z ?b) (z ?ag)) (block-present ?b))
 	:effect (and 
-(not (block-present ?b)) (not (at-x ?b ?x_front)
-) (not (at-y ?b ?y)
-) (not (at-z ?b ?z)
-) (not (agent-has-n-log ?ag ?n_start)
-) (agent-has-n-log ?ag ?n_end)
+(not (block-present ?b)) (increase (agent-num-obsidian ?ag) 1))
 )
+
+
+(:action place-obsidian-west
+	:parameters (?ag - agent ?b - obsidian-block)
+	:precondition (and 
+(exists (?bl - block) (and 
+(= (x ?bl) (+ (x ?ag) -1)) (= (y ?bl) (+ (y ?ag) 1)) (= (z ?bl) (z ?ag)))) (not (exists (?bl - block) (and 
+(= (x ?bl) (+ (x ?ag) -1)) (= (y ?bl) (y ?ag)) (= (z ?bl) (z ?ag))))))
+	:effect (and 
+(block-present ?b) (assign (x ?b) (+ (x ?ag) -1)) (assign (y ?b) (y ?ag)) (assign (z ?b) (z ?ag)) (decrease (agent-num-obsidian ?ag) 1))
+)
+
+
+(:action break-log-west
+	:parameters (?ag - agent ?b - log-block)
+	:precondition (and 
+(= (x ?b) (+ (x ?ag) -1)) (= (y ?b) (y ?ag)) (= (z ?b) (z ?ag)) (block-present ?b))
+	:effect (and 
+(not (block-present ?b)) (increase (agent-num-log ?ag) 1))
 )
 
 
 (:action place-log-west
-	:parameters (?ag - agent ?b - log-block ?x - position ?x_front - position ?y - position ?y_down - position ?z - position ?n_start - count ?n_end - count)
+	:parameters (?ag - agent ?b - log-block)
 	:precondition (and 
 (exists (?bl - block) (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?bl ?x_front)
- (at-y ?bl ?y_down)
- (at-z ?bl ?z)
-)) (not (exists (?bl - block) (and 
-(at-x ?ag ?x)
- (at-y ?ag ?y)
- (at-z ?ag ?z)
- (at-x ?bl ?x_front)
- (at-y ?bl ?y)
- (at-z ?bl ?z)
-))) (are-seq ?y_down ?y)
- (are-seq ?x_front ?x)
- (are-seq ?n_end ?n_start)
- (agent-has-n-log ?ag ?n_start)
-)
+(= (x ?bl) (+ (x ?ag) -1)) (= (y ?bl) (+ (y ?ag) 1)) (= (z ?bl) (z ?ag)))) (not (exists (?bl - block) (and 
+(= (x ?bl) (+ (x ?ag) -1)) (= (y ?bl) (y ?ag)) (= (z ?bl) (z ?ag))))))
 	:effect (and 
-(block-present ?b) (at-x ?b ?x_front)
- (at-y ?b ?y)
- (at-z ?b ?z)
- (not (agent-has-n-log ?ag ?n_start)
-) (agent-has-n-log ?ag ?n_end)
-)
+(block-present ?b) (assign (x ?b) (+ (x ?ag) -1)) (assign (y ?b) (y ?ag)) (assign (z ?b) (z ?ag)) (decrease (agent-num-log ?ag) 1))
 )
 
 
-(:action move-north-and-pickup-diamond
-	:parameters (?ag - agent ?i - diamond ?x - position ?y_up - position ?y_down - position ?z_start - position ?z_end - position ?n_start - count ?n_end - count)
+(:action move_and_pickup-diamond-north
+	:parameters (?ag - agent ?i - diamond)
 	:precondition (and 
-(agent-alive ?ag)
- (at-x ?ag ?x)
- (at-y ?ag ?y_down)
- (at-z ?ag ?z_start)
- (are-seq ?z_end ?z_start)
- (are-seq ?y_down ?y_up)
- (not (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x)
- (or (at-y ?b ?y_up)
- (at-y ?b ?y_down)
-) (at-z ?b ?z_end)
-))) (exists (?i - item) (and 
-(item-present ?i)
- (at-x ?i ?x)
- (at-y ?i ?y_down)
- (at-z ?i ?z_end)
-)) (agent-has-n-diamond ?ag ?n_start)
-)
+(and 
+(item-present ?i) (= (x ?i) (x ?ag)) (= (y ?i) (y ?ag)) (= (z ?i) (+ (z ?ag) -1))) (not (exists (?b - block) (and 
+(= (x ?b) (x ?ag)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (+ (z ?ag) -1))))))
 	:effect (and 
-(not (at-z ?ag ?z_start)
-) (at-z ?ag ?z_end)
- (not (agent-has-n-diamond ?ag ?n_start)
-) (not (at-x ?i ?x)
-) (not (at-y ?i ?y_down)
-) (not (at-z ?i ?z_end)
-) (agent-has-n-diamond ?ag ?n_end)
- (not (item-present ?i)))
+(increase (agent-num-diamond ?ag) 1) (not (item-present ?i)) (decrease (z ?ag) 1))
 )
 
 
-(:action move-south-and-pickup-diamond
-	:parameters (?ag - agent ?i - diamond ?x - position ?y_up - position ?y_down - position ?z_start - position ?z_end - position ?n_start - count ?n_end - count)
+(:action move_and_pickup-diamond-south
+	:parameters (?ag - agent ?i - diamond)
 	:precondition (and 
-(agent-alive ?ag)
- (at-x ?ag ?x)
- (at-y ?ag ?y_down)
- (at-z ?ag ?z_start)
- (are-seq ?z_start ?z_end)
- (are-seq ?y_down ?y_up)
- (not (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x)
- (or (at-y ?b ?y_up)
- (at-y ?b ?y_down)
-) (at-z ?b ?z_end)
-))) (exists (?i - item) (and 
-(item-present ?i)
- (at-x ?i ?x)
- (at-y ?i ?y_down)
- (at-z ?i ?z_end)
-)) (agent-has-n-diamond ?ag ?n_start)
-)
+(and 
+(item-present ?i) (= (x ?i) (x ?ag)) (= (y ?i) (y ?ag)) (= (z ?i) (+ (z ?ag) 1))) (not (exists (?b - block) (and 
+(= (x ?b) (x ?ag)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (+ (z ?ag) 1))))))
 	:effect (and 
-(not (at-z ?ag ?z_start)
-) (at-z ?ag ?z_end)
- (not (agent-has-n-diamond ?ag ?n_start)
-) (not (at-x ?i ?x)
-) (not (at-y ?i ?y_down)
-) (not (at-z ?i ?z_end)
-) (agent-has-n-diamond ?ag ?n_end)
- (not (item-present ?i)))
+(increase (agent-num-diamond ?ag) 1) (not (item-present ?i)) (increase (z ?ag) 1))
 )
 
 
-(:action move-east-and-pickup-diamond
-	:parameters (?ag - agent ?i - diamond ?z - position ?x_start - position ?x_end - position ?y_up - position ?y_down - position ?n_start - count ?n_end - count)
+(:action move_and_pickup-diamond-east
+	:parameters (?ag - agent ?i - diamond)
 	:precondition (and 
-(agent-alive ?ag)
- (at-x ?ag ?x_start)
- (at-y ?ag ?y_down)
- (at-z ?ag ?z)
- (are-seq ?x_start ?x_end)
- (are-seq ?y_down ?y_up)
- (not (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x_end)
- (or (at-y ?b ?y_up)
- (at-y ?b ?y_down)
-) (at-z ?b ?z)
-))) (exists (?i - item) (and 
-(item-present ?i)
- (at-x ?i ?x_end)
- (at-y ?i ?y_down)
- (at-z ?i ?z)
-)) (agent-has-n-diamond ?ag ?n_start)
-)
+(and 
+(item-present ?i) (= (x ?i) (+ (x ?ag) 1)) (= (y ?i) (y ?ag)) (= (z ?i) (z ?ag))) (not (exists (?b - block) (and 
+(= (x ?b) (+ (x ?ag) 1)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (z ?ag))))))
 	:effect (and 
-(not (at-x ?ag ?x_start)
-) (at-x ?ag ?x_end)
- (not (agent-has-n-diamond ?ag ?n_start)
-) (not (at-x ?i ?x_end)
-) (not (at-y ?i ?y_down)
-) (not (at-z ?i ?z)
-) (agent-has-n-diamond ?ag ?n_end)
- (not (item-present ?i)))
+(increase (agent-num-diamond ?ag) 1) (not (item-present ?i)) (increase (x ?ag) 1))
 )
 
 
-(:action move-west-and-pickup-diamond
-	:parameters (?ag - agent ?i - diamond ?z - position ?x_start - position ?x_end - position ?y_up - position ?y_down - position ?n_start - count ?n_end - count)
+(:action move_and_pickup-diamond-west
+	:parameters (?ag - agent ?i - diamond)
 	:precondition (and 
-(agent-alive ?ag)
- (at-x ?ag ?x_start)
- (at-y ?ag ?y_down)
- (at-z ?ag ?z)
- (are-seq ?x_end ?x_start)
- (are-seq ?y_down ?y_up)
- (not (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x_end)
- (or (at-y ?b ?y_up)
- (at-y ?b ?y_down)
-) (at-z ?b ?z)
-))) (exists (?i - item) (and 
-(item-present ?i)
- (at-x ?i ?x_end)
- (at-y ?i ?y_down)
- (at-z ?i ?z)
-)) (agent-has-n-diamond ?ag ?n_start)
-)
+(and 
+(item-present ?i) (= (x ?i) (+ (x ?ag) -1)) (= (y ?i) (y ?ag)) (= (z ?i) (z ?ag))) (not (exists (?b - block) (and 
+(= (x ?b) (+ (x ?ag) -1)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (z ?ag))))))
 	:effect (and 
-(not (at-x ?ag ?x_start)
-) (at-x ?ag ?x_end)
- (not (agent-has-n-diamond ?ag ?n_start)
-) (not (at-x ?i ?x_end)
-) (not (at-y ?i ?y_down)
-) (not (at-z ?i ?z)
-) (agent-has-n-diamond ?ag ?n_end)
- (not (item-present ?i)))
+(increase (agent-num-diamond ?ag) 1) (not (item-present ?i)) (decrease (x ?ag) 1))
 )
 
 
-(:action move-north-and-pickup-oak-log
-	:parameters (?ag - agent ?i - oak-log ?x - position ?y_up - position ?y_down - position ?z_start - position ?z_end - position ?n_start - count ?n_end - count)
+(:action move_and_pickup-oak-log-north
+	:parameters (?ag - agent ?i - oak-log)
 	:precondition (and 
-(agent-alive ?ag)
- (at-x ?ag ?x)
- (at-y ?ag ?y_down)
- (at-z ?ag ?z_start)
- (are-seq ?z_end ?z_start)
- (are-seq ?y_down ?y_up)
- (not (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x)
- (or (at-y ?b ?y_up)
- (at-y ?b ?y_down)
-) (at-z ?b ?z_end)
-))) (exists (?i - item) (and 
-(item-present ?i)
- (at-x ?i ?x)
- (at-y ?i ?y_down)
- (at-z ?i ?z_end)
-)) (agent-has-n-oak-log ?ag ?n_start)
-)
+(and 
+(item-present ?i) (= (x ?i) (x ?ag)) (= (y ?i) (y ?ag)) (= (z ?i) (+ (z ?ag) -1))) (not (exists (?b - block) (and 
+(= (x ?b) (x ?ag)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (+ (z ?ag) -1))))))
 	:effect (and 
-(not (at-z ?ag ?z_start)
-) (at-z ?ag ?z_end)
- (not (agent-has-n-oak-log ?ag ?n_start)
-) (not (at-x ?i ?x)
-) (not (at-y ?i ?y_down)
-) (not (at-z ?i ?z_end)
-) (agent-has-n-oak-log ?ag ?n_end)
- (not (item-present ?i)))
+(increase (agent-num-oak-log ?ag) 1) (not (item-present ?i)) (decrease (z ?ag) 1))
 )
 
 
-(:action move-south-and-pickup-oak-log
-	:parameters (?ag - agent ?i - oak-log ?x - position ?y_up - position ?y_down - position ?z_start - position ?z_end - position ?n_start - count ?n_end - count)
+(:action move_and_pickup-oak-log-south
+	:parameters (?ag - agent ?i - oak-log)
 	:precondition (and 
-(agent-alive ?ag)
- (at-x ?ag ?x)
- (at-y ?ag ?y_down)
- (at-z ?ag ?z_start)
- (are-seq ?z_start ?z_end)
- (are-seq ?y_down ?y_up)
- (not (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x)
- (or (at-y ?b ?y_up)
- (at-y ?b ?y_down)
-) (at-z ?b ?z_end)
-))) (exists (?i - item) (and 
-(item-present ?i)
- (at-x ?i ?x)
- (at-y ?i ?y_down)
- (at-z ?i ?z_end)
-)) (agent-has-n-oak-log ?ag ?n_start)
-)
+(and 
+(item-present ?i) (= (x ?i) (x ?ag)) (= (y ?i) (y ?ag)) (= (z ?i) (+ (z ?ag) 1))) (not (exists (?b - block) (and 
+(= (x ?b) (x ?ag)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (+ (z ?ag) 1))))))
 	:effect (and 
-(not (at-z ?ag ?z_start)
-) (at-z ?ag ?z_end)
- (not (agent-has-n-oak-log ?ag ?n_start)
-) (not (at-x ?i ?x)
-) (not (at-y ?i ?y_down)
-) (not (at-z ?i ?z_end)
-) (agent-has-n-oak-log ?ag ?n_end)
- (not (item-present ?i)))
+(increase (agent-num-oak-log ?ag) 1) (not (item-present ?i)) (increase (z ?ag) 1))
 )
 
 
-(:action move-east-and-pickup-oak-log
-	:parameters (?ag - agent ?i - oak-log ?z - position ?x_start - position ?x_end - position ?y_up - position ?y_down - position ?n_start - count ?n_end - count)
+(:action move_and_pickup-oak-log-east
+	:parameters (?ag - agent ?i - oak-log)
 	:precondition (and 
-(agent-alive ?ag)
- (at-x ?ag ?x_start)
- (at-y ?ag ?y_down)
- (at-z ?ag ?z)
- (are-seq ?x_start ?x_end)
- (are-seq ?y_down ?y_up)
- (not (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x_end)
- (or (at-y ?b ?y_up)
- (at-y ?b ?y_down)
-) (at-z ?b ?z)
-))) (exists (?i - item) (and 
-(item-present ?i)
- (at-x ?i ?x_end)
- (at-y ?i ?y_down)
- (at-z ?i ?z)
-)) (agent-has-n-oak-log ?ag ?n_start)
-)
+(and 
+(item-present ?i) (= (x ?i) (+ (x ?ag) 1)) (= (y ?i) (y ?ag)) (= (z ?i) (z ?ag))) (not (exists (?b - block) (and 
+(= (x ?b) (+ (x ?ag) 1)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (z ?ag))))))
 	:effect (and 
-(not (at-x ?ag ?x_start)
-) (at-x ?ag ?x_end)
- (not (agent-has-n-oak-log ?ag ?n_start)
-) (not (at-x ?i ?x_end)
-) (not (at-y ?i ?y_down)
-) (not (at-z ?i ?z)
-) (agent-has-n-oak-log ?ag ?n_end)
- (not (item-present ?i)))
+(increase (agent-num-oak-log ?ag) 1) (not (item-present ?i)) (increase (x ?ag) 1))
 )
 
 
-(:action move-west-and-pickup-oak-log
-	:parameters (?ag - agent ?i - oak-log ?z - position ?x_start - position ?x_end - position ?y_up - position ?y_down - position ?n_start - count ?n_end - count)
+(:action move_and_pickup-oak-log-west
+	:parameters (?ag - agent ?i - oak-log)
 	:precondition (and 
-(agent-alive ?ag)
- (at-x ?ag ?x_start)
- (at-y ?ag ?y_down)
- (at-z ?ag ?z)
- (are-seq ?x_end ?x_start)
- (are-seq ?y_down ?y_up)
- (not (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x_end)
- (or (at-y ?b ?y_up)
- (at-y ?b ?y_down)
-) (at-z ?b ?z)
-))) (exists (?i - item) (and 
-(item-present ?i)
- (at-x ?i ?x_end)
- (at-y ?i ?y_down)
- (at-z ?i ?z)
-)) (agent-has-n-oak-log ?ag ?n_start)
-)
+(and 
+(item-present ?i) (= (x ?i) (+ (x ?ag) -1)) (= (y ?i) (y ?ag)) (= (z ?i) (z ?ag))) (not (exists (?b - block) (and 
+(= (x ?b) (+ (x ?ag) -1)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (z ?ag))))))
 	:effect (and 
-(not (at-x ?ag ?x_start)
-) (at-x ?ag ?x_end)
- (not (agent-has-n-oak-log ?ag ?n_start)
-) (not (at-x ?i ?x_end)
-) (not (at-y ?i ?y_down)
-) (not (at-z ?i ?z)
-) (agent-has-n-oak-log ?ag ?n_end)
- (not (item-present ?i)))
+(increase (agent-num-oak-log ?ag) 1) (not (item-present ?i)) (decrease (x ?ag) 1))
 )
 
 
-(:action move-north-and-pickup-log
-	:parameters (?ag - agent ?i - log ?x - position ?y_up - position ?y_down - position ?z_start - position ?z_end - position ?n_start - count ?n_end - count)
+(:action move_and_pickup-log-north
+	:parameters (?ag - agent ?i - log)
 	:precondition (and 
-(agent-alive ?ag)
- (at-x ?ag ?x)
- (at-y ?ag ?y_down)
- (at-z ?ag ?z_start)
- (are-seq ?z_end ?z_start)
- (are-seq ?y_down ?y_up)
- (not (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x)
- (or (at-y ?b ?y_up)
- (at-y ?b ?y_down)
-) (at-z ?b ?z_end)
-))) (exists (?i - item) (and 
-(item-present ?i)
- (at-x ?i ?x)
- (at-y ?i ?y_down)
- (at-z ?i ?z_end)
-)) (agent-has-n-log ?ag ?n_start)
-)
+(and 
+(item-present ?i) (= (x ?i) (x ?ag)) (= (y ?i) (y ?ag)) (= (z ?i) (+ (z ?ag) -1))) (not (exists (?b - block) (and 
+(= (x ?b) (x ?ag)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (+ (z ?ag) -1))))))
 	:effect (and 
-(not (at-z ?ag ?z_start)
-) (at-z ?ag ?z_end)
- (not (agent-has-n-log ?ag ?n_start)
-) (not (at-x ?i ?x)
-) (not (at-y ?i ?y_down)
-) (not (at-z ?i ?z_end)
-) (agent-has-n-log ?ag ?n_end)
- (not (item-present ?i)))
+(increase (agent-num-log ?ag) 1) (not (item-present ?i)) (decrease (z ?ag) 1))
 )
 
 
-(:action move-south-and-pickup-log
-	:parameters (?ag - agent ?i - log ?x - position ?y_up - position ?y_down - position ?z_start - position ?z_end - position ?n_start - count ?n_end - count)
+(:action move_and_pickup-log-south
+	:parameters (?ag - agent ?i - log)
 	:precondition (and 
-(agent-alive ?ag)
- (at-x ?ag ?x)
- (at-y ?ag ?y_down)
- (at-z ?ag ?z_start)
- (are-seq ?z_start ?z_end)
- (are-seq ?y_down ?y_up)
- (not (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x)
- (or (at-y ?b ?y_up)
- (at-y ?b ?y_down)
-) (at-z ?b ?z_end)
-))) (exists (?i - item) (and 
-(item-present ?i)
- (at-x ?i ?x)
- (at-y ?i ?y_down)
- (at-z ?i ?z_end)
-)) (agent-has-n-log ?ag ?n_start)
-)
+(and 
+(item-present ?i) (= (x ?i) (x ?ag)) (= (y ?i) (y ?ag)) (= (z ?i) (+ (z ?ag) 1))) (not (exists (?b - block) (and 
+(= (x ?b) (x ?ag)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (+ (z ?ag) 1))))))
 	:effect (and 
-(not (at-z ?ag ?z_start)
-) (at-z ?ag ?z_end)
- (not (agent-has-n-log ?ag ?n_start)
-) (not (at-x ?i ?x)
-) (not (at-y ?i ?y_down)
-) (not (at-z ?i ?z_end)
-) (agent-has-n-log ?ag ?n_end)
- (not (item-present ?i)))
+(increase (agent-num-log ?ag) 1) (not (item-present ?i)) (increase (z ?ag) 1))
 )
 
 
-(:action move-east-and-pickup-log
-	:parameters (?ag - agent ?i - log ?z - position ?x_start - position ?x_end - position ?y_up - position ?y_down - position ?n_start - count ?n_end - count)
+(:action move_and_pickup-log-east
+	:parameters (?ag - agent ?i - log)
 	:precondition (and 
-(agent-alive ?ag)
- (at-x ?ag ?x_start)
- (at-y ?ag ?y_down)
- (at-z ?ag ?z)
- (are-seq ?x_start ?x_end)
- (are-seq ?y_down ?y_up)
- (not (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x_end)
- (or (at-y ?b ?y_up)
- (at-y ?b ?y_down)
-) (at-z ?b ?z)
-))) (exists (?i - item) (and 
-(item-present ?i)
- (at-x ?i ?x_end)
- (at-y ?i ?y_down)
- (at-z ?i ?z)
-)) (agent-has-n-log ?ag ?n_start)
-)
+(and 
+(item-present ?i) (= (x ?i) (+ (x ?ag) 1)) (= (y ?i) (y ?ag)) (= (z ?i) (z ?ag))) (not (exists (?b - block) (and 
+(= (x ?b) (+ (x ?ag) 1)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (z ?ag))))))
 	:effect (and 
-(not (at-x ?ag ?x_start)
-) (at-x ?ag ?x_end)
- (not (agent-has-n-log ?ag ?n_start)
-) (not (at-x ?i ?x_end)
-) (not (at-y ?i ?y_down)
-) (not (at-z ?i ?z)
-) (agent-has-n-log ?ag ?n_end)
- (not (item-present ?i)))
+(increase (agent-num-log ?ag) 1) (not (item-present ?i)) (increase (x ?ag) 1))
 )
 
 
-(:action move-west-and-pickup-log
-	:parameters (?ag - agent ?i - log ?z - position ?x_start - position ?x_end - position ?y_up - position ?y_down - position ?n_start - count ?n_end - count)
+(:action move_and_pickup-log-west
+	:parameters (?ag - agent ?i - log)
 	:precondition (and 
-(agent-alive ?ag)
- (at-x ?ag ?x_start)
- (at-y ?ag ?y_down)
- (at-z ?ag ?z)
- (are-seq ?x_end ?x_start)
- (are-seq ?y_down ?y_up)
- (not (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x_end)
- (or (at-y ?b ?y_up)
- (at-y ?b ?y_down)
-) (at-z ?b ?z)
-))) (exists (?i - item) (and 
-(item-present ?i)
- (at-x ?i ?x_end)
- (at-y ?i ?y_down)
- (at-z ?i ?z)
-)) (agent-has-n-log ?ag ?n_start)
-)
+(and 
+(item-present ?i) (= (x ?i) (+ (x ?ag) -1)) (= (y ?i) (y ?ag)) (= (z ?i) (z ?ag))) (not (exists (?b - block) (and 
+(= (x ?b) (+ (x ?ag) -1)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (z ?ag))))))
 	:effect (and 
-(not (at-x ?ag ?x_start)
-) (at-x ?ag ?x_end)
- (not (agent-has-n-log ?ag ?n_start)
-) (not (at-x ?i ?x_end)
-) (not (at-y ?i ?y_down)
-) (not (at-z ?i ?z)
-) (agent-has-n-log ?ag ?n_end)
- (not (item-present ?i)))
+(increase (agent-num-log ?ag) 1) (not (item-present ?i)) (decrease (x ?ag) 1))
 )
 
 
-(:action move-north-and-pickup-obsidian
-	:parameters (?ag - agent ?i - obsidian ?x - position ?y_up - position ?y_down - position ?z_start - position ?z_end - position ?n_start - count ?n_end - count)
+(:action move_and_pickup-obsidian-north
+	:parameters (?ag - agent ?i - obsidian)
 	:precondition (and 
-(agent-alive ?ag)
- (at-x ?ag ?x)
- (at-y ?ag ?y_down)
- (at-z ?ag ?z_start)
- (are-seq ?z_end ?z_start)
- (are-seq ?y_down ?y_up)
- (not (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x)
- (or (at-y ?b ?y_up)
- (at-y ?b ?y_down)
-) (at-z ?b ?z_end)
-))) (exists (?i - item) (and 
-(item-present ?i)
- (at-x ?i ?x)
- (at-y ?i ?y_down)
- (at-z ?i ?z_end)
-)) (agent-has-n-obsidian ?ag ?n_start)
-)
+(and 
+(item-present ?i) (= (x ?i) (x ?ag)) (= (y ?i) (y ?ag)) (= (z ?i) (+ (z ?ag) -1))) (not (exists (?b - block) (and 
+(= (x ?b) (x ?ag)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (+ (z ?ag) -1))))))
 	:effect (and 
-(not (at-z ?ag ?z_start)
-) (at-z ?ag ?z_end)
- (not (agent-has-n-obsidian ?ag ?n_start)
-) (not (at-x ?i ?x)
-) (not (at-y ?i ?y_down)
-) (not (at-z ?i ?z_end)
-) (agent-has-n-obsidian ?ag ?n_end)
- (not (item-present ?i)))
+(increase (agent-num-obsidian ?ag) 1) (not (item-present ?i)) (decrease (z ?ag) 1))
 )
 
 
-(:action move-south-and-pickup-obsidian
-	:parameters (?ag - agent ?i - obsidian ?x - position ?y_up - position ?y_down - position ?z_start - position ?z_end - position ?n_start - count ?n_end - count)
+(:action move_and_pickup-obsidian-south
+	:parameters (?ag - agent ?i - obsidian)
 	:precondition (and 
-(agent-alive ?ag)
- (at-x ?ag ?x)
- (at-y ?ag ?y_down)
- (at-z ?ag ?z_start)
- (are-seq ?z_start ?z_end)
- (are-seq ?y_down ?y_up)
- (not (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x)
- (or (at-y ?b ?y_up)
- (at-y ?b ?y_down)
-) (at-z ?b ?z_end)
-))) (exists (?i - item) (and 
-(item-present ?i)
- (at-x ?i ?x)
- (at-y ?i ?y_down)
- (at-z ?i ?z_end)
-)) (agent-has-n-obsidian ?ag ?n_start)
-)
+(and 
+(item-present ?i) (= (x ?i) (x ?ag)) (= (y ?i) (y ?ag)) (= (z ?i) (+ (z ?ag) 1))) (not (exists (?b - block) (and 
+(= (x ?b) (x ?ag)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (+ (z ?ag) 1))))))
 	:effect (and 
-(not (at-z ?ag ?z_start)
-) (at-z ?ag ?z_end)
- (not (agent-has-n-obsidian ?ag ?n_start)
-) (not (at-x ?i ?x)
-) (not (at-y ?i ?y_down)
-) (not (at-z ?i ?z_end)
-) (agent-has-n-obsidian ?ag ?n_end)
- (not (item-present ?i)))
+(increase (agent-num-obsidian ?ag) 1) (not (item-present ?i)) (increase (z ?ag) 1))
 )
 
 
-(:action move-east-and-pickup-obsidian
-	:parameters (?ag - agent ?i - obsidian ?z - position ?x_start - position ?x_end - position ?y_up - position ?y_down - position ?n_start - count ?n_end - count)
+(:action move_and_pickup-obsidian-east
+	:parameters (?ag - agent ?i - obsidian)
 	:precondition (and 
-(agent-alive ?ag)
- (at-x ?ag ?x_start)
- (at-y ?ag ?y_down)
- (at-z ?ag ?z)
- (are-seq ?x_start ?x_end)
- (are-seq ?y_down ?y_up)
- (not (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x_end)
- (or (at-y ?b ?y_up)
- (at-y ?b ?y_down)
-) (at-z ?b ?z)
-))) (exists (?i - item) (and 
-(item-present ?i)
- (at-x ?i ?x_end)
- (at-y ?i ?y_down)
- (at-z ?i ?z)
-)) (agent-has-n-obsidian ?ag ?n_start)
-)
+(and 
+(item-present ?i) (= (x ?i) (+ (x ?ag) 1)) (= (y ?i) (y ?ag)) (= (z ?i) (z ?ag))) (not (exists (?b - block) (and 
+(= (x ?b) (+ (x ?ag) 1)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (z ?ag))))))
 	:effect (and 
-(not (at-x ?ag ?x_start)
-) (at-x ?ag ?x_end)
- (not (agent-has-n-obsidian ?ag ?n_start)
-) (not (at-x ?i ?x_end)
-) (not (at-y ?i ?y_down)
-) (not (at-z ?i ?z)
-) (agent-has-n-obsidian ?ag ?n_end)
- (not (item-present ?i)))
+(increase (agent-num-obsidian ?ag) 1) (not (item-present ?i)) (increase (x ?ag) 1))
 )
 
 
-(:action move-west-and-pickup-obsidian
-	:parameters (?ag - agent ?i - obsidian ?z - position ?x_start - position ?x_end - position ?y_up - position ?y_down - position ?n_start - count ?n_end - count)
+(:action move_and_pickup-obsidian-west
+	:parameters (?ag - agent ?i - obsidian)
 	:precondition (and 
-(agent-alive ?ag)
- (at-x ?ag ?x_start)
- (at-y ?ag ?y_down)
- (at-z ?ag ?z)
- (are-seq ?x_end ?x_start)
- (are-seq ?y_down ?y_up)
- (not (exists (?b - block) (and 
-(block-present ?b)
- (at-x ?b ?x_end)
- (or (at-y ?b ?y_up)
- (at-y ?b ?y_down)
-) (at-z ?b ?z)
-))) (exists (?i - item) (and 
-(item-present ?i)
- (at-x ?i ?x_end)
- (at-y ?i ?y_down)
- (at-z ?i ?z)
-)) (agent-has-n-obsidian ?ag ?n_start)
-)
+(and 
+(item-present ?i) (= (x ?i) (+ (x ?ag) -1)) (= (y ?i) (y ?ag)) (= (z ?i) (z ?ag))) (not (exists (?b - block) (and 
+(= (x ?b) (+ (x ?ag) -1)) (= (y ?b) (+ (y ?ag) 1)) (= (z ?b) (z ?ag))))))
 	:effect (and 
-(not (at-x ?ag ?x_start)
-) (at-x ?ag ?x_end)
- (not (agent-has-n-obsidian ?ag ?n_start)
-) (not (at-x ?i ?x_end)
-) (not (at-y ?i ?y_down)
-) (not (at-z ?i ?z)
-) (agent-has-n-obsidian ?ag ?n_end)
- (not (item-present ?i)))
+(increase (agent-num-obsidian ?ag) 1) (not (item-present ?i)) (decrease (x ?ag) 1))
 )
 
 
-(:action check-goal
+(:action checkgoal
 	:parameters (?ag - agent)
 	:precondition (and 
 (exists (?b - log-block) (and 
-(at-x ?b position0)
- (at-y ?b position4)
- (at-z ?b position-2)
-))
-	 (or (agent-has-n-log ?ag count1)
- (agent-has-n-log ?ag count2)
- (agent-has-n-log ?ag count3)
- (agent-has-n-log ?ag count4)
- (agent-has-n-log ?ag count5)
- (agent-has-n-log ?ag count6)
- (agent-has-n-log ?ag count7)
- (agent-has-n-log ?ag count8)
- (agent-has-n-log ?ag count9)
- (agent-has-n-log ?ag count10)
- (agent-has-n-log ?ag count11)
- (agent-has-n-log ?ag count12)
- (agent-has-n-log ?ag count13)
- (agent-has-n-log ?ag count14)
- (agent-has-n-log ?ag count15)
- (agent-has-n-log ?ag count16)
- (agent-has-n-log ?ag count17)
- (agent-has-n-log ?ag count18)
- (agent-has-n-log ?ag count19)
- (agent-has-n-log ?ag count20)
- (agent-has-n-log ?ag count21)
- (agent-has-n-log ?ag count22)
- (agent-has-n-log ?ag count23)
- (agent-has-n-log ?ag count24)
- (agent-has-n-log ?ag count25)
- (agent-has-n-log ?ag count26)
- (agent-has-n-log ?ag count27)
- (agent-has-n-log ?ag count28)
- (agent-has-n-log ?ag count29)
- (agent-has-n-log ?ag count30)
- (agent-has-n-log ?ag count31)
- (agent-has-n-log ?ag count32)
- (agent-has-n-log ?ag count33)
- (agent-has-n-log ?ag count34)
- (agent-has-n-log ?ag count35)
- (agent-has-n-log ?ag count36)
- (agent-has-n-log ?ag count37)
- (agent-has-n-log ?ag count38)
- (agent-has-n-log ?ag count39)
- (agent-has-n-log ?ag count40)
- (agent-has-n-log ?ag count41)
- (agent-has-n-log ?ag count42)
- (agent-has-n-log ?ag count43)
- (agent-has-n-log ?ag count44)
- (agent-has-n-log ?ag count45)
- (agent-has-n-log ?ag count46)
- (agent-has-n-log ?ag count47)
- (agent-has-n-log ?ag count48)
- (agent-has-n-log ?ag count49)
- (agent-has-n-log ?ag count50)
- (agent-has-n-log ?ag count51)
- (agent-has-n-log ?ag count52)
- (agent-has-n-log ?ag count53)
- (agent-has-n-log ?ag count54)
- (agent-has-n-log ?ag count55)
- (agent-has-n-log ?ag count56)
- (agent-has-n-log ?ag count57)
- (agent-has-n-log ?ag count58)
- (agent-has-n-log ?ag count59)
- (agent-has-n-log ?ag count60)
- (agent-has-n-log ?ag count61)
- (agent-has-n-log ?ag count62)
- (agent-has-n-log ?ag count63)
-))
+(= (x ?b) 0) (= (y ?b) 4) (= (z ?b) -2)))
+	 (>= (agent-num-log ?ag) 1))
 	:effect (and 
 (goal-achieved ?ag))
 )

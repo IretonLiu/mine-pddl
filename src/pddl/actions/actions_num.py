@@ -559,7 +559,13 @@ class JumpUp(Action):
             ),
             # there must not be an item where we are landing - we don't need to check above us because of gravity
             pddl_not(
-                False, "?i", x_modifier=x_modifier, y_modifier=1, z_modifier=z_modifier
+                block_or_item_exists_at_location(
+                    False,
+                    "?i",
+                    x_modifier=x_modifier,
+                    y_modifier=1,
+                    z_modifier=z_modifier,
+                )
             ),
         )
 

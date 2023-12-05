@@ -30,6 +30,8 @@ from pddl.problem import Problem
 - 
 """
 
+# todo: unify the domain and problem views items and blocks (everything needs to be present in both items and blocks)
+
 
 def generate_or_execute_pddl(args):
     # todo: process the agent's inventory - will go into the items dict
