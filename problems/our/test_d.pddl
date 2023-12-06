@@ -4122,7 +4122,7 @@
 	:precondition (and 
 (exists (?b - planks-block) (and 
 (at-x ?b position7)
- (at-y ?b position8)
+ (at-y ?b position4)
  (at-z ?b position0)
 ))
 	 )

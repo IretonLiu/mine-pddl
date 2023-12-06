@@ -267,8 +267,7 @@ class MoveAndPickup(Action):
             )
         self.effects = pddl_and(
             pddl_increase(
-                # type: ignore
-                f"({InventoryFunction.var_name.format(self.item)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                f"({InventoryFunction.var_name.format(self.item)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",  # type: ignore
                 "1",
             ),
             pddl_not(f"({ItemPresentPredicate.var_name} {self.parameters[self.item]})"),
@@ -345,8 +344,7 @@ class Break(Action):
                 f"({BlockPresentPredicate.var_name} {self.parameters[self.block]})"
             ),
             pddl_increase(
-                # type: ignore
-                f"({InventoryFunction.var_name.format(self.item)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                f"({InventoryFunction.var_name.format(self.item)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",  # type: ignore
                 "1",
             ),
         )
@@ -414,11 +412,12 @@ class Place(Action):
             (1 if self.place_pos_axis else -1) if not self.place_east_west else 0
         )
 
+        # todo: make sure that num inventory items > 0
         self.preconditions = pddl_and(
             block_exists_at_location(
                 "?bl",
                 x_modifier=x_modifier,
-                y_modifier=1,  # There must be a block underneath
+                y_modifier=-1,  # There must be a block underneath
                 z_modifier=z_modifier,
             ),
             pddl_not(
@@ -428,6 +427,11 @@ class Place(Action):
                     x_modifier=x_modifier,
                     z_modifier=z_modifier,
                 ),
+            ),
+            # there must be an item in the inventory to place
+            pddl_ge(
+                f"({InventoryFunction.var_name.format(self.item)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",  # type: ignore
+                "1",
             ),
         )
 
@@ -459,8 +463,7 @@ class Place(Action):
             block_assign_at_location_component(YPositionFunction, 0),
             block_assign_at_location_component(ZPositionFunction, z_modifier),
             pddl_decrease(
-                # type: ignore
-                f"({InventoryFunction.var_name.format(self.item)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                f"({InventoryFunction.var_name.format(self.item)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",  # type: ignore
                 "1",
             ),
         )
@@ -744,8 +747,7 @@ class JumpUpAndPickup(Action):
             ),
             # handle the removal of the item from the world and the updating of the inventory
             pddl_increase(
-                # type: ignore
-                f"({InventoryFunction.var_name.format(self.item_to_pickup)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                f"({InventoryFunction.var_name.format(self.item_to_pickup)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",  # type: ignore
                 "1",
             ),
             pddl_not(
@@ -1033,8 +1035,7 @@ class JumpDownAndPickup(Action):
             ),
             # handle the removal of the item from the world and the updating of the inventory
             pddl_increase(
-                # type: ignore
-                f"({InventoryFunction.var_name.format(self.item_to_pickup)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                f"({InventoryFunction.var_name.format(self.item_to_pickup)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",  # type: ignore
                 "1",
             ),
             pddl_not(
@@ -1087,8 +1088,7 @@ class CheckGoal(Action):
         for item in inventory:
             # each item in the inventory needs to have at least the specified quantity
             item_pddl += pddl_ge(
-                # type: ignore
-                f"({InventoryFunction.var_name.format(item['type'])} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                f"({InventoryFunction.var_name.format(item['type'])} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",  # type: ignore
                 str(item["quantity"]),
             )
 

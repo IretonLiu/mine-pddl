@@ -82,7 +82,7 @@ class GoalAchievedPredicate(Predicate):
 
     @staticmethod
     def to_precondition(agent: str):
-        return f"({GoalAchievedPredicate.var_name} ?{agent})"
+        return f"({GoalAchievedPredicate.var_name} {agent})"
 
 
 # for propositional logic

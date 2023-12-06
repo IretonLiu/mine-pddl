@@ -2348,7 +2348,7 @@
 	(not (item-present planks0))
 )
 (:goal
-	(and (goal-achieved ?steve))
+	(and (goal-achieved steve))
 		
 )
 )
