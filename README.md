@@ -162,5 +162,5 @@ They will be bulit and run using Docker and the Docker Compose plugin, which can
 3. Run the planner
 
     ```shell
-    docker compose run downward --alias lama-first pddl/<path to domain file> pddl/<path to problem file>
+    docker compose run downward --alias lama-first --plan-file pddl/<path-to-plan-file> pddl/<path-to-domain-file> pddl/<path-to-problem-file>
     ```
