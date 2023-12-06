@@ -267,7 +267,8 @@ class MoveAndPickup(Action):
             )
         self.effects = pddl_and(
             pddl_increase(
-                f"({InventoryFunction.var_name.format(self.item)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",  # type: ignore
+                # type: ignore
+                f"({InventoryFunction.var_name.format(self.item)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
                 "1",
             ),
             pddl_not(f"({ItemPresentPredicate.var_name} {self.parameters[self.item]})"),
@@ -344,7 +345,8 @@ class Break(Action):
                 f"({BlockPresentPredicate.var_name} {self.parameters[self.block]})"
             ),
             pddl_increase(
-                f"({InventoryFunction.var_name.format(self.item)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",  # type: ignore
+                # type: ignore
+                f"({InventoryFunction.var_name.format(self.item)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
                 "1",
             ),
         )
@@ -457,7 +459,8 @@ class Place(Action):
             block_assign_at_location_component(YPositionFunction, 0),
             block_assign_at_location_component(ZPositionFunction, z_modifier),
             pddl_decrease(
-                f"({InventoryFunction.var_name.format(self.item)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",  # type: ignore
+                # type: ignore
+                f"({InventoryFunction.var_name.format(self.item)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
                 "1",
             ),
         )
@@ -741,7 +744,8 @@ class JumpUpAndPickup(Action):
             ),
             # handle the removal of the item from the world and the updating of the inventory
             pddl_increase(
-                f"({InventoryFunction.var_name.format(self.item_to_pickup)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",  # type: ignore
+                # type: ignore
+                f"({InventoryFunction.var_name.format(self.item_to_pickup)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
                 "1",
             ),
             pddl_not(
@@ -1029,7 +1033,8 @@ class JumpDownAndPickup(Action):
             ),
             # handle the removal of the item from the world and the updating of the inventory
             pddl_increase(
-                f"({InventoryFunction.var_name.format(self.item_to_pickup)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",  # type: ignore
+                # type: ignore
+                f"({InventoryFunction.var_name.format(self.item_to_pickup)} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
                 "1",
             ),
             pddl_not(
@@ -1082,7 +1087,8 @@ class CheckGoal(Action):
         for item in inventory:
             # each item in the inventory needs to have at least the specified quantity
             item_pddl += pddl_ge(
-                f"({InventoryFunction.var_name.format(item['type'])} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",  # type: ignore
+                # type: ignore
+                f"({InventoryFunction.var_name.format(item['type'])} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
                 str(item["quantity"]),
             )
 

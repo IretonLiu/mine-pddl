@@ -72,15 +72,38 @@ def place_block(env, action_args: List[str], agent: AgentType) -> None:
     set the desired block to be one in front and one below the player
     """
     block_name = action_args[1]
+    direction = action_args[-1]
 
     # place the block in the world
     # example command: /setblock <x> <y> <z> <new block name> [variation] [oldBlockHandling:default=replace] [dataTag (for new block)]
-    command = "/setblock {} {} {} {}".format(
-        agent.functions[XPositionFunction].value,
-        agent.functions[YPositionFunction].value,
-        agent.functions[ZPositionFunction].value + 1,
-        block_name,
-    )
+    if direction == "south":
+        command = "/setblock {} {} {} {}".format(
+            agent.functions[XPositionFunction].value,
+            agent.functions[YPositionFunction].value,
+            agent.functions[ZPositionFunction].value + 1,
+            block_name,
+        )
+    elif direction == "north":
+        command = "/setblock {} {} {} {}".format(
+            agent.functions[XPositionFunction].value,
+            agent.functions[YPositionFunction].value,
+            agent.functions[ZPositionFunction].value - 1,
+            block_name,
+        )
+    elif direction == "east":
+        command = "/setblock {} {} {} {}".format(
+            agent.functions[XPositionFunction].value + 1,
+            agent.functions[YPositionFunction].value,
+            agent.functions[ZPositionFunction].value,
+            block_name,
+        )
+    elif direction == "west":
+        command = "/setblock {} {} {} {}".format(
+            agent.functions[XPositionFunction].value - 1,
+            agent.functions[YPositionFunction].value,
+            agent.functions[ZPositionFunction].value,
+            block_name,
+        )
     env.execute_cmd(command)
 
     # decrement this block from the agent's inventory
@@ -96,14 +119,38 @@ def break_block(env, action_args: List[str], agent: AgentType) -> None:
     break a block in front of the agent
     """
     block_name = action_args[1]
+    direction = action_args[-1]
 
     # https://www.digminecraft.com/game_commands/setblock_command.php
-    command = "/setblock {} {} {} {}".format(
-        agent.functions[XPositionFunction].value,
-        agent.functions[YPositionFunction].value,
-        agent.functions[ZPositionFunction].value + 1,
-        "air",
-    )
+    if direction == "south":
+        command = "/setblock {} {} {} {}".format(
+            agent.functions[XPositionFunction].value,
+            agent.functions[YPositionFunction].value,
+            agent.functions[ZPositionFunction].value + 1,
+            "air",
+        )
+    elif direction == "north":
+        command = "/setblock {} {} {} {}".format(
+            agent.functions[XPositionFunction].value,
+            agent.functions[YPositionFunction].value,
+            agent.functions[ZPositionFunction].value - 1,
+            "air",
+        )
+    elif direction == "east":
+        command = "/setblock {} {} {} {}".format(
+            agent.functions[XPositionFunction].value + 1,
+            agent.functions[YPositionFunction].value,
+            agent.functions[ZPositionFunction].value,
+            "air",
+        )
+    elif direction == "west":
+        command = "/setblock {} {} {} {}".format(
+            agent.functions[XPositionFunction].value - 1,
+            agent.functions[YPositionFunction].value,
+            agent.functions[ZPositionFunction].value,
+            "air",
+        )
+
     env.execute_cmd(command)
 
     # decrement this block from the agent's inventory
@@ -120,7 +167,7 @@ def jump(env, action_args: List[str], direction: int, agent):
     direction up = tp one up and one in front
     direction down = tp one behind and one down
     """
-    move_command(env, action_args, agent, direction)
+    move_command(env=env, action_args=action_args, agent=agent, jump_dir=direction)
 
 
 def get_action_from_str(
@@ -157,16 +204,18 @@ def get_action_from_str(
         return action_vector, curr_dir
 
     yaw = dir_to_yaw[action_dir]
-    exec_command = f"/tp @p ~ ~ ~ {yaw} 0"
-    env.execute_cmd(exec_command)
-    curr_dir = action_dir
+
+    if action_dir != curr_dir:
+        exec_command = f"/tp @p ~ ~ ~ {yaw} 0"
+        env.execute_cmd(exec_command)
+        curr_dir = action_dir
 
     if "move" in action_name:
         move_command(env, action_args, agent)
     elif "jumpup" in action_name:
-        jump(env, action_args, agent, 1)
+        jump(env, action_args, agent=agent, direction=1)
     elif "jumpdown" in action_name:
-        jump(env, action_args, agent, -1)
+        jump(env, action_args, agent=agent, direction=-1)
     elif action_name == "place":
         # eg action is "place-obsidian"
         # action_args will be "obsidian"

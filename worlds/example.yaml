@@ -7,14 +7,29 @@ name: "First Problem"
 # intialise all block positions
 blocks:
   - position:
-      x: '4'
+      x: '0'
       y: '4'
-      z: '0'
+      z: '1'
     type: obsidian
   - position:
-      x: '4'
-      y: '5'
+      x: '0'
+      y: '4'
+      z: '-3'
+    type: obsidian
+  - position:
+      x: '0'
+      y: '4'
       z: '-4'
+    type: obsidian
+  - position:
+      x: '0'
+      y: '4'
+      z: '-5'
+    type: obsidian
+  - position:
+      x: '0'
+      y: '5'
+      z: '-6'
     type: log
 
 # initialise all floating items in the world
