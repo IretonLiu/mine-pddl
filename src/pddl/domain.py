@@ -51,12 +51,10 @@ class Domain:
                         getattr(cls, "type_name", None)
                     )
 
-        for key in item_types:
+        for key in item_types.keys() | block_types.keys():
             types_dict["item"].append(key)
 
-        for key in block_types:
             # TODO: check if block is destructible
-
             types_dict[
                 getattr(base_pddl_types.DestructibleBlockType, "type_name")
             ].append(key + "-block")
@@ -108,6 +106,8 @@ class Domain:
                 if return_predicates:
                     for predicate in obj.predicates.values():
                         if isinstance(predicate, AgentHasNItemsPredicate):
+                            # this is a special case
+                            # the blocks can be converted to items, which is why we create this predicate for them as well
                             if items is None:
                                 raise ValueError(
                                     "Must pass items if there is an AgentHasNItemsPredicate"
@@ -205,14 +205,12 @@ class Domain:
             self.actions.append(module.Move(dir))
             self.actions.append(module.JumpUp(dir))
             self.actions.append(module.JumpDown(dir))
-            for block in blocks:
-                self.actions.append(module.Break(block, dir))
-                self.actions.append(module.Place(block, dir))
-
-            for item in items:
-                self.actions.append(module.MoveAndPickup(dir, item))
-                self.actions.append(module.JumpUpAndPickup(dir, item))
-                self.actions.append(module.JumpDownAndPickup(dir, item))
+            for key in blocks.keys() | items.keys():
+                self.actions.append(module.Break(key, dir))
+                self.actions.append(module.Place(key, dir))
+                self.actions.append(module.MoveAndPickup(dir, key))
+                self.actions.append(module.JumpUpAndPickup(dir, key))
+                self.actions.append(module.JumpDownAndPickup(dir, key))
 
         # handling check goal is special depending on what type of pddl we are using
         if self.use_propositional:
@@ -233,8 +231,8 @@ class Domain:
         file_path: str,
     ):
         pddl = f"(define (domain {self.name})\n"
-        pddl += "(:requirements :typing {} :negative-preconditions :universal-preconditions :existential-preconditions)\n".format(
-            "" if self.use_propositional else ":fluents"
+        pddl += "(:requirements :typing {}:negative-preconditions :universal-preconditions :existential-preconditions)\n".format(
+            "" if self.use_propositional else ":fluents "
         )
         pddl += self.construct_types(items, blocks) + "\n"
         pddl += self.construct_predicates(items, blocks) + "\n"

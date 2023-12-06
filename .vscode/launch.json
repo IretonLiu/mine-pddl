@@ -8,10 +8,28 @@
             "name": "Python: main.py",
             "type": "python",
             "request": "launch",
-            "args": ["--execute-plan"],
             "program": "${workspaceFolder}/src/main.py",
             "console": "integratedTerminal",
-            "justMyCode": false
+            "justMyCode": false,
+            "args": [
+                "--generate-pddl",
+                "--pddl-type",
+                "propositional",
+                "--world-config",
+                "worlds/Climb_Place_Easy.yaml",
+                "--domain-name",
+                "test_domain",
+                "--problem-name",
+                "test_problem",
+                "--domain-file",
+                "problems/our/test_d.pddl",
+                "--problem-file",
+                "problems/our/test_p.pddl",
+                "--max-inventory-stack",
+                "64",
+                "--observation-range",
+                "(8, 6, 8)"
+            ],
         }
     ]
 }

@@ -30,9 +30,7 @@ from pddl.problem import Problem
 - 
 """
 
-# todo: unify the domain and problem views items and blocks (everything needs to be present in both items and blocks)
 # todo: also add in extra problem-file pddl objects for all the inventory contents
-# todo: fix the predicates always being initialised to true
 
 
 def generate_or_execute_pddl(args):
@@ -126,13 +124,14 @@ def generate_or_execute_pddl(args):
         video_helper = VideoHelper(args.video_save_path)
         video_helper.save_image(obs["rgb"])
         curr_dir = "south"
+
+        # todo: read the plan from the file
         # action_sequence = execution_helper.read_plan(args.plan_file)
         action_sequence = [
             "move-north",
             "move-north",
-            "jumpup-north"
+            "jumpup-north",
             "place-obsidian-north",
-            
         ]
         for action_str in action_sequence:
             # get the action vector
@@ -150,10 +149,6 @@ def generate_or_execute_pddl(args):
             items, agent = extract_entities(obs, use_propositional)
             blocks = extract_blocks(obs, use_propositional)
             inventory = extract_inventory(obs, items, agent, use_propositional)
-
-        while True:
-            obs, reward, done, info = env.step(env.action_space.no_op())
-            video_helper.save_image(obs["rgb"])
 
         print(
             "plan successful: ",

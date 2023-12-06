@@ -68,21 +68,26 @@ class Problem:
         output += f"\t{agent.name} - {agent.type_name}\n"
 
         # loop through the keys of items and blocks
-        for i, d in enumerate([blocks, items]):
-            for key in d:
-                # loop through each of the values
-                temp = ""
-                for j, value in enumerate(d[key]):
-                    # include a number in the name so we can uniquely identify the item/object
+        for key in blocks.keys() | items.keys():
+            # construct the object string for both the item and block version of this type
 
-                    temp += f"{value.name}"
-                    temp += "-block" if i == 0 else ""
-                    temp += f"{j} "
+            total_occurances = 0
+            if key in blocks:
+                total_occurances += len(blocks[key])
+            if key in items:
+                total_occurances += len(items[key])
 
-                temp += f"- {key}"
-                temp += "-block" if i == 0 else ""
-                # add the temp string to the object string
-                output += f"\t{temp}\n"
+            # include an object (with a number) for each occurance of the item/block
+            item_objects = [f"{key}{i}" for i in range(total_occurances)]
+            block_objects = [f"{key}-block{i}" for i in range(total_occurances)]
+
+            # add in the object type
+            item_objects.extend(["-", key])
+            block_objects.extend(["-", f"{key}-block"])
+
+            # add the both strings to the object string
+            output += f"\t{' '.join(item_objects)}\n"
+            output += f"\t{' '.join(block_objects)}\n"
 
         if self.use_propositional:
             # add the position objects

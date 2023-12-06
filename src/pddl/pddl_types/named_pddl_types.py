@@ -21,7 +21,11 @@ class NamedItemType(ItemType):
 
 
 class NamedBlockType(DestructibleBlockType):
-    def __init__(self, use_propositional: bool, block_name: str = "default"):
+    def __init__(
+        self,
+        use_propositional: bool,
+        block_name: str = "default",
+    ):
         super().__init__(use_propositional)
         self.name = block_name
         self.name = self.name.replace(" ", "_")
