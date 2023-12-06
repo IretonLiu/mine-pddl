@@ -301,7 +301,7 @@ class MoveAndPickup(Action):
             )
 
         block_var = "?b"
-        item_var = "?i"
+        # item_var = "?i"
         self.preconditions = pddl_and(
             f"({AgentAlivePredicate.var_name} {self.param_name['Agent']})\n",
             AtXLocationPredicate.to_precondition(self.param_name["Agent"], x_start),
@@ -338,19 +338,14 @@ class MoveAndPickup(Action):
                     ),
                 )
             ),
-            # todo: this doesn't account for type of item
-            pddl_exists(
-                {TypeName.ITEM_TYPE_NAME.value: item_var},
-                pddl_and(
-                    f"({ItemPresentPredicate.var_name} {item_var})\n",
-                    AtXLocationPredicate.to_precondition(item_var, x_end),
-                    # here we only check that there is no item at the level of the agent (bottom) since items cannot float
-                    # they would require a block to be placed beneath it, which is handled by the previous precondition
-                    AtYLocationPredicate.to_precondition(
-                        item_var, self.param_name["YPositionDown"]
-                    ),
-                    AtZLocationPredicate.to_precondition(item_var, z_end),
+            # check that the required item exists at the target location
+            pddl_and(
+                f"({ItemPresentPredicate.var_name} {self.param_name['Item']})\n",
+                AtXLocationPredicate.to_precondition(self.param_name["Item"], x_end),
+                AtYLocationPredicate.to_precondition(
+                    self.param_name["Item"], self.param_name["YPositionDown"]
                 ),
+                AtZLocationPredicate.to_precondition(self.param_name["Item"], z_end),
             ),
             # add pressure for NStart to be meaningful
             AgentHasNItemsPredicate.to_precondition(
