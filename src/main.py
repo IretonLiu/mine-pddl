@@ -127,21 +127,11 @@ def generate_or_execute_pddl(args):
         curr_dir = "south"
         # action_sequence = execution_helper.read_plan(args.plan_file)
         action_sequence = [
-            "move-east",
-            # "place-obsidian",
             "move-north",
             "move-north",
-            "move-north",
-            "move-north",
-            "move-south",
-            "move-south",
-            "move-south",
-            "move-south",
-            # "break-obsidian",
-            "move-north",
-            "move-north",
-            "move-north",
-            "move-north",
+            "jumpup-north"
+            "place-obsidian-north",
+            
         ]
         for action_str in action_sequence:
             # get the action vector
@@ -159,6 +149,10 @@ def generate_or_execute_pddl(args):
             items, agent = extract_entities(obs, use_propositional)
             blocks = extract_blocks(obs, use_propositional)
             inventory = extract_inventory(obs, items, agent, use_propositional)
+
+        while True:
+            obs, reward, done, info = env.step(env.action_space.no_op())
+            video_helper.save_image(obs["rgb"])
 
         print(
             "plan successful: ",
