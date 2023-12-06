@@ -123,6 +123,7 @@ def extract_blocks(obs, use_propositional: bool):
                 block_name = voxels[x][y][z]
                 if block_name == "air":
                     continue
+
                 # Assume observation is centred at player
                 block_name = rename[block_name] if block_name in rename else block_name
                 absolute_pos = (
@@ -151,7 +152,9 @@ def extract_blocks(obs, use_propositional: bool):
                 # assign value to the predicates
                 # we are reading these items/blocks/agent from the world, so they must exist
                 for predicate in named_block.predicates.values():
-                    predicate.set_value(True)
+                    predicate.set_value(
+                        True
+                    )  # this is just the block-present predicate for now
 
                 if named_block.name not in blocks:
                     blocks[named_block.name] = [named_block]
@@ -206,7 +209,9 @@ def extract_entities(obs, use_propositional: bool) -> Tuple[Dict, AgentType]:
             # assign value to the predicates
             # we are reading these items/blocks/agent from the world, so they must exist
             for predicate in object_to_process.predicates.values():
-                predicate.set_value(True)
+                predicate.set_value(
+                    True
+                )  # this is just the item-present predicate for now
 
         elif entity["name"] == "MineDojoAgent0":
             # we are working with the agent now
@@ -218,12 +223,10 @@ def extract_entities(obs, use_propositional: bool) -> Tuple[Dict, AgentType]:
             # create a reference so we don't duplicate code
             object_to_process = agent
 
-        # for function in object_to_process.functions:
-        #     if isinstance(function, PositionFunction):
-        # set the position of the object
         if object_to_process is None:
             raise Exception("object_to_process is None")
 
+        # set the position of the object
         position = ((entity["x"]), (entity["y"]), (entity["z"]))
         object_to_process.functions[XPositionFunction].set_value(position[0])
         object_to_process.functions[YPositionFunction].set_value(position[1])

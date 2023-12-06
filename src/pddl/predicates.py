@@ -1,3 +1,4 @@
+from pddl.operators import pddl_not
 from pddl.pddl_types.types_names import TypeName
 
 
@@ -31,7 +32,7 @@ class Predicate:
         # the parent_object_name is the specific name of the object to which this applies (i.e. with the number appended)
         pddl = f"({self.var_name} {parent_object_name})"
         if not self.value:
-            pddl = f"(not {pddl})"
+            pddl = pddl_not(pddl)
         return pddl
 
 
@@ -82,10 +83,6 @@ class GoalAchievedPredicate(Predicate):
     @staticmethod
     def to_precondition(agent: str):
         return f"({GoalAchievedPredicate.var_name} ?{agent})"
-
-    @staticmethod
-    def to_problem(agent: str):
-        return f"({GoalAchievedPredicate.var_name} {agent})"
 
 
 # for propositional logic
