@@ -1,5 +1,6 @@
 from typing import Optional
 
+import numpy as np
 from pddl.operators import pddl_and, pddl_equal
 from pddl.pddl_types.types_names import TypeName
 
@@ -40,7 +41,8 @@ class Function:
 
         if len(self.arguments) == 1:
             return pddl_equal(
-                f"({full_var_name} {parent_object_name})", str(int(self.value))
+                f"({full_var_name} {parent_object_name})",
+                str(int(np.floor(self.value))),
             )
         else:
             # if there are multple arguments, we need to create a conjunction of equalities
@@ -48,7 +50,7 @@ class Function:
                 [
                     pddl_equal(
                         f"({full_var_name} {parent_object_name} {arg})",
-                        str(int(self.value[arg])),
+                        str(int(np.floor(self.value[arg]))),
                     )
                     for arg in self.arguments
                 ]

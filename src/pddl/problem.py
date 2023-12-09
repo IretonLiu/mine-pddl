@@ -1,5 +1,6 @@
 from typing import Dict, List, Tuple
 
+import numpy as np
 from helpers.prop_helper import generate_initial_seq_predicates
 from pddl.domain import Domain
 from pddl.functions import (
@@ -77,9 +78,19 @@ class Problem:
             if key in items:
                 total_occurances += len(items[key])
 
+            # add in extra objects to account for the inventory contents being placed in the world
+            # we only need to account for blocks, since we cannot drop an item (yet)
+            inventory_quantity = 0
+            if key in items:
+                for item in items[key]:
+                    if item.in_inventory:
+                        inventory_quantity += item.quantity
+
             # include an object (with a number) for each occurance of the item/block
             item_objects = [f"{key}{i}" for i in range(total_occurances)]
-            block_objects = [f"{key}-block{i}" for i in range(total_occurances)]
+            block_objects = [
+                f"{key}-block{i}" for i in range(total_occurances + inventory_quantity)
+            ]
 
             # add in the object type
             item_objects.extend(["-", key])
@@ -93,10 +104,37 @@ class Problem:
             # add the position objects
             self.postition_objects = []
             self.count_objects = []
-            max_range = max(self.obs_range)
+            max_index = np.argmax(self.obs_range)
+            max_range = self.obs_range[max_index]
+
+            agent_function_name = ""
+            if max_index == 0:
+                agent_function_name = XPositionFunction
+            elif max_index == 1:
+                agent_function_name = YPositionFunction
+            elif max_index == 2:
+                agent_function_name = ZPositionFunction
+
+            agent_position_along_max = int(
+                np.floor(agent.functions[agent_function_name].value)
+            )
+
+            # how far is the fursthest axis position from 0
+            largest_axis_position = -1
+            axes = [XPositionFunction, YPositionFunction, ZPositionFunction]
+            for axis in axes:
+                if abs(agent.functions[axis].value) > largest_axis_position:
+                    largest_axis_position = abs(agent.functions[axis].value)
+            largest_axis_position = int(largest_axis_position)
+
             output += "\t"
             for i in range(
-                -max_range // 2 - 1, max_range // 2 + 1 + 1
+                agent_position_along_max - (max_range // 2) - largest_axis_position - 1,
+                agent_position_along_max
+                + (max_range // 2)
+                + largest_axis_position
+                + 1
+                + 1,
             ):  # add a buffer of 1 to either side of the position range
                 # todo: could double the range, but that would add in quite a bit of complexity
                 output += f"{PositionType.construct_problem_object(i)} "
@@ -154,11 +192,11 @@ class Problem:
                 # this will also only be called for propositional pddl
                 position = float("inf")
                 if isinstance(predicate, AtXLocationPredicate):
-                    position = int(agent.functions[XPositionFunction].value)
+                    position = int(np.floor(agent.functions[XPositionFunction].value))
                 elif isinstance(predicate, AtYLocationPredicate):
-                    position = int(agent.functions[YPositionFunction].value)
+                    position = int(np.floor(agent.functions[YPositionFunction].value))
                 elif isinstance(predicate, AtZLocationPredicate):
-                    position = int(agent.functions[ZPositionFunction].value)
+                    position = int(np.floor(agent.functions[ZPositionFunction].value))
                 output_list.append(
                     predicate.to_precondition(
                         agent.name, PositionType.construct_problem_object(int(position))
@@ -205,15 +243,15 @@ class Problem:
                             position = float("inf")
                             if isinstance(predicate, AtXLocationPredicate):
                                 position = int(
-                                    entity.functions[XPositionFunction].value
+                                    np.floor(entity.functions[XPositionFunction].value)
                                 )
                             elif isinstance(predicate, AtYLocationPredicate):
                                 position = int(
-                                    entity.functions[YPositionFunction].value
+                                    np.floor(entity.functions[YPositionFunction].value)
                                 )
                             elif isinstance(predicate, AtZLocationPredicate):
                                 position = int(
-                                    entity.functions[ZPositionFunction].value
+                                    np.floor(entity.functions[ZPositionFunction].value)
                                 )
                             output_list.append(
                                 predicate.to_precondition(

@@ -243,9 +243,9 @@ def check_goal_state(obs, voxel_size, goal):
         relative_position = (
             np.array(
                 [
-                    int(block_position["x"]),
-                    int(block_position["y"]),
-                    int(block_position["z"]),
+                    int(np.floor(block_position["x"])),
+                    int(np.floor(block_position["y"])),
+                    int(np.floor(block_position["z"])),
                 ]
             )
             - agent_pos

@@ -1,3 +1,4 @@
+import numpy as np
 from pddl.operators import pddl_and, pddl_exists, pddl_not, pddl_or
 from pddl.pddl_types.special_pddl_types import CountType, PositionType
 from pddl.pddl_types.types_names import TypeName
@@ -1679,19 +1680,19 @@ class CheckGoal(Action):
                     AtXLocationPredicate.to_precondition(
                         block_var,
                         PositionType.construct_problem_object(
-                            int(block["position"]["x"])
+                            int(np.floor(float(block["position"]["x"])))
                         ),
                     ),
                     AtYLocationPredicate.to_precondition(
                         block_var,
                         PositionType.construct_problem_object(
-                            int(block["position"]["y"])
+                            int(np.floor(float(block["position"]["y"])))
                         ),
                     ),
                     AtZLocationPredicate.to_precondition(
                         block_var,
                         PositionType.construct_problem_object(
-                            int(block["position"]["z"])
+                            int(np.floor(float(block["position"]["z"])))
                         ),
                     ),
                 ),
