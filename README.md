@@ -118,19 +118,19 @@ python src/main.py \
 Two planners have been provided:
 
 - Propositional Planner: Fast Downward
-- Numerical Planner: enhsp19
+- Numerical Planner: enhsp20
 
 They will be bulit and run using Docker and the Docker Compose plugin, which can be installed using these instructions: [https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
 
 > [!IMPORTANT]
 > `<path to domain file>` and `<path to problem file>` are relative to the root directory
 
-### enhsp19
+### enhsp20
 
-1. Navigate to the enhsp19 directory
+1. Navigate to the enhsp20 directory
 
     ```shell
-    cd containers/enhsp19
+    cd containers/enhsp20
     ```
 
 2. Build the image
@@ -142,7 +142,7 @@ They will be bulit and run using Docker and the Docker Compose plugin, which can
 3. Run the planner
 
     ```shell
-    docker compose run enhsp19 -o pddl/<path to domain file> -f pddl/<path to problem file>
+    docker compose run enhsp20 -o pddl/<path to domain file> -f pddl/<path to problem file>
     ```
 
 ### Fast Downward

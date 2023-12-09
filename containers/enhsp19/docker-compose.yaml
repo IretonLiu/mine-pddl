@@ -1,7 +1,0 @@
-version: "3"
-services:
-  enhsp19:
-    build: .
-    image: enhsp19
-    volumes:
-      - ../..:/root/enhsp19/pddl

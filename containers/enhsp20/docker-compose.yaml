@@ -1,0 +1,7 @@
+version: "3"
+services:
+  enhsp20:
+    build: .
+    image: enhsp20
+    volumes:
+      - ../..:/root/enhsp20/pddl
