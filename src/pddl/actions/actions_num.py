@@ -383,6 +383,7 @@ class Place(Action):
             return pddl_exists(
                 {TypeName.BLOCK_TYPE_NAME.value: block_name},
                 pddl_and(
+                    f"({BlockPresentPredicate.var_name} {block_name})",
                     pddl_equal(
                         f"({XPositionFunction.var_name} {block_name})",
                         pddl_add_wrapper(
