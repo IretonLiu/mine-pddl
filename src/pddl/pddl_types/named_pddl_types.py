@@ -13,7 +13,7 @@ class NamedItemType(ItemType):
         in_inventory: bool = False,
     ):
         super().__init__(use_propositional)
-        self.name = f"{variation}-{item_name}" if variation else item_name
+        self.name = item_name
         self.name = self.name.replace(" ", "_")
         self.variation = variation
         self.quantity = quantity  # only used if Minecraft has grouped items together
