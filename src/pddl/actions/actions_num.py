@@ -1178,6 +1178,7 @@ class CheckGoal(Action):
             block_pddl += pddl_exists(
                 {block["type"] + "-block": "?b"},
                 pddl_and(
+                    f"({BlockPresentPredicate.var_name} ?b)",
                     pddl_equal(
                         f"({XPositionFunction.var_name} ?b)", block["position"]["x"]
                     ),

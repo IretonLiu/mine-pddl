@@ -53,9 +53,9 @@ def generate_or_execute_pddl(args):
         use_voxel=True,
         # spawn_mobs=False,
         voxel_size=voxel_size,
-        drawing_str=f"""{yaml_helper.yaml_blocks_to_xml_str(world_config["blocks"])}""",
+        drawing_str=f"""{yaml_helper.yaml_blocks_to_xml_str(world_config["blocks"] if "blocks" in world_config else [])}""",
         initial_inventory=yaml_helper.yaml_inventory_to_inventory_item(
-            world_config["inventory"]
+            world_config["inventory"] if "inventory" in world_config else []
         ),
         generate_world_type=args.world_type,
         break_speed_multiplier=1000,

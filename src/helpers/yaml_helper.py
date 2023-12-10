@@ -42,6 +42,8 @@ def yaml_inventory_to_inventory_item(inventory: list[dict]) -> list:
     """
     inventory_item_list = []
     for i, item in enumerate(inventory):
+        if item["type"] == "air":
+            continue
         inventory_item_list.append(
             InventoryItem(
                 slot=i,

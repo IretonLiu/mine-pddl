@@ -7,3 +7,5 @@ pyrightconfig.json
 .java-version
 *.png 
 *.mp4
+task-worlds
+problems/tasks

@@ -1761,6 +1761,7 @@ class CheckGoal(Action):
             block_pddl += pddl_exists(
                 {block["type"] + "-block": block_var},
                 pddl_and(
+                    f"({BlockPresentPredicate.var_name} {block_var})\n",
                     AtXLocationPredicate.to_precondition(
                         block_var,
                         PositionType.construct_problem_object(
