@@ -113,7 +113,7 @@ class Move(Action):
                     pddl_exists(
                         {TypeName.BLOCK_TYPE_NAME.value: "?b"},
                         pddl_and(
-                            f"{BlockPresentPredicate.var_name} ?b",
+                            f"({BlockPresentPredicate.var_name} ?b)",
                             x_equality("b"),
                             pddl_or(
                                 pddl_equal(
@@ -249,7 +249,7 @@ class MoveAndPickup(Action):
                 pddl_exists(
                     {TypeName.BLOCK_TYPE_NAME.value: "?b"},
                     pddl_and(
-                        f"{BlockPresentPredicate.var_name} ?b",
+                        f"({BlockPresentPredicate.var_name} ?b)",
                         x_equality("b"),
                         pddl_equal(
                             f"({YPositionFunction.var_name} ?b)",
