@@ -45,6 +45,16 @@ def generate_or_execute_pddl(args):
         zmax=ranges[2] // 2,
     )
 
+    drawing_str = (
+        f"""{yaml_helper.yaml_blocks_to_xml_str(world_config["blocks"])}"""
+        if "blocks" in world_config
+        else None
+    )
+    initial_inventory = (
+        yaml_helper.yaml_inventory_to_inventory_item(world_config["inventory"])
+        if "inventory" in world_config
+        else None
+    )
     env = minedojo.make(
         args.world_name,
         image_size=args.window_size,
@@ -53,10 +63,8 @@ def generate_or_execute_pddl(args):
         use_voxel=True,
         # spawn_mobs=False,
         voxel_size=voxel_size,
-        drawing_str=f"""{yaml_helper.yaml_blocks_to_xml_str(world_config["blocks"] if "blocks" in world_config else [])}""",
-        initial_inventory=yaml_helper.yaml_inventory_to_inventory_item(
-            world_config["inventory"] if "inventory" in world_config else []
-        ),
+        drawing_str=drawing_str,
+        initial_inventory=initial_inventory,
         generate_world_type=args.world_type,
         break_speed_multiplier=1000,
         allow_mob_spawn=False,
