@@ -91,11 +91,29 @@ class Move(Action):
 
         self.preconditions = pddl_and(
             f"({AgentAlivePredicate.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+            # check that we can stand on a block
+            pddl_exists(
+                {TypeName.BLOCK_TYPE_NAME.value: "?b"},
+                pddl_and(
+                    f"({BlockPresentPredicate.var_name} ?b)",
+                    x_equality("b"),
+                    pddl_equal(
+                        f"({YPositionFunction.var_name} ?b)",
+                        pddl_add(
+                            f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                            "-1",
+                        ),
+                    ),
+                    z_equality("b"),
+                ),
+            ),
+            # check that there is no block or item in the way
             pddl_and(
                 pddl_not(
                     pddl_exists(
                         {TypeName.BLOCK_TYPE_NAME.value: "?b"},
                         pddl_and(
+                            f"{BlockPresentPredicate.var_name} ?b",
                             x_equality("b"),
                             pddl_or(
                                 pddl_equal(
@@ -118,6 +136,7 @@ class Move(Action):
                     pddl_exists(
                         {TypeName.ITEM_TYPE_NAME.value: "?i"},
                         pddl_and(
+                            f"({ItemPresentPredicate.var_name} ?i)",
                             x_equality("i"),
                             pddl_equal(
                                 f"({YPositionFunction.var_name} ?i)",
@@ -214,6 +233,7 @@ class MoveAndPickup(Action):
                 )
 
         self.preconditions = pddl_and(
+            f"({AgentAlivePredicate.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
             # preconditions for items
             pddl_and(
                 f"({ItemPresentPredicate.var_name} {self.parameters[self.item]})",
@@ -229,6 +249,7 @@ class MoveAndPickup(Action):
                 pddl_exists(
                     {TypeName.BLOCK_TYPE_NAME.value: "?b"},
                     pddl_and(
+                        f"{BlockPresentPredicate.var_name} ?b",
                         x_equality("b"),
                         pddl_equal(
                             f"({YPositionFunction.var_name} ?b)",
@@ -239,6 +260,22 @@ class MoveAndPickup(Action):
                         ),
                         z_equality("b"),
                     ),
+                ),
+            ),
+            # check that we can stand on a block
+            pddl_exists(
+                {TypeName.BLOCK_TYPE_NAME.value: "?b"},
+                pddl_and(
+                    f"({BlockPresentPredicate.var_name} ?b)",
+                    x_equality("b"),
+                    pddl_equal(
+                        f"({YPositionFunction.var_name} ?b)",
+                        pddl_add(
+                            f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                            "-1",
+                        ),
+                    ),
+                    z_equality("b"),
                 ),
             ),
         )
@@ -336,6 +373,25 @@ class Break(Action):
             ),
             z_equality,
             f"({BlockPresentPredicate.var_name} {self.parameters[self.block]})",
+            # check that there is not an item on top of the block-to-break
+            # this would require us to account for the item falling
+            pddl_not(
+                pddl_exists(
+                    {TypeName.ITEM_TYPE_NAME.value: "?i"},
+                    pddl_and(
+                        f"({ItemPresentPredicate.var_name} ?i)",
+                        x_equality,
+                        pddl_equal(
+                            f"({YPositionFunction.var_name} ?i)",
+                            pddl_add(
+                                f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                                "1",
+                            ),
+                        ),
+                        z_equality,
+                    ),
+                )
+            ),
         )
 
     def construct_effects(self):
@@ -374,32 +430,43 @@ class Place(Action):
         self.place_pos_axis = self.dir == "south" or self.dir == "east"
 
     def construct_preconditions(self):
-        def block_exists_at_location(
-            block_name: str,
+        def block_or_item_exists_at_location(
+            block_exists: bool,  # True for block; False for item
+            object_name: str,
             x_modifier: int = 0,
             y_modifier: int = 0,
             z_modifier: int = 0,
         ) -> str:
+            object_exists_typename = (
+                TypeName.BLOCK_TYPE_NAME.value
+                if block_exists
+                else TypeName.ITEM_TYPE_NAME.value
+            )
+            present_predicate_var_name = (
+                BlockPresentPredicate.var_name
+                if block_exists
+                else ItemPresentPredicate.var_name
+            )
             return pddl_exists(
-                {TypeName.BLOCK_TYPE_NAME.value: block_name},
+                {object_exists_typename: object_name},
                 pddl_and(
-                    f"({BlockPresentPredicate.var_name} {block_name})",
+                    f"({present_predicate_var_name} {object_name})",
                     pddl_equal(
-                        f"({XPositionFunction.var_name} {block_name})",
+                        f"({XPositionFunction.var_name} {object_name})",
                         pddl_add_wrapper(
                             f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
                             x_modifier,
                         ),
                     ),
                     pddl_equal(
-                        f"({YPositionFunction.var_name} {block_name})",
+                        f"({YPositionFunction.var_name} {object_name})",
                         pddl_add_wrapper(
                             f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
                             y_modifier,
                         ),
                     ),
                     pddl_equal(
-                        f"({ZPositionFunction.var_name} {block_name})",
+                        f"({ZPositionFunction.var_name} {object_name})",
                         pddl_add_wrapper(
                             f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
                             z_modifier,
@@ -413,9 +480,13 @@ class Place(Action):
             (1 if self.place_pos_axis else -1) if not self.place_east_west else 0
         )
 
-        # todo: make sure that num inventory items > 0
         self.preconditions = pddl_and(
-            block_exists_at_location(
+            # the block-to-place must not already be present
+            pddl_not(
+                f"({BlockPresentPredicate.var_name} {self.parameters[self.block]})"
+            ),
+            block_or_item_exists_at_location(
+                True,
                 "?bl",
                 x_modifier=x_modifier,
                 y_modifier=-1,  # There must be a block underneath
@@ -423,11 +494,21 @@ class Place(Action):
             ),
             pddl_not(
                 # There mustn't be a block at the same location
-                block_exists_at_location(
+                block_or_item_exists_at_location(
+                    True,
                     "?bl",
                     x_modifier=x_modifier,
                     z_modifier=z_modifier,
                 ),
+            ),
+            # there must not be an item where we want to place the block
+            pddl_not(
+                block_or_item_exists_at_location(
+                    False,
+                    "?i",
+                    x_modifier=x_modifier,
+                    z_modifier=z_modifier,
+                )
             ),
             # there must be an item in the inventory to place
             pddl_ge(
@@ -504,9 +585,15 @@ class JumpUp(Action):
                 if block_exists
                 else TypeName.ITEM_TYPE_NAME.value
             )
+            present_predicate_var_name = (
+                BlockPresentPredicate.var_name
+                if block_exists
+                else ItemPresentPredicate.var_name
+            )
             return pddl_exists(
                 {object_exists_typename: object_name},
                 pddl_and(
+                    f"({present_predicate_var_name} {object_name})",
                     pddl_equal(
                         f"({XPositionFunction.var_name} {object_name})",
                         pddl_add_wrapper(
@@ -636,9 +723,15 @@ class JumpUpAndPickup(Action):
                 if block_exists
                 else TypeName.ITEM_TYPE_NAME.value
             )
+            present_predicate_var_name = (
+                BlockPresentPredicate.var_name
+                if block_exists
+                else ItemPresentPredicate.var_name
+            )
             return pddl_exists(
                 {object_exists_typename: object_name},
                 pddl_and(
+                    f"({present_predicate_var_name} {object_name})",
                     pddl_equal(
                         f"({XPositionFunction.var_name} {object_name})",
                         pddl_add_wrapper(
@@ -791,9 +884,15 @@ class JumpDown(Action):
                 if block_exists
                 else TypeName.ITEM_TYPE_NAME.value
             )
+            present_predicate_var_name = (
+                BlockPresentPredicate.var_name
+                if block_exists
+                else ItemPresentPredicate.var_name
+            )
             return pddl_exists(
                 {object_exists_typename: object_name},
                 pddl_and(
+                    f"({present_predicate_var_name} {object_name})",
                     pddl_equal(
                         f"({XPositionFunction.var_name} {object_name})",
                         pddl_add_wrapper(
@@ -924,9 +1023,15 @@ class JumpDownAndPickup(Action):
                 if block_exists
                 else TypeName.ITEM_TYPE_NAME.value
             )
+            present_predicate_var_name = (
+                BlockPresentPredicate.var_name
+                if block_exists
+                else ItemPresentPredicate.var_name
+            )
             return pddl_exists(
                 {object_exists_typename: object_name},
                 pddl_and(
+                    f"({present_predicate_var_name} {object_name})",
                     pddl_equal(
                         f"({XPositionFunction.var_name} {object_name})",
                         pddl_add_wrapper(

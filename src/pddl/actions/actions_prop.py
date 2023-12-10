@@ -42,6 +42,7 @@ class Move(Action):
             "XPositionEnd": "?x_end",
             "YPositionUp": "?y_up",
             "YPositionDown": "?y_down",
+            "YPosition2Down": "?y_2_down",  # for standing on when we move
             "ZPositionStart": "?z_start",
             "ZPositionEnd": "?z_end",
         }
@@ -54,6 +55,7 @@ class Move(Action):
             "XPositionEnd": TypeName.POSITION_TYPE_NAME.value,
             "YPositionUp": TypeName.POSITION_TYPE_NAME.value,
             "YPositionDown": TypeName.POSITION_TYPE_NAME.value,
+            "YPosition2Down": TypeName.POSITION_TYPE_NAME.value,
             "ZPositionStart": TypeName.POSITION_TYPE_NAME.value,
             "ZPositionEnd": TypeName.POSITION_TYPE_NAME.value,
         }
@@ -137,6 +139,21 @@ class Move(Action):
             AreSequentialPredicate.to_precondition(
                 self.param_name["YPositionDown"], self.param_name["YPositionUp"]
             ),
+            AreSequentialPredicate.to_precondition(
+                self.param_name["YPosition2Down"], self.param_name["YPositionDown"]
+            ),
+            # check there is a block to stand on
+            pddl_exists(
+                {TypeName.BLOCK_TYPE_NAME.value: block_var},
+                pddl_and(
+                    f"({BlockPresentPredicate.var_name} {block_var})\n",
+                    AtXLocationPredicate.to_precondition(block_var, x_end),
+                    AtYLocationPredicate.to_precondition(
+                        block_var, self.param_name["YPosition2Down"]
+                    ),
+                    AtZLocationPredicate.to_precondition(block_var, z_end),
+                ),
+            ),
             pddl_not(
                 pddl_exists(
                     {TypeName.BLOCK_TYPE_NAME.value: block_var},
@@ -217,6 +234,7 @@ class MoveAndPickup(Action):
             "XPositionEnd": "?x_end",
             "YPositionUp": "?y_up",
             "YPositionDown": "?y_down",
+            "YPosition2Down": "?y_2_down",  # for standing on when we move
             "ZPositionStart": "?z_start",
             "ZPositionEnd": "?z_end",
             "NStart": "?n_start",
@@ -232,6 +250,7 @@ class MoveAndPickup(Action):
             "XPositionEnd": TypeName.POSITION_TYPE_NAME.value,
             "YPositionUp": TypeName.POSITION_TYPE_NAME.value,
             "YPositionDown": TypeName.POSITION_TYPE_NAME.value,
+            "YPosition2Down": TypeName.POSITION_TYPE_NAME.value,
             "ZPositionStart": TypeName.POSITION_TYPE_NAME.value,
             "ZPositionEnd": TypeName.POSITION_TYPE_NAME.value,
             "NStart": TypeName.COUNT_TYPE_NAME.value,
@@ -318,8 +337,23 @@ class MoveAndPickup(Action):
                 self.param_name["YPositionDown"], self.param_name["YPositionUp"]
             ),
             AreSequentialPredicate.to_precondition(
+                self.param_name["YPosition2Down"], self.param_name["YPositionDown"]
+            ),
+            AreSequentialPredicate.to_precondition(
                 self.param_name["NStart"], self.param_name["NEnd"]
             ),  # start should be smaller since we are picking up
+            # check there is a block to stand on
+            pddl_exists(
+                {TypeName.BLOCK_TYPE_NAME.value: block_var},
+                pddl_and(
+                    f"({BlockPresentPredicate.var_name} {block_var})\n",
+                    AtXLocationPredicate.to_precondition(block_var, x_end),
+                    AtYLocationPredicate.to_precondition(
+                        block_var, self.param_name["YPosition2Down"]
+                    ),
+                    AtZLocationPredicate.to_precondition(block_var, z_end),
+                ),
+            ),
             pddl_not(
                 pddl_exists(
                     {TypeName.BLOCK_TYPE_NAME.value: block_var},
@@ -426,6 +460,7 @@ class Break(Action):
             "XPosition": "?x",
             "XPositionFront": "?x_front",
             "YPosition": "?y",
+            "YPositionUp": "?y_up",
             "ZPosition": "?z",
             "ZPositionFront": "?z_front",
             "NStart": "?n_start",
@@ -438,6 +473,7 @@ class Break(Action):
             "XPosition": TypeName.POSITION_TYPE_NAME.value,
             "XPositionFront": TypeName.POSITION_TYPE_NAME.value,
             "YPosition": TypeName.POSITION_TYPE_NAME.value,
+            "YPositionUp": TypeName.POSITION_TYPE_NAME.value,
             "ZPosition": TypeName.POSITION_TYPE_NAME.value,
             "ZPositionFront": TypeName.POSITION_TYPE_NAME.value,
             "NStart": TypeName.COUNT_TYPE_NAME.value,
@@ -473,6 +509,7 @@ class Break(Action):
             front = "ZPositionFront"
 
         self.preconditions = pddl_and(
+            f"({AgentAlivePredicate.var_name} {self.param_names['Agent']})\n",
             AtXLocationPredicate.to_precondition(
                 self.param_names["Agent"], self.param_names["XPosition"]
             ),
@@ -491,6 +528,7 @@ class Break(Action):
             AtZLocationPredicate.to_precondition(
                 self.param_names["Block"], self.param_names[self.z_front]
             ),
+            # this is a ternary
             AreSequentialPredicate.to_precondition(
                 self.param_names[front], self.param_names[back]
             )
@@ -498,7 +536,28 @@ class Break(Action):
             else AreSequentialPredicate.to_precondition(
                 self.param_names[back], self.param_names[front]
             ),
+            AreSequentialPredicate.to_precondition(
+                self.param_names["YPosition"], self.param_names["YPositionUp"]
+            ),
             f'({BlockPresentPredicate.var_name} {self.param_names["Block"]})',
+            # make sure that there is not an item on top of the block - if it exists, we would have to account for it falling
+            pddl_not(
+                pddl_exists(
+                    {TypeName.ITEM_TYPE_NAME.value: "?i"},
+                    pddl_and(
+                        f"({ItemPresentPredicate.var_name} ?i)\n",
+                        AtXLocationPredicate.to_precondition(
+                            "?i", self.param_names[self.x_front]
+                        ),
+                        AtYLocationPredicate.to_precondition(
+                            "?i", self.param_names["YPositionUp"]
+                        ),
+                        AtZLocationPredicate.to_precondition(
+                            "?i", self.param_names[self.z_front]
+                        ),
+                    ),
+                ),
+            ),
             AreSequentialPredicate.to_precondition(
                 self.param_names["NStart"], self.param_names["NEnd"]
             ),
@@ -619,19 +678,24 @@ class Place(Action):
 
         block_var = "?bl"
         self.preconditions = pddl_and(
+            f"({AgentAlivePredicate.var_name} {self.param_names['Agent']})\n",
+            # set the agent position
+            AtXLocationPredicate.to_precondition(
+                self.param_names["Agent"], self.param_names["XPosition"]
+            ),
+            AtYLocationPredicate.to_precondition(
+                self.param_names["Agent"], self.param_names["YPosition"]
+            ),
+            AtZLocationPredicate.to_precondition(
+                self.param_names["Agent"], self.param_names["ZPosition"]
+            ),
+            # check that the block we want to place does not exist
+            pddl_not(f'({BlockPresentPredicate.var_name} {self.param_names["Block"]})'),
             # There must be a block one down and one in front of us, for support for the block we are placing
             pddl_exists(
                 {TypeName.BLOCK_TYPE_NAME.value: block_var},
                 pddl_and(
-                    AtXLocationPredicate.to_precondition(
-                        self.param_names["Agent"], self.param_names["XPosition"]
-                    ),
-                    AtYLocationPredicate.to_precondition(
-                        self.param_names["Agent"], self.param_names["YPosition"]
-                    ),
-                    AtZLocationPredicate.to_precondition(
-                        self.param_names["Agent"], self.param_names["ZPosition"]
-                    ),
+                    f"({BlockPresentPredicate.var_name} {block_var})\n",
                     AtXLocationPredicate.to_precondition(
                         block_var, self.param_names[self.x_front]
                     ),
@@ -650,15 +714,7 @@ class Place(Action):
                 pddl_exists(
                     {TypeName.BLOCK_TYPE_NAME.value: block_var},
                     pddl_and(
-                        AtXLocationPredicate.to_precondition(
-                            self.param_names["Agent"], self.param_names["XPosition"]
-                        ),
-                        AtYLocationPredicate.to_precondition(
-                            self.param_names["Agent"], self.param_names["YPosition"]
-                        ),
-                        AtZLocationPredicate.to_precondition(
-                            self.param_names["Agent"], self.param_names["ZPosition"]
-                        ),
+                        f"({BlockPresentPredicate.var_name} {block_var})\n",
                         AtXLocationPredicate.to_precondition(
                             block_var, self.param_names[self.x_front]
                         ),
@@ -668,6 +724,24 @@ class Place(Action):
                         AtZLocationPredicate.to_precondition(
                             block_var,
                             self.param_names[self.z_front],
+                        ),
+                    ),
+                )
+            ),
+            # There must not be an item at the location we are placing the new block
+            pddl_not(
+                pddl_exists(
+                    {TypeName.ITEM_TYPE_NAME.value: "?i"},
+                    pddl_and(
+                        f"({ItemPresentPredicate.var_name} ?i)\n",
+                        AtXLocationPredicate.to_precondition(
+                            "?i", self.param_names[self.x_front]
+                        ),
+                        AtYLocationPredicate.to_precondition(
+                            "?i", self.param_names["YPosition"]
+                        ),
+                        AtZLocationPredicate.to_precondition(
+                            "?i", self.param_names[self.z_front]
                         ),
                     ),
                 )
@@ -847,6 +921,21 @@ class JumpUp(Action):
             AreSequentialPredicate.to_precondition(
                 self.param_name["YPositionUp"], self.param_name["YPositionUpUp"]
             ),
+            # check that we can jump in the current column (required before we can move forward)
+            pddl_not(
+                pddl_exists(
+                    {TypeName.BLOCK_TYPE_NAME.value: block_var},
+                    pddl_and(
+                        f"({BlockPresentPredicate.var_name} {block_var})\n",
+                        AtXLocationPredicate.to_precondition(block_var, x_start),
+                        # only check upup, since up is occupied by the agent
+                        AtYLocationPredicate.to_precondition(
+                            block_var, self.param_name["YPositionUpUp"]
+                        ),
+                        AtZLocationPredicate.to_precondition(block_var, z_start),
+                    ),
+                )
+            ),
             pddl_not(
                 pddl_exists(
                     {TypeName.BLOCK_TYPE_NAME.value: block_var},
@@ -886,13 +975,8 @@ class JumpUp(Action):
                         AtXLocationPredicate.to_precondition(item_var, x_end),
                         # here we only check that there is no item at the level of the agent (bottom) since items cannot float
                         # they would require a block to be placed beneath it, which is handled by the previous precondition
-                        pddl_or(
-                            AtYLocationPredicate.to_precondition(
-                                item_var, self.param_name["YPositionDown"]
-                            ),
-                            AtYLocationPredicate.to_precondition(
-                                item_var, self.param_name["YPositionUp"]
-                            ),
+                        AtYLocationPredicate.to_precondition(
+                            item_var, self.param_name["YPositionUp"]
                         ),
                         AtZLocationPredicate.to_precondition(item_var, z_end),
                     ),
