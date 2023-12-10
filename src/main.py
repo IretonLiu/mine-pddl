@@ -30,12 +30,8 @@ from pddl.problem import Problem
 - 
 """
 
-# todo: also add in extra problem-file pddl objects for all the inventory contents
-
 
 def generate_or_execute_pddl(args):
-    # todo: process the agent's inventory - will go into the items dict
-
     world_config = yaml_helper.load_yaml(args.world_config)
 
     max_inventory_stack = args.max_inventory_stack

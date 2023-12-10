@@ -1,5 +1,7 @@
-from minedojo.sim.inventory import InventoryItem
+from typing import Dict, Tuple
+
 import yaml
+from minedojo.sim.inventory import InventoryItem
 
 
 def load_yaml(yaml_file: str) -> dict:
@@ -71,6 +73,60 @@ def yaml_items_to_cmd(items: list[dict]) -> list:
         commands.append(cmd)
 
     return commands
+
+
+def yaml_find_max_range(items, blocks) -> Dict[str, Tuple[int, int]]:
+    """
+    Find the max range of the world
+    """
+    axes = ["x", "y", "z"]
+    output = {}
+
+    for axis in axes:
+        min_pos = float("inf")
+        max_pos = -float("inf")
+        for item in items:
+            position = float(item["position"][axis])
+            min_pos = min(position, min_pos)
+            max_pos = max(position, max_pos)
+        for block in blocks:
+            position = float(block["position"][axis])
+            min_pos = min(position, min_pos)
+            max_pos = max(position, max_pos)
+
+        output[axis] = (min_pos, max_pos)
+    return output
+
+
+if __name__ == "__main__":
+    import os
+
+    tasks = os.listdir("./task-worlds/worlds")
+
+    for difficulty in ["Easy", "Medium", "Hard"]:
+        print(f"Difficulty: {difficulty}")
+        ranges = {
+            "x": (float("inf"), -float("inf")),
+            "y": (float("inf"), -float("inf")),
+            "z": (float("inf"), -float("inf")),
+        }
+        for task in tasks:
+            filename = f"./task-worlds/worlds/{task}/{task}_{difficulty}.yaml"
+            if not os.path.isfile(filename):
+                continue
+            yaml_file = load_yaml(filename)
+            output = yaml_find_max_range(
+                yaml_file["items"] if "items" in yaml_file else [],
+                yaml_file["blocks"] if "blocks" in yaml_file else [],
+            )
+
+            for key in output.keys():
+                ranges[key] = (
+                    min(ranges[key][0], output[key][0]),
+                    max(ranges[key][1], output[key][1]),
+                )
+
+        print(ranges)
 
 
 # TODO : error handling
