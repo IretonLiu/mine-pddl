@@ -1,10 +1,11 @@
 python src/main.py \
     --generate-pddl \
-    --pddl-type numerical \
-    --world-config worlds/Place_Wood_Easy.yaml \
+    --pddl-type propositional \
+    --world-config task-worlds/worlds/Place_Wood/Place_Wood_Easy.yaml \
     --domain-name test_domain \
     --problem-name test_problem \
-    --domain-file problems/our/wood_d_e_num.pddl \
-    --problem-file problems/our/wood_p_e_num.pddl \
-    --max-inventory-stack 64 \
-    --observation-range "(5, 4, 5)"
+    --domain-file problems/tasks/Build_Cross/Easy/propositional/d.pddl \
+    --problem-file problems/tasks/Build_Cross/Easy/propositional/p.pddl \
+    --max-inventory-stack 5 \
+    --observation-range "(5, 4, 3)" \
+    --agent-start-position "(0, 5, 0)" 

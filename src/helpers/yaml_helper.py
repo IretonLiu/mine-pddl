@@ -1,4 +1,4 @@
-from typing import Dict, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import yaml
 from minedojo.sim.inventory import InventoryItem
@@ -36,13 +36,13 @@ def yaml_blocks_to_xml_str(blocks: list[dict]) -> str:
     return xml_str
 
 
-def yaml_inventory_to_inventory_item(inventory: list[dict]) -> list:
+def yaml_inventory_to_inventory_item(inventory: list[dict]) -> Optional[List]:
     """
     Converts a list of inventory items to an inventory item list
     """
     inventory_item_list = []
     for i, item in enumerate(inventory):
-        if item["type"] == "air":
+        if item["type"] == "air" or item["quantity"] == 0:
             continue
         inventory_item_list.append(
             InventoryItem(
@@ -52,7 +52,7 @@ def yaml_inventory_to_inventory_item(inventory: list[dict]) -> list:
                 quantity=item["quantity"],
             )
         )
-    return inventory_item_list
+    return None if len(inventory_item_list) == 0 else inventory_item_list
 
 
 def yaml_items_to_cmd(items: list[dict]) -> list:

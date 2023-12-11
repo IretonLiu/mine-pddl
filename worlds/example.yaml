@@ -40,14 +40,12 @@ items:
       z: '5'
     quantity: 1
     type: diamond
-    persist: 1
   - position:
       x: '-1'
       y: '5'
       z: '5'
     quantity: 1
     type: log
-    persist: 0
 
 # specify the agnents initial inventory
 inventory:
