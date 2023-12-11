@@ -6,7 +6,7 @@ from pddl.pddl_types.base_pddl_types import AgentType
 from pddl.pddl_types.named_pddl_types import NamedBlockType, NamedItemType
 from pddl.predicates import AgentAlivePredicate, GoalAchievedPredicate
 
-rename = {"wood": "log"}
+rename = {"wood": "log", "wooden planks": "planks"}
 
 
 def get_valid_inventory_types():
