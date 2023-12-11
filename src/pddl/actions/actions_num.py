@@ -1168,12 +1168,30 @@ class CheckGoal(Action):
         self.goal = goal
 
     def construct_preconditions(self):
+        agents = self.goal["agent"] if "agent" in self.goal else []
         blocks = self.goal["blocks"] if "blocks" in self.goal else []
         inventory = self.goal["inventory"] if "inventory" in self.goal else []
 
+        agent_pddl = ""
         block_pddl = ""
         item_pddl = ""
 
+        for agent in agents:
+            # add the agents position
+            agent_pddl += pddl_and(
+                pddl_equal(
+                    f"({XPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                    agent["position"]["x"],
+                ),
+                pddl_equal(
+                    f"({YPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                    agent["position"]["y"],
+                ),
+                pddl_equal(
+                    f"({ZPositionFunction.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+                    agent["position"]["z"],
+                ),
+            )
         for block in blocks:
             block_pddl += pddl_exists(
                 {block["type"] + "-block": "?b"},
@@ -1199,7 +1217,12 @@ class CheckGoal(Action):
                 str(item["quantity"]),
             )
 
-        self.preconditions = pddl_and(block_pddl, item_pddl)
+        self.preconditions = pddl_and(
+            f"({AgentAlivePredicate.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})",
+            agent_pddl,
+            block_pddl,
+            item_pddl,
+        )
 
     def construct_effects(self):
         self.effects = pddl_and(

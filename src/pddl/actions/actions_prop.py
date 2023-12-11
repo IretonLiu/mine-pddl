@@ -1750,11 +1750,36 @@ class CheckGoal(Action):
         self.max_inventory_stack = max_inentory_stack
 
     def construct_preconditions(self):
+        agents = self.goal["agent"] if "agent" in self.goal else []
         blocks = self.goal["blocks"] if "blocks" in self.goal else []
         inventory = self.goal["inventory"] if "inventory" in self.goal else []
 
+        agent_pddl = ""
         block_pddl = ""
         item_pddl = ""
+
+        for agent in agents:
+            # add the agent's position
+            agent_pddl += pddl_and(
+                AtXLocationPredicate.to_precondition(
+                    self.parameters[TypeName.AGENT_TYPE_NAME.value],
+                    PositionType.construct_problem_object(
+                        int(np.floor(float(agent["position"]["x"])))
+                    ),
+                ),
+                AtYLocationPredicate.to_precondition(
+                    self.parameters[TypeName.AGENT_TYPE_NAME.value],
+                    PositionType.construct_problem_object(
+                        int(np.floor(float(agent["position"]["y"])))
+                    ),
+                ),
+                AtZLocationPredicate.to_precondition(
+                    self.parameters[TypeName.AGENT_TYPE_NAME.value],
+                    PositionType.construct_problem_object(
+                        int(np.floor(float(agent["position"]["z"])))
+                    ),
+                ),
+            )
 
         block_var = "?b"
         for block in blocks:
@@ -1797,7 +1822,12 @@ class CheckGoal(Action):
                 )
             item_pddl += pddl_or(*args)
 
-        self.preconditions = pddl_and(block_pddl, item_pddl)
+        self.preconditions = pddl_and(
+            f"({AgentAlivePredicate.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})\n",
+            agent_pddl,
+            block_pddl,
+            item_pddl,
+        )
 
     def construct_effects(self):
         self.effects = pddl_and(

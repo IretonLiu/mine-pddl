@@ -5,6 +5,7 @@
 name: "First Problem"
 
 # intialise all block positions
+# if there are no blocks, leave this out
 blocks:
   - position:
       x: '0'
@@ -33,6 +34,7 @@ blocks:
     type: log
 
 # initialise all floating items in the world
+# if there are no items, leave this out
 items:
   - position:
       x: '1'
@@ -48,14 +50,21 @@ items:
     type: log
 
 # specify the agnents initial inventory
+# if there are no items, leave this out
 inventory:
   - type: log
     quantity: '64'
   - type: obsidian
     quantity: '64'
 
-# specify the goal: can be specific blocks placed at specific locations or agent having specific items in the inventory
+# specify the goal: can be agent at a specific location, specific blocks placed at specific locations or agent having specific items in the inventory
+# if any one of these is not required, leave it out
 goal:
+  agent:
+    - position: 
+        x: '-2'
+        y: '4'
+        z: '0'
   blocks:
     - position:
         x: '0'

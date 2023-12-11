@@ -104,6 +104,9 @@ def place_block(env, action_args: List[str], agent: AgentType) -> None:
             agent.functions[ZPositionFunction].value,
             block_name,
         )
+    else:
+        raise ValueError(f"Invalid direction {direction}")
+
     env.execute_cmd(command)
 
     # decrement this block from the agent's inventory
@@ -150,6 +153,8 @@ def break_block(env, action_args: List[str], agent: AgentType) -> None:
             agent.functions[ZPositionFunction].value,
             "air",
         )
+    else:
+        raise ValueError(f"Invalid direction {direction}")
 
     env.execute_cmd(command)
 
@@ -234,18 +239,38 @@ def get_action_from_str(
 
 
 def check_goal_state(obs, voxel_size, goal):
-    agent_pos = obs["location_stats"]["pos"].astype(int)
+    # get the agent, block, and inventory from the goal
+    agent = goal["agent"][0] if "agent" in goal else None
+    blocks = goal["blocks"] if "blocks" in goal else []
+    inventory = goal["inventory"] if "inventory" in goal else []
+
+    # get the position of the agent in the world
+    agent_pos = obs["location_stats"]["pos"]
+    agent_pos = np.floor(agent_pos).astype(int)
+
+    # confirm the agent is in the correct position
+    if agent is not None:
+        agent_goal_position = agent["position"]
+        agent_goal_position = np.array(
+            [
+                int(np.floor(float(agent_goal_position["x"]))),
+                int(np.floor(float(agent_goal_position["y"]))),
+                int(np.floor(float(agent_goal_position["z"]))),
+            ]
+        )
+        if not np.all(agent_pos == agent_goal_position):
+            return False
 
     # loop over all the blocks in the goal and check if they are present
-    for block in goal["blocks"]:
+    for block in blocks:
         block_position = block["position"]
 
         relative_position = (
             np.array(
                 [
-                    int(np.floor(block_position["x"])),
-                    int(np.floor(block_position["y"])),
-                    int(np.floor(block_position["z"])),
+                    int(np.floor(float(block_position["x"]))),
+                    int(np.floor(float(block_position["y"]))),
+                    int(np.floor(float(block_position["z"]))),
                 ]
             )
             - agent_pos
@@ -265,7 +290,7 @@ def check_goal_state(obs, voxel_size, goal):
             return False
 
     # loop over all the inventory items in the goal and check if they are present
-    for inv_item in goal["inventory"]:
+    for inv_item in inventory:
         for i, name in enumerate(obs["inventory"]["name"]):
             if name == inv_item["type"]:
                 if obs["inventory"]["quantity"][i] < inv_item["quantity"]:
