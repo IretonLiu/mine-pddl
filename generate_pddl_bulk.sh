@@ -9,19 +9,19 @@ declare -a difficulty_array=("Easy" "Medium" "Hard")
 # define the default observation ranges, as well as any task-specific overrides
 # note that the overrides will have to specially handled later on
 declare -A obsrange_array=(
-    [Easy]="(8, 4, 8)" 
-    [Medium]="(15, 8, 15)" 
-    [Hard]="(65, 25, 65)"
+    [Easy]="(13, 9, 13)" 
+    [Medium]="(21, 15, 21)" 
+    [Hard]="(71, 31, 71)"
 )
 declare -A logcabin_obsrange_array=(
-    [Easy]="(20, 10, 20)" 
-    [Medium]="(40, 10, 40)" 
-    [Hard]="(65, 10, 65)"
+    [Easy]="(21, 11, 21)" 
+    [Medium]="(41, 11, 41)" 
+    [Hard]="(65, 11, 65)"
 )
 declare -A cuttree_obsrange_array=(
-    [Easy]="(20, 30, 20)" 
-    [Medium]="(40, 30, 40)" 
-    [Hard]="(65, 30, 65)"
+    [Easy]="(21, 31, 21)" 
+    [Medium]="(41, 31, 41)" 
+    [Hard]="(65, 31, 65)"
 )
 
 # define the pddl types
