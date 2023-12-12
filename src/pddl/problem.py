@@ -188,6 +188,17 @@ class Problem:
                                     item_type=key,
                                 )
                             )
+
+                # account for a block of that type being present, but not specified in the items
+                for key in blocks:
+                    if key not in items:
+                        output_list.append(
+                            predicate.to_precondition(
+                                agent.name,
+                                n=CountType.construct_problem_object(0),
+                                item_type=key,
+                            )
+                        )
             elif isinstance(predicate, AtLocationPredicate):
                 # this will also only be called for propositional pddl
                 position = float("inf")
@@ -226,6 +237,13 @@ class Problem:
                                         agent.name, label=key, quantity=0
                                     )
                                 )
+
+                    # account for a block of that type being present, but not specified in the items
+                    for key in blocks:
+                        if key not in items:
+                            output_list.append(
+                                function.to_problem(agent.name, label=key, quantity=0)
+                            )
                 else:
                     output_list.append(function.to_problem(agent.name))
 

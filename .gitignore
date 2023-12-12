@@ -8,4 +8,4 @@ pyrightconfig.json
 *.png 
 *.mp4
 task-worlds
-problems/tasks
+problems/tasks*

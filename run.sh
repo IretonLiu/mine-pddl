@@ -1,10 +1,10 @@
 python src/main.py \
     --generate-pddl \
-    --pddl-type propositional \
-    --world-config task-worlds/Move_to_Location/Move_to_Location_Easy.yaml \
+    --pddl-type numerical \
+    --world-config worlds/example.yaml \
     --domain-name test_domain \
     --problem-name test_problem \
-    --domain-file problems/tasks/Move_to_Location/Easy/propositional/d.pddl \
-    --problem-file problems/tasks/Move_to_Location/Easy/propositional/p.pddl \
+    --domain-file problems/d.pddl \
+    --problem-file problems/p.pddl \
     --max-inventory-stack 5 \
-    --observation-range "(8, 4, 8)" 
+    --observation-range "(5, 4, 5)" 
