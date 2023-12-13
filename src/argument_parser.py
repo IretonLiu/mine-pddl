@@ -8,14 +8,18 @@ from argparse import ArgumentDefaultsHelpFormatter
 from operator import attrgetter
 from typing import Dict, Tuple
 
+import numpy as np
+
 
 class HelpFormatter(ArgumentDefaultsHelpFormatter):
     """
     Sort the arguments alphabetically, and also print the default values
     """
+
     def add_arguments(self, actions):
-        actions = sorted(actions, key=attrgetter('option_strings'))
+        actions = sorted(actions, key=attrgetter("option_strings"))
         super(HelpFormatter, self).add_arguments(actions)
+
 
 def coords_3d(arg: str) -> Tuple[int, int, int]:
     # check if have ( and ) and remove them
@@ -44,10 +48,10 @@ def agent_start_position(arg: str) -> Dict[str, float]:
             x, y, z = [float(a) for a in arg.split(",")]
 
             # check if x and z need to be incremented by 0.5 (if not already specified)
-            if int(x) + 0.5 != x:
-                x = int(x) + 0.5
-            if int(z) + 0.5 != z:
-                z = int(z) + 0.5
+            if int(np.floor(x)) + 0.5 != x:
+                x = int(np.floor(x)) + 0.5
+            if int(np.floor(z)) + 0.5 != z:
+                z = int(np.floor(z)) + 0.5
 
             return {
                 "x": x,
@@ -62,6 +66,7 @@ def agent_start_position(arg: str) -> Dict[str, float]:
     raise argparse.ArgumentTypeError(
         "Agent start position must be in the form (x,y,z), where x, y, z are numbers"
     )
+
 
 def window_size(arg: str) -> Tuple[int, int]:
     # check if have ( and ) and remove them
@@ -79,11 +84,15 @@ def window_size(arg: str) -> Tuple[int, int]:
         "Window size must be in the form (w,h), where w, h are ints"
     )
 
+
 def no_spaces(arg: str) -> str:
     return arg.replace(" ", "_")
 
+
 def get_args_parser():
-    parser = argparse.ArgumentParser("Mine-PDDL", add_help=True, formatter_class=HelpFormatter)
+    parser = argparse.ArgumentParser(
+        "Mine-PDDL", add_help=True, formatter_class=HelpFormatter
+    )
 
     # General stuff
     parser.add_argument(
@@ -99,10 +108,16 @@ def get_args_parser():
         "--world-type", type=str, default="flat", help="Type of the world"
     )
     parser.add_argument(
-        "--world-seed", type=str, default="Enter the Nether", help="Seed for random generation of world"
+        "--world-seed",
+        type=str,
+        default="Enter the Nether",
+        help="Seed for random generation of world",
     )
     parser.add_argument(
-        "--window-size", type=window_size, default="(1024, 1024)", help="Size of the window. Format: (w, h)"
+        "--window-size",
+        type=window_size,
+        default="(1024, 1024)",
+        help="Size of the window. Format: (w, h)",
     )
     parser.add_argument(
         "--video-save-path",

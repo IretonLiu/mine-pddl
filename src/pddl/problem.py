@@ -104,39 +104,25 @@ class Problem:
             # add the position objects
             self.postition_objects = []
             self.count_objects = []
-            max_index = np.argmax(self.obs_range)
-            max_range = self.obs_range[max_index]
 
-            agent_function_name = ""
-            if max_index == 0:
-                agent_function_name = XPositionFunction
-            elif max_index == 1:
-                agent_function_name = YPositionFunction
-            elif max_index == 2:
-                agent_function_name = ZPositionFunction
-
-            agent_position_along_max = int(
-                np.floor(agent.functions[agent_function_name].value)
+            # we need to find the largest positive position and the smallest negative position
+            # this will be used to determine the range of positions to include in the problem
+            min_shifted_position = min(
+                agent.functions[XPositionFunction].value - self.obs_range[0] // 2,
+                agent.functions[YPositionFunction].value - self.obs_range[1] // 2,
+                agent.functions[ZPositionFunction].value - self.obs_range[2] // 2,
             )
-
-            # how far is the fursthest axis position from 0
-            largest_axis_position = -1
-            axes = [XPositionFunction, YPositionFunction, ZPositionFunction]
-            for axis in axes:
-                if abs(agent.functions[axis].value) > largest_axis_position:
-                    largest_axis_position = abs(agent.functions[axis].value)
-            largest_axis_position = int(largest_axis_position)
+            max_shifted_position = max(
+                agent.functions[XPositionFunction].value + self.obs_range[0] // 2,
+                agent.functions[YPositionFunction].value + self.obs_range[1] // 2,
+                agent.functions[ZPositionFunction].value + self.obs_range[2] // 2,
+            )
 
             output += "\t"
             for i in range(
-                agent_position_along_max - (max_range // 2) - largest_axis_position - 1,
-                agent_position_along_max
-                + (max_range // 2)
-                + largest_axis_position
-                + 1
-                + 1,
+                int(np.floor(min_shifted_position)) - 1,
+                int(np.ceil(max_shifted_position)) + 1 + 1,
             ):  # add a buffer of 1 to either side of the position range
-                # todo: could double the range, but that would add in quite a bit of complexity
                 output += f"{PositionType.construct_problem_object(i)} "
                 self.postition_objects.append(PositionType.construct_problem_object(i))
 
