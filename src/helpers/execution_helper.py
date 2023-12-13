@@ -327,3 +327,10 @@ def check_goal_state(obs, voxel_size, goal):
             return False
 
     return True
+
+
+def set_birds_eye_view(env):
+    exec_command = f"/gamemode spectator"
+    env.execute_cmd(exec_command)
+    exec_command = f"/tp @p ~ 15 ~ 0 90"
+    env.execute_cmd(exec_command)

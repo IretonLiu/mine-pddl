@@ -151,6 +151,11 @@ def generate_or_execute_pddl(args):
             blocks = extract_blocks(obs, use_propositional)
             inventory = extract_inventory(obs, items, agent, use_propositional)
 
+        execution_helper.set_birds_eye_view(env)
+        for i in range(5):
+            obs, reward, done, info = env.step(env.action_space.no_op())
+            video_helper.save_image(obs["rgb"])
+
         plan_successful = execution_helper.check_goal_state(
             obs, voxel_size, world_config["goal"]
         )
