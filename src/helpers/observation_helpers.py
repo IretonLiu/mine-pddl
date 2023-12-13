@@ -1,12 +1,11 @@
 from typing import Dict, List, Tuple
 
 import numpy as np
+from helpers.utils import rename
 from pddl.functions import XPositionFunction, YPositionFunction, ZPositionFunction
 from pddl.pddl_types.base_pddl_types import AgentType
 from pddl.pddl_types.named_pddl_types import NamedBlockType, NamedItemType
 from pddl.predicates import AgentAlivePredicate, GoalAchievedPredicate
-
-rename = {"wood": "log", "wooden planks": "planks"}
 
 
 def get_valid_inventory_types():

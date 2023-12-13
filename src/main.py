@@ -30,6 +30,10 @@ from pddl.problem import Problem
 - 
 """
 
+RED = "\033[31m"
+GREEN = "\033[32m"
+RESET = "\033[0m"
+
 
 def generate_or_execute_pddl(args):
     world_config = yaml_helper.load_yaml(args.world_config)
@@ -129,14 +133,7 @@ def generate_or_execute_pddl(args):
         video_helper.save_image(obs["rgb"])
         curr_dir = "south"
 
-        # todo: read the plan from the file
-        # action_sequence = execution_helper.read_plan(args.plan_file)
-        action_sequence = [
-            "move-north",
-            "move-north",
-            "jumpup-north",
-            "place-obsidian-north",
-        ]
+        action_sequence = execution_helper.read_plan(args.plan_file)
         for action_str in action_sequence:
             # get the action vector
             action, curr_dir = execution_helper.get_action_from_str(
@@ -154,9 +151,11 @@ def generate_or_execute_pddl(args):
             blocks = extract_blocks(obs, use_propositional)
             inventory = extract_inventory(obs, items, agent, use_propositional)
 
+        plan_successful = execution_helper.check_goal_state(
+            obs, voxel_size, world_config["goal"]
+        )
         print(
-            "plan successful: ",
-            execution_helper.check_goal_state(obs, voxel_size, world_config["goal"]),
+            f"{GREEN if plan_successful else RED}{'Goal Achieved' if plan_successful else 'Goal Not Achieved'}{RESET}"
         )
 
         print("Generating Video...")

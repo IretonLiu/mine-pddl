@@ -1,6 +1,7 @@
-import numpy as np
-import cv2
 import os
+
+import cv2
+import numpy as np
 
 
 class VideoHelper:
@@ -39,12 +40,16 @@ class VideoHelper:
         )
 
         # Appending the images to the video one by one
-        for i in range(self.image_count):
-            video.write(cv2.imread(os.path.join(self.filepath, f"{i}.png")))
+        # add a pseudo-freeze frame at the end
+        for i in range(self.image_count + 5):
+            num = min(i, self.image_count - 1)
+            video.write(cv2.imread(os.path.join(self.filepath, f"{num}.png")))
 
         # Deallocating memories taken for window creation
         cv2.destroyAllWindows()
         video.release()  # releasing the video generated
+
+        print(f"Video saved to {os.path.join(self.filepath, video_name)}")
 
     def clean_up(self):
         # delete all the intermediate images

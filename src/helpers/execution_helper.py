@@ -1,6 +1,7 @@
 from typing import Dict, List, Optional
 
 import numpy as np
+from helpers.utils import rename
 from minedojo.sim.wrappers.ar_nn.ar_nn_wrapper import ARNNWrapper
 from pddl.functions import XPositionFunction, YPositionFunction, ZPositionFunction
 from pddl.pddl_types.base_pddl_types import AgentType
@@ -11,18 +12,25 @@ from pddl.pddl_types.base_pddl_types import AgentType
 def read_plan(plan_path: str):
     """
     Read the plan from the pddl file
-    Each line has the following format: <action no.>: (<action name> <action args>)
+    Each line has the following format: (<action name> <action args>)
     """
 
     action_sequence = []
     with open(plan_path, "r") as file:
         for line in file:
-            if line[0] == ";":
-                continue
+            if line[0] == "(":
+                # this line is a valid action
+                # i.e. in the format (<action name> <action args>)
 
-            action_sequence.append(
-                line.split(":")[1].strip().split(" ")[0].strip("(")
-            )  # )
+                # get the action name only - get rid of the brackets and action args (which are only meaningful to the planner)
+                action_name = line[1:].split(" ")[0].strip("(").strip()
+
+                action_sequence.append(action_name)
+
+                # if we have the checkgoal action, we can stop reading the plan any further
+                # todo: carry on reading the plan, which would allow for optimality/efficiency checking
+                if action_name == "checkgoal":
+                    break
 
     return action_sequence
 
@@ -275,26 +283,47 @@ def check_goal_state(obs, voxel_size, goal):
             )
             - agent_pos
         )
-        relative_position += np.array(
+        voxel_position = np.array(
             [
-                (voxel_size["xmax"] - voxel_size["xmin"]) // 2,
-                (voxel_size["ymax"] - voxel_size["ymin"]) // 2,
-                (voxel_size["zmax"] - voxel_size["zmin"]) // 2,
+                (voxel_size["xmax"] - voxel_size["xmin"]) / 2,
+                (voxel_size["ymax"] - voxel_size["ymin"]) / 2,
+                (voxel_size["zmax"] - voxel_size["zmin"]) / 2,
             ]
         )
+
+        relative_position += np.ceil(voxel_position).astype(int)
 
         actual = obs["voxels"]["block_name"][
             relative_position[0], relative_position[1], relative_position[2]
         ]
+        # rename actual block if neccessary
+        if actual in rename:
+            actual = rename[actual]
+
         if actual != block["type"]:
             return False
 
     # loop over all the inventory items in the goal and check if they are present
     for inv_item in inventory:
+        item_in_true_inventory = False
         for i, name in enumerate(obs["inventory"]["name"]):
-            if name == inv_item["type"]:
-                if obs["inventory"]["quantity"][i] < inv_item["quantity"]:
-                    return False
+            if int(inv_item["quantity"]) == 0:
+                # if the quantity is 0, we don't care about the item
+                item_in_true_inventory = True
                 break
+
+            if name == inv_item["type"]:
+                item_in_true_inventory = True
+                if float(obs["inventory"]["quantity"][i]) < float(inv_item["quantity"]):
+                    return False
+
+                # break if we have found the item we are looking for
+                break
+
+        # if we get here, we have either
+        # 1) found the item in the inventory and checked the quantity is correct
+        # 2) not found the item in the inventory
+        if not item_in_true_inventory:
+            return False
 
     return True
