@@ -129,7 +129,13 @@ def generate_or_execute_pddl(args):
 
     if args.execute_plan:
         # create the video helper
-        video_helper = VideoHelper(args.video_save_path)
+        video_helper = VideoHelper(
+            args.video_save_path,
+            world_config["name"] if "name" in world_config else "unknown",
+            args.domain_name,
+            args.problem_name,
+            args.pddl_type,
+        )
         video_helper.save_image(obs["rgb"])
         curr_dir = "south"
 
@@ -151,14 +157,16 @@ def generate_or_execute_pddl(args):
             blocks = extract_blocks(obs, use_propositional)
             inventory = extract_inventory(obs, items, agent, use_propositional)
 
-        execution_helper.set_birds_eye_view(env)
-        for i in range(5):
-            obs, reward, done, info = env.step(env.action_space.no_op())
-            video_helper.save_image(obs["rgb"])
-
+        # check if the goal state has been reached BEFORE switch to birds eye view - since obs is relative to agent
         plan_successful = execution_helper.check_goal_state(
             obs, voxel_size, world_config["goal"]
         )
+
+        execution_helper.set_birds_eye_view(env)
+        for i in range(5):
+            obs, reward, done, info = env.step(env.action_space.no_op())
+        video_helper.save_birds_eye_view(obs["rgb"])
+
         print(
             f"{GREEN if plan_successful else RED}{'Goal Achieved' if plan_successful else 'Goal Not Achieved'}{RESET}"
         )
