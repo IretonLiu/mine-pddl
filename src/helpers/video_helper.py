@@ -114,7 +114,6 @@ class VideoHelper:
 
         # add the birds eye view image
         if os.path.exists(self.birds_eye_view_image_path):
-            print("here =========================")
             image = cv2.imread(self.birds_eye_view_image_path)
             image = self.overlay_text(image)
             for i in range(5):

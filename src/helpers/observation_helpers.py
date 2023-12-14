@@ -124,7 +124,9 @@ def extract_blocks(obs, use_propositional: bool):
                     continue
 
                 # Assume observation is centred at player
-                block_name = rename[block_name] if block_name in rename else block_name
+                if block_name in rename:
+                    block_name = rename[block_name]
+
                 absolute_pos = (
                     np.array([x, y, z])
                     - np.array(voxels.shape) // 2
