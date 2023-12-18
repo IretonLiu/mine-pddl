@@ -57,7 +57,18 @@ To get a list of valid block and item types, run:
 
 ```shell
 python src/main.py --print-valid-types
-```
+```  
+  
+### Converting a Minecraft World to a YAML list of blocks
+Provided in the `Utilities` folder is a Jupyter notebook, `World_To_YAML.ipynb` that can assist in converting a standard Java Minecraft save into a list of blocks in the YAML format described above.  
+
+A standard Java Minecraft save folder is needed, which can be found in `.minecraft/saves/`, where this will need to be copied to the `Utilities` directory. Also take note of the name of the world folder as it will need to be specified within the notebook.   
+
+Within the notebook, the `radius` and `world_file_path` parameters need to be specified. The `radius` parameter represents the number of blocks the search will check for, centered around (x, y) = (0, 0). PyBlock will search all y-levels when listing blocks, and is not affected by the radius parameter. The `world_file_path` represents the name of the world folder.  
+  
+The next cell can then be run which will list all available blocks within the current Minecraft save, within the specified radius. The blocks needed will then need to be added to the dictionary described below that cell in order to translate between the Minecraft naming scheme and the YAML naming scheme.  
+
+The final cell will then search the Minecraft world for each block specified above, and save the list of blocks as `Utilities/block_list.yaml`. This can then be copied into the YAML description file to be used to convert to PDDL.
 
 ## Running
 
