@@ -44,4 +44,5 @@ urllib3==2.0.3
 websocket-client==1.5.3
 wget==3.2
 xmltodict==0.13.0
+pyblock==0.6
 -e MineDojo-PDDL # git+ssh://git@github.com/IretonLiu/MineDojo-PDDL.git@6be3df45dc775250b826f99db9195cabf61fdecf#egg=minedojo&subdirectory=../../MineDojo-PDDL
