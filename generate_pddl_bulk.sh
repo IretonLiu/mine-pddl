@@ -1,7 +1,7 @@
 #!/bin/zsh
 
 # define the tasks to skip
-declare -a skip_task_array=("PDDL Files" "Farm_Wheat" "Craft_Item" "Grow_Tree")
+declare -a skip_task_array=("PDDL Files" "Farm_Wheat" "Craft_Item" "Grow_Tree", "Scaled_Move_to_Location")
 
 # define the difficulty levels
 declare -a difficulty_array=("Easy" "Medium" "Hard")
