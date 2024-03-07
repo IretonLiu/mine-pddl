@@ -175,3 +175,30 @@ They will be bulit and run using Docker and the Docker Compose plugin, which can
     ```shell
     docker compose run downward --alias lama-first --plan-file pddl/<path-to-plan-file> pddl/<path-to-domain-file> pddl/<path-to-problem-file>
     ```
+
+## Using the generator scripts
+
+There are two generator scripts: one to generate the domain and problem pddl files for all the provided tasks, and a second one to generate the YAML files and associated domain and problem pddl files for the scaling task.
+
+### Bulk Generator
+
+Run with `./generate_pddl_bulk.sh`.
+
+This script will generate the domain and problem pddl files for all the provided tasks. The behaviour of the script can be modified by changing the valeus of the arrays at the beginning of the script:
+
+- `skip_task_array`: pddl will not be generated for the tasks specified here
+- `obsrange_array`: specifies the standard observation ranges for the different levels of difficulty
+- `logcabin_obsrange_array` and `cuttree_obsrange_array`: override the standard observation ranges per difficulty level for the Log_Cabin and Cut_Tree tasks. Note that more overrides can be added for other tasks, but this will require editing of the script (although it will be quite similar to the `if` blocks already accounting for Log_Cabin and Cut_Tree).
+
+### Scaled Task Generator
+
+Run with `./generate_scaling_tasks`.
+
+This script will generate the YAML task files and the associated domain and problem pddl files for the Scaled Task. This suite of tasks is special in that it only specifies a single strip of a varying number of blocks for the agent to move over, with the purpose of finding the number of blocks in a task at which planners fail. There are 4 variables in the script that can be edited:
+
+- `min_blocks`: the (inclusive) lower bound of the range of the number of blocks in the tasks
+- `max_blocks`: the (inclusive) upper bound of the range of the number of blocks in the tasks
+- `base_yaml_folder`: the base path to where the YAML files will be saved
+- `base_pddl_folder`: the base path to where the domain and problem files will be saved
+
+The specific tasks in this suite are controlled by the `min_blocks` and `max_blocks` variables, which define the range of the number of blocks in each of the tasks, using a single step increment from the smallest to the largest task.
