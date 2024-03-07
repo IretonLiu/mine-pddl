@@ -334,3 +334,8 @@ def set_birds_eye_view(env):
     env.execute_cmd(exec_command)
     exec_command = "/tp @p ~ 15 ~ 0 90"
     env.execute_cmd(exec_command)
+
+
+def move_agent_to_location(env, x_pos, y_pos, z_pos):
+    exec_command = f"/tp @p {x_pos} {y_pos} {z_pos}"
+    env.execute_cmd(exec_command)

@@ -2,6 +2,7 @@ import os
 
 import handlers.entities as handlers
 import minedojo  # type: ignore
+from argument_parser import agent_start_position as process_agent_start_position
 from argument_parser import get_args_parser
 from helpers import execution_helper, yaml_helper
 from helpers.observation_helpers import (
@@ -13,6 +14,7 @@ from helpers.observation_helpers import (
 )
 from helpers.video_helper import VideoHelper
 from pddl.domain import Domain
+from pddl.functions import XPositionFunction, YPositionFunction, ZPositionFunction
 from pddl.problem import Problem
 
 """
@@ -41,9 +43,9 @@ def generate_or_execute_pddl(args):
     max_inventory_stack = args.max_inventory_stack
     ranges = args.observation_range
     voxel_size = dict(
-        xmin=-ranges[0] // 2,
-        ymin=-ranges[1] // 2,
-        zmin=-ranges[2] // 2,
+        xmin=-(ranges[0] // 2) + (1 if ranges[0] % 2 == 0 else 0),
+        ymin=-(ranges[1] // 2) + (1 if ranges[1] % 2 == 0 else 0),
+        zmin=-(ranges[2] // 2) + (1 if ranges[2] % 2 == 0 else 0),
         xmax=ranges[0] // 2,
         ymax=ranges[1] // 2,
         zmax=ranges[2] // 2,
@@ -95,6 +97,39 @@ def generate_or_execute_pddl(args):
     blocks = extract_blocks(obs, use_propositional)
     inventory = extract_inventory(obs, items, agent, use_propositional)
 
+    # check if the world config has the agent start position
+    # this start position is an override, but we can only enforce it now, otherwise the observation would be centred at the wrong location
+    # so we need to enforce it now
+    if "agent" in world_config:
+        # get the new position
+        agent_start_position_overwrite = world_config["agent"][0]["position"]
+        agent_start_position_overwrite = process_agent_start_position(
+            f"({agent_start_position_overwrite['x']}, {agent_start_position_overwrite['y']}, {agent_start_position_overwrite['z']})"
+        )
+
+        # change the agent's position - this is required for the correctness of the problem pddl
+        agent.functions[XPositionFunction].set_value(
+            agent_start_position_overwrite["x"]
+        )
+        agent.functions[YPositionFunction].set_value(
+            agent_start_position_overwrite["y"]
+        )
+        agent.functions[ZPositionFunction].set_value(
+            agent_start_position_overwrite["z"]
+        )
+
+        # move the agent to the start position - this is required for the correctness of executing the plan
+        execution_helper.move_agent_to_location(
+            env,
+            agent_start_position_overwrite["x"],
+            agent_start_position_overwrite["y"],
+            agent_start_position_overwrite["z"],
+        )
+
+        # make sure the teleportation takes effect
+        for i in range(5):
+            obs, reward, done, info = env.step(env.action_space.no_op())
+
     if args.generate_pddl:
         # make sure the paths exist
         for filepath in [args.domain_file, args.problem_file]:
@@ -128,6 +163,12 @@ def generate_or_execute_pddl(args):
         )
 
     if args.execute_plan:
+        # we might have had to update the agent's position, so we need to process the updated obs
+        # we couldn't do it earlier because we don't want to alter the blocks, items, and inventory for generating pddl
+        items, agent = extract_entities(obs, use_propositional)
+        blocks = extract_blocks(obs, use_propositional)
+        inventory = extract_inventory(obs, items, agent, use_propositional)
+
         # create the video helper
         video_helper = VideoHelper(
             args.video_save_path,
