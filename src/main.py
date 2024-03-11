@@ -100,12 +100,21 @@ def generate_or_execute_pddl(args):
     # check if the world config has the agent start position
     # this start position is an override, but we can only enforce it now, otherwise the observation would be centred at the wrong location
     # so we need to enforce it now
+    agent_original_position = None
     if "agent" in world_config:
         # get the new position
         agent_start_position_overwrite = world_config["agent"][0]["position"]
         agent_start_position_overwrite = process_agent_start_position(
             f"({agent_start_position_overwrite['x']}, {agent_start_position_overwrite['y']}, {agent_start_position_overwrite['z']})"
         )
+
+        # store the original position
+        # since we are moving the agent's starting position, we need to override the agent's position in the problem pddl when generating the position objects
+        agent_original_position = {
+            "x": agent.functions[XPositionFunction].value,
+            "y": agent.functions[YPositionFunction].value,
+            "z": agent.functions[ZPositionFunction].value,
+        }
 
         # change the agent's position - this is required for the correctness of the problem pddl
         agent.functions[XPositionFunction].set_value(
@@ -160,6 +169,7 @@ def generate_or_execute_pddl(args):
             items,
             blocks,
             file_path=args.problem_file,
+            agent_position_override=agent_original_position,
         )
 
     if args.execute_plan:

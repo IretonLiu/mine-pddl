@@ -1,4 +1,4 @@
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 from helpers.prop_helper import generate_initial_seq_predicates
@@ -63,7 +63,12 @@ class Problem:
         agent: AgentType,
         items: Dict[str, List[NamedItemType]],
         blocks: Dict[str, List[NamedBlockType]],
+        agent_position_override: Optional[Dict[str, int]] = None,
     ):
+        # agent_position_override is used when the starting position of the agent has been modified by yaml
+        # in this case, we still want the world to be centred at the agent's spawn position, so we pass that through as an override,
+        # since the agent object has had its position updated
+
         output = "(:objects\n"
 
         output += f"\t{agent.name} - {agent.type_name}\n"
@@ -105,17 +110,24 @@ class Problem:
             self.postition_objects = []
             self.count_objects = []
 
+            # see if there is a position override
+            if agent_position_override is None:
+                agent_position_override = {}
+                agent_position_override["x"] = agent.functions[XPositionFunction].value
+                agent_position_override["y"] = agent.functions[YPositionFunction].value
+                agent_position_override["z"] = agent.functions[ZPositionFunction].value
+
             # we need to find the largest positive position and the smallest negative position
             # this will be used to determine the range of positions to include in the problem
             min_shifted_position = min(
-                agent.functions[XPositionFunction].value - self.obs_range[0] // 2,
-                agent.functions[YPositionFunction].value - self.obs_range[1] // 2,
-                agent.functions[ZPositionFunction].value - self.obs_range[2] // 2,
+                agent_position_override["x"] - self.obs_range[0] // 2,
+                agent_position_override["y"] - self.obs_range[1] // 2,
+                agent_position_override["z"] - self.obs_range[2] // 2,
             )
             max_shifted_position = max(
-                agent.functions[XPositionFunction].value + self.obs_range[0] // 2,
-                agent.functions[YPositionFunction].value + self.obs_range[1] // 2,
-                agent.functions[ZPositionFunction].value + self.obs_range[2] // 2,
+                agent_position_override["x"] + self.obs_range[0] // 2,
+                agent_position_override["y"] + self.obs_range[1] // 2,
+                agent_position_override["z"] + self.obs_range[2] // 2,
             )
 
             output += "\t"
@@ -293,10 +305,15 @@ class Problem:
         items: Dict[str, List[NamedItemType]],
         blocks: Dict[str, List[NamedBlockType]],
         file_path: str,
+        agent_position_override: Optional[
+            Dict[str, int]
+        ] = None,  # see self.construct_objects comment for more info
     ):
         pddl = f"(define (problem {self.name})\n"
         pddl += f"\t(:domain {self.domain.name})\n"
-        pddl += f"{self.construct_objects(agent, items, blocks)}\n"
+        pddl += (
+            f"{self.construct_objects(agent, items, blocks, agent_position_override)}\n"
+        )
         pddl += f"{self.construct_initial_state(agent, items, blocks)}\n"
         pddl += f"{self.construct_goal(agent)}\n"
         pddl += ")"
