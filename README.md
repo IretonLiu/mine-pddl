@@ -18,34 +18,34 @@ Install MinePlanner and dependencies:
 
 1. Clone the repository, using SSH
 
-    ```shell
-    git clone --recurse-submodules git@github.com:IretonLiu/mine-pddl.git
-    ```
+   ```shell
+   git clone --recurse-submodules git@github.com:IretonLiu/mine-pddl.git
+   ```
 
-    or using HTTPS
+   or using HTTPS
 
-    ```shell
-    git clone --recurse-submodules https://github.com/IretonLiu/mine-pddl.git
-    ```
+   ```shell
+   git clone --recurse-submodules https://github.com/IretonLiu/mine-pddl.git
+   ```
 
 2. Change the working directory:
 
-    ```shell
-    cd mine-pddl
-    ```
+   ```shell
+   cd mine-pddl
+   ```
 
 3. [Optional] Create a python virtual environment
 
-    ```shell
-    python -m venv env
-    source env/bin/activate
-    ```
+   ```shell
+   python -m venv env
+   source env/bin/activate
+   ```
 
 4. Install python packages
 
-    ```shell
-    pip install -r requirements.txt
-    ```
+   ```shell
+   pip install -r requirements.txt
+   ```
 
 ## Specifying Minecraft World
 
@@ -57,16 +57,17 @@ To get a list of valid block and item types, run:
 
 ```shell
 python src/main.py --print-valid-types
-```  
-  
+```
+
 ### Converting a Minecraft World to a YAML list of blocks
-Provided in the `Utilities` folder is a Jupyter notebook, `World_To_YAML.ipynb` that can assist in converting a standard Java Minecraft save into a list of blocks in the YAML format described above.  
 
-A standard Java Minecraft save folder is needed, which can be found in `.minecraft/saves/`, where this will need to be copied to the `Utilities` directory. Also take note of the name of the world folder as it will need to be specified within the notebook.   
+Provided in the `Utilities` folder is a Jupyter notebook, `World_To_YAML.ipynb` that can assist in converting a standard Java Minecraft save into a list of blocks in the YAML format described above.
 
-Within the notebook, the `radius` and `world_file_path` parameters need to be specified. The `radius` parameter represents the number of blocks the search will check for, centered around (x, y) = (0, 0). PyBlock will search all y-levels when listing blocks, and is not affected by the radius parameter. The `world_file_path` represents the name of the world folder.  
-  
-The next cell can then be run which will list all available blocks within the current Minecraft save, within the specified radius. The blocks needed will then need to be added to the dictionary described below that cell in order to translate between the Minecraft naming scheme and the YAML naming scheme.  
+A standard Java Minecraft save folder is needed, which can be found in `.minecraft/saves/`, where this will need to be copied to the `Utilities` directory. Also take note of the name of the world folder as it will need to be specified within the notebook.
+
+Within the notebook, the `radius` and `world_file_path` parameters need to be specified. The `radius` parameter represents the number of blocks the search will check for, centered around (x, y) = (0, 0). PyBlock will search all y-levels when listing blocks, and is not affected by the radius parameter. The `world_file_path` represents the name of the world folder.
+
+The next cell can then be run which will list all available blocks within the current Minecraft save, within the specified radius. The blocks needed will then need to be added to the dictionary described below that cell in order to translate between the Minecraft naming scheme and the YAML naming scheme.
 
 The final cell will then search the Minecraft world for each block specified above, and save the list of blocks as `Utilities/block_list.yaml`. This can then be copied into the YAML description file to be used to convert to PDDL.
 
@@ -133,48 +134,47 @@ Two planners have been provided:
 
 They will be bulit and run using Docker and the Docker Compose plugin, which can be installed using these instructions: [https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
 
-> [!IMPORTANT]
-> `<path to domain file>` and `<path to problem file>` are relative to the root directory
+> [!IMPORTANT] > `<path to domain file>` and `<path to problem file>` are relative to the root directory
 
 ### enhsp20
 
 1. Navigate to the enhsp20 directory
 
-    ```shell
-    cd containers/enhsp20
-    ```
+   ```shell
+   cd containers/enhsp20
+   ```
 
 2. Build the image
 
-    ```shell
-    docker compose build
-    ```
+   ```shell
+   docker compose build
+   ```
 
 3. Run the planner
 
-    ```shell
-    docker compose run enhsp20 -o pddl/<path to domain file> -f pddl/<path to problem file>
-    ```
+   ```shell
+   docker compose run enhsp20 -o pddl/<path to domain file> -f pddl/<path to problem file>
+   ```
 
 ### Fast Downward
 
 1. Navigate to the Fast Downward directory
 
-    ```shell
-    cd containers/downward
-    ```
+   ```shell
+   cd containers/downward
+   ```
 
 2. Build the image
 
-    ```shell
-    docker compose build
-    ```
+   ```shell
+   docker compose build
+   ```
 
 3. Run the planner
 
-    ```shell
-    docker compose run downward --alias lama-first --plan-file pddl/<path-to-plan-file> pddl/<path-to-domain-file> pddl/<path-to-problem-file>
-    ```
+   ```shell
+   docker compose run downward --alias lama-first --plan-file pddl/<path-to-plan-file> pddl/<path-to-domain-file> pddl/<path-to-problem-file>
+   ```
 
 ## Using the generator scripts
 
@@ -202,3 +202,19 @@ This script will generate the YAML task files and the associated domain and prob
 - `base_pddl_folder`: the base path to where the domain and problem files will be saved
 
 The specific tasks in this suite are controlled by the `min_blocks` and `max_blocks` variables, which define the range of the number of blocks in each of the tasks, using a single step increment from the smallest to the largest task.
+
+## Miscellaneous Scripts
+
+These are standalone scripts found in the `misc` directory.
+
+### convert_human_solution_to_pddl.py
+
+This script converts the json form of actions (i.e. a json list of action objects), which was generated from a manual run through of a task, to their pddl equivalent for validation by MinePlanner.
+
+Usage:
+
+```python
+python misc/convert_human_solution_to_pddl.py --json-file-path <relative path to root folder of json files> --pddl-file-path <relative path to root folder where the pddl files should be stored>
+```
+
+**Note: the directory structure rooted at `--json-file-path` will be maintained in `--pddl-file-path`**

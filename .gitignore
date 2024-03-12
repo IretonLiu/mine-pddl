@@ -10,3 +10,5 @@ pyrightconfig.json
 task-worlds
 problems/tasks*
 Plans
+Human Solutions
+pddl-human-solutions
