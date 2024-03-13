@@ -7,6 +7,7 @@ import os
 from typing import List, Tuple
 
 RED = "\033[31m"
+YELLOW = "\033[33m"
 GREEN = "\033[32m"
 RESET = "\033[0m"
 
@@ -33,12 +34,103 @@ def construct_argument_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def find_differences_in_files(
-    file1: List[str], file2: List[str]
+def find_differences_in_files_part_one(
+    file1: List[str], file2: List[str], is_domain: bool
 ) -> List[Tuple[int, str, str]]:
     # returns a tuple of the line number and the lines
 
+    """
+    Domain:
+    - ignore the first two lines (domain/problem name and requirements) since they are the same everywhere
+    - then we get to types/objetcs, where each line needs to be split, sorted and compared
+    """
+
+    differences = []
+
+    file1_words = []
+    file2_words = []
+
+    # line_num is the same for both files
     line_num = 0
+    while line_num < len(file1):
+        # get the two lines to compare
+        file1_line = file1[line_num]
+        file2_line = file2[line_num]
+
+        # Removing whitespaces
+        file1_line = file1_line.strip()
+        file2_line = file2_line.strip()
+
+        # split the lines
+        file1_line = file1_line.split()
+        file2_line = file2_line.split()
+
+        # add to the collection
+        file1_words.extend(file1_line)
+        file2_words.extend(file2_line)
+
+        line_num += 1
+
+    # sort the lines
+    file1_words.sort()
+    file2_words.sort()
+
+    # join the lines
+    file1_words = " ".join(file1_words)
+    file1_words = " ".join(file1_words)
+
+    # Compare the lines from both file
+    if file1_words != file1_words:
+        # store the difference
+        differences.append((line_num + 1, file1_words, file1_words))
+
+    return differences
+
+
+def find_differences_in_files(
+    file1: List[str], file2: List[str], is_domain: bool
+) -> List[Tuple[int, str, str]]:
+    # returns a tuple of the line number and the lines
+
+    """
+    There is an issue of random order in the files.
+    So what we will do is split the domain and problem files into two parts (where the second part will be sorted and compared line-by-line):
+
+    - domain: first part is everything up until "predicates" and will require splitting each line and comparing the parts
+
+    - problem: first part is everything up until "init" and will require splitting each line and comparing the parts
+               the second part has the special case of ignoring positions offset by a single location (this is due to a slight change in the
+                   positioning update which does not affect correctness, since it only shifts the world)
+
+    This will work for the most part, but since the sorting will break the "container" of each section, there may be some differences that
+    slip through the cracks.
+    """
+
+    if is_domain:
+        section_part_separator = "action"
+    else:
+        section_part_separator = "init"
+
+    # find the line where the first part ends in both files
+    line_num = 0
+    while line_num < len(file1):
+        if f"(:{section_part_separator}" in file1[line_num]:
+            break
+        line_num += 1
+
+    if f"(:{section_part_separator}" not in file2[line_num]:
+        print(
+            f"{RED}Error: The first part of the files are not the same length {RESET}"
+        )
+        return [(-1, "", "")]
+
+    # compare the first part
+    output = find_differences_in_files_part_one(
+        file1[:line_num], file2[:line_num], is_domain
+    )
+
+    return output
+
     output = []
     while line_num < len(file1) and line_num < len(file2):
         # get the two lines to compare
@@ -76,6 +168,7 @@ if __name__ == "__main__":
     # do a directory walk
     total_count = 0
     different_count = 0
+    files_to_redo = []
     for dirpath, dirnames, filenames in os.walk(args.current_pddl_file_path):
         # check if there are pddl files here
         for filename in filenames:
@@ -88,9 +181,10 @@ if __name__ == "__main__":
                     filename,
                 )
                 if not os.path.exists(old_filepath):
-                    print(
-                        f"{RED}File {filename} does not exist in the old directory{RESET}"
-                    )
+                    if "Scaled" not in filename:
+                        print(
+                            f"{RED}File {filename} does not exist in the old directory{RESET}"
+                        )
                     continue
 
                 # read the files
@@ -101,12 +195,28 @@ if __name__ == "__main__":
 
                 # find the differences
                 differences: List[Tuple[int, str, str]] = find_differences_in_files(
-                    current_contents, old_contents
+                    current_contents, old_contents, "_domain.pddl" in filename
                 )
 
                 # check if there are differences
                 if len(differences) > 0:
-                    print(f"{RED}File {filename} has differences{RESET}")
+                    print(f"{YELLOW}File {filename} has differences{RESET}")
+
+                    file_to_redo = filename.replace("_domain.pddl", ".pddl").replace(
+                        "_problem.pddl", ".pddl"
+                    )
+                    file_to_redo = (
+                        "prop: " + file_to_redo
+                        if "proposition" in dirpath
+                        else file_to_redo
+                    )
+                    file_to_redo = (
+                        "num:  " + file_to_redo
+                        if "numerical" in dirpath
+                        else file_to_redo
+                    )
+                    if file_to_redo not in files_to_redo:
+                        files_to_redo.append(file_to_redo)
 
                     # make sure the diff folder exists
                     diff_folder = dirpath.replace(args.current_pddl_file_path, "")
@@ -132,3 +242,6 @@ if __name__ == "__main__":
     print(
         f"Successfully checked {total_count} files, of which {different_count} were different"
     )
+    print("These are the files to redo:")
+    files_to_redo.sort()
+    print("\n".join(files_to_redo))
