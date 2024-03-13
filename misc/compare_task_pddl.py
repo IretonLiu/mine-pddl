@@ -35,12 +35,11 @@ def construct_argument_parser() -> argparse.ArgumentParser:
 
 
 def find_differences_in_files_part_one(
-    file1: List[str], file2: List[str], is_domain: bool
+    file1: List[str], file2: List[str]
 ) -> List[Tuple[int, str, str]]:
     # returns a tuple of the line number and the lines
 
     """
-    Domain:
     - ignore the first two lines (domain/problem name and requirements) since they are the same everywhere
     - then we get to types/objetcs, where each line needs to be split, sorted and compared
     """
@@ -77,12 +76,65 @@ def find_differences_in_files_part_one(
 
     # join the lines
     file1_words = " ".join(file1_words)
-    file1_words = " ".join(file1_words)
+    file2_words = " ".join(file2_words)
 
     # Compare the lines from both file
-    if file1_words != file1_words:
+    if file1_words != file2_words:
         # store the difference
-        differences.append((line_num + 1, file1_words, file1_words))
+        differences.append((line_num + 1, file1_words, file2_words))
+
+    return differences
+
+
+def find_differences_in_files_part_two(
+    file1: List[str], file2: List[str]
+) -> List[Tuple[int, str, str]]:
+    # returns a tuple of the line number and the lines
+
+    """
+    Domain:
+    - ignore the first two lines (domain/problem name and requirements) since they are the same everywhere
+    - then we get to types/objetcs, where each line needs to be split, sorted and compared
+    """
+
+    differences = []
+
+    # strip any whitespace
+    file1_lines = [line.strip() for line in file1]
+    file2_lines = [line.strip() for line in file2]
+
+    # sort the two files
+    file1_lines.sort()
+    file2_lines.sort()
+
+    line_num = 0
+    while line_num < len(file1_lines) and line_num < len(file2_lines):
+        # get the two lines to compare
+        file1_line = file1_lines[line_num]
+        file2_line = file2_lines[line_num]
+
+        # Removing whitespaces
+        file1_line = file1_line.strip()
+        file2_line = file2_line.strip()
+
+        # compare the lines
+        if file1_line != file2_line:
+            # store the difference
+            differences.append((line_num + 1, file1_line, file2_line))
+
+        line_num += 1
+
+    # check if there's a bunch of extra lines in one of the files
+    if len(file1_lines) != len(file2_lines):
+        # get the extra lines
+        first_longer = len(file1_lines) > len(file2_lines)
+        for i in range(
+            line_num, len(file1_lines) if first_longer else len(file2_lines)
+        ):
+            if first_longer:
+                differences.append((i, file1_lines[i], ""))
+            else:
+                differences.append((i, "", file2_lines[i]))
 
     return differences
 
@@ -125,38 +177,13 @@ def find_differences_in_files(
         return [(-1, "", "")]
 
     # compare the first part
-    output = find_differences_in_files_part_one(
-        file1[:line_num], file2[:line_num], is_domain
-    )
+    output = find_differences_in_files_part_one(file1[:line_num], file2[:line_num])
 
-    return output
+    if len(output) > 0:
+        return output
 
-    output = []
-    while line_num < len(file1) and line_num < len(file2):
-        # get the two lines to compare
-        file1_line = file1[line_num]
-        file2_line = file2[line_num]
-
-        # Removing whitespaces
-        file1_line = file1_line.strip()
-        file2_line = file2_line.strip()
-
-        # Compare the lines from both file
-        if file1_line != file2_line:
-            # store the difference
-            output.append((line_num + 1, file1_line, file2_line))
-
-        line_num += 1
-
-    # check if there's a bunch of extra lines in one of the files
-    if len(file1) != len(file2):
-        # get the extra lines
-        first_longer = len(file1) > len(file2)
-        for i in range(line_num, len(file1) if first_longer else len(file2)):
-            if first_longer:
-                output.append((i, file1[i], ""))
-            else:
-                output.append((i, "", file2[i]))
+    # compare the second part
+    output = find_differences_in_files_part_two(file1[line_num:], file2[line_num:])
 
     return output
 
@@ -200,7 +227,9 @@ if __name__ == "__main__":
 
                 # check if there are differences
                 if len(differences) > 0:
-                    print(f"{YELLOW}File {filename} has differences{RESET}")
+                    print(
+                        f"{YELLOW}File ({'prop' if 'proposition' in dirpath else 'num '}) {filename} has differences{RESET}"
+                    )
 
                     file_to_redo = filename.replace("_domain.pddl", ".pddl").replace(
                         "_problem.pddl", ".pddl"
@@ -233,8 +262,8 @@ if __name__ == "__main__":
                                 f"Line {line_num}:\n\t- {file1_line}\n\t+ {file2_line}\n\n"
                             )
                     different_count += 1
-                else:
-                    print(f"{GREEN}File {filename} is the same{RESET}")
+                # else:
+                #     print(f"{GREEN}File {filename} is the same{RESET}")
 
                 total_count += 1
 
