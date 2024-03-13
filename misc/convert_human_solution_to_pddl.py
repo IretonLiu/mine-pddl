@@ -7,8 +7,8 @@ This script is responsible for converting the json action to their pddl form and
 """
 
 import argparse
-import os
 import json
+import os
 from typing import Dict
 
 

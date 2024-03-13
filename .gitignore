@@ -7,8 +7,9 @@ pyrightconfig.json
 .java-version
 *.png 
 *.mp4
-task-worlds
+task-worlds*
 problems/tasks*
 Plans
-Human Solutions
-pddl-human-solutions
+human-solutions*
+old-pddl-files
+diff
