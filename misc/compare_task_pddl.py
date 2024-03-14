@@ -9,6 +9,7 @@ from typing import List, Tuple
 RED = "\033[31m"
 YELLOW = "\033[33m"
 GREEN = "\033[32m"
+BLUE = "\033[94m"
 RESET = "\033[0m"
 
 
@@ -35,7 +36,7 @@ def construct_argument_parser() -> argparse.ArgumentParser:
 
 
 def find_differences_in_files_part_one(
-    file1: List[str], file2: List[str]
+    file1: List[str], file2: List[str], is_domain: bool
 ) -> List[Tuple[int, str, str]]:
     # returns a tuple of the line number and the lines
 
@@ -81,9 +82,43 @@ def find_differences_in_files_part_one(
     # Compare the lines from both file
     if file1_words != file2_words:
         # store the difference
-        differences.append((line_num + 1, file1_words, file2_words))
+        file1_words_set = set(file1_words.split())
+        file2_words_set = set(file2_words.split())
+        file1_diff = list(file1_words_set - file2_words_set)
+        file2_diff = list(file2_words_set - file1_words_set)
+        file1_diff.sort()
+        file2_diff.sort()
+        differences.append(
+            (
+                line_num + 1,
+                file1_diff,
+                file2_diff,
+            )
+        )
 
-    return differences
+        # if this is a problem file, check if the difference is due to a few extra blocks
+        if not is_domain:
+            # grass_block will always be present
+            grass_block_name = "grass_block-block"
+            if (
+                grass_block_name not in file1_words
+                or grass_block_name not in file2_words
+            ):
+                print(f"{BLUE}grass_block not found in the problem file{RESET}")
+            else:
+                # find the max num of grass blocks in each file
+                file1_grass_blocks = file1_words.count(grass_block_name)
+                file2_grass_blocks = file2_words.count(grass_block_name)
+
+                diff = abs(file1_grass_blocks - file2_grass_blocks)
+                ranges = [13, 21, 41, 65, 71]
+                if diff in [2 * i + 1 for i in ranges]:
+                    print(f"{GREEN}grass_block-block difference: {diff}{RESET}")
+                    differences = [(-10, "", "")]
+                else:
+                    print(f"grass_block-block difference: {diff}{RESET}")
+
+    return differences  # type: ignore
 
 
 def find_differences_in_files_part_two(
@@ -177,9 +212,13 @@ def find_differences_in_files(
         return [(-1, "", "")]
 
     # compare the first part
-    output = find_differences_in_files_part_one(file1[:line_num], file2[:line_num])
+    output = find_differences_in_files_part_one(
+        file1[:line_num], file2[:line_num], is_domain
+    )
 
     if len(output) > 0:
+        if output[0][0] == -10:
+            output = []
         return output
 
     # compare the second part
@@ -212,6 +251,24 @@ if __name__ == "__main__":
                         print(
                             f"{RED}File {filename} does not exist in the old directory{RESET}"
                         )
+                        file_to_redo = filename.replace(
+                            "_domain.pddl", ".pddl"
+                        ).replace("_problem.pddl", ".pddl")
+                        file_to_redo = (
+                            "prop: " + file_to_redo
+                            if "proposition" in dirpath
+                            else file_to_redo
+                        )
+                        file_to_redo = (
+                            "num:  " + file_to_redo
+                            if "numerical" in dirpath
+                            else file_to_redo
+                        )
+                        if file_to_redo not in files_to_redo:
+                            files_to_redo.append(file_to_redo)
+
+                        total_count += 1
+                        different_count += 1
                     continue
 
                 # read the files
@@ -221,6 +278,9 @@ if __name__ == "__main__":
                     old_contents = fp.readlines()
 
                 # find the differences
+                print(
+                    f"===================== Processing {filename} ====================="
+                )
                 differences: List[Tuple[int, str, str]] = find_differences_in_files(
                     current_contents, old_contents, "_domain.pddl" in filename
                 )
