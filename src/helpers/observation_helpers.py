@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Dict, List, Tuple
 
 import numpy as np
@@ -103,7 +104,7 @@ def extract_blocks(obs, use_propositional: bool):
     pass in the observation returned from minedojo
     returns a dict of blocks (key is their block name, value is a NamedBlockType)
     """
-    entities = obs["entities"]
+    entities = deepcopy(obs["entities"])
 
     # extra player from entities
     player_pos = None

@@ -23,7 +23,7 @@ def read_plan(plan_path: str):
                 # i.e. in the format (<action name> <action args>)
 
                 # get the action name only - get rid of the brackets and action args (which are only meaningful to the planner)
-                action_name = line[1:].split(" ")[0].strip("()").strip()
+                action_name = line[1:].split(" ")[0].strip().strip("()").strip()
 
                 action_sequence.append(action_name)
 
