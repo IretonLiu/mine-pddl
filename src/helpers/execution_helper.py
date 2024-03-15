@@ -291,7 +291,7 @@ def check_goal_state(obs, voxel_size, goal):
             ]
         )
 
-        relative_position += np.ceil(voxel_position).astype(int)
+        relative_position += np.floor(voxel_position).astype(int)
 
         actual = obs["voxels"]["block_name"][
             relative_position[0], relative_position[1], relative_position[2]
