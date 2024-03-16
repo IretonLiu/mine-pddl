@@ -61,6 +61,15 @@ def generate_or_execute_pddl(args):
         if "inventory" in world_config
         else None
     )
+
+    # special case: agent sinks in water
+    # so when executing the plan, we need to sub water blocks for something similar-looking that won't let the agent sink
+    # ergo - ice
+    if args.execute_plan:
+        drawing_str = (
+            drawing_str.replace("water", "ice") if drawing_str is not None else None
+        )
+
     env = minedojo.make(
         args.world_name,
         image_size=args.window_size,
