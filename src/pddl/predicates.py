@@ -181,3 +181,19 @@ class AtZLocationPredicate(AtLocationPredicate):
     @staticmethod
     def to_precondition(object: str, location: str):
         return f"({AtZLocationPredicate.var_name} {object} {location})\n"
+
+
+class IsEmptyAtPositionPredicate(Predicate):
+    var_name = "is-empty-at-position"
+
+    def __init__(self):
+        super().__init__()
+        self.arguments = {
+            "?x": TypeName.POSITION_TYPE_NAME.value,
+            "?y": TypeName.POSITION_TYPE_NAME.value,
+            "?z": TypeName.POSITION_TYPE_NAME.value,
+        }
+
+    @staticmethod
+    def to_precondition(x_location: str, y_location: str, z_location: str):
+        return f"({IsEmptyAtPositionPredicate.var_name} {x_location} {y_location} {z_location})\n"

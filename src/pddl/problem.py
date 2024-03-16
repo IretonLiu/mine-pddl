@@ -9,6 +9,7 @@ from pddl.functions import (
     YPositionFunction,
     ZPositionFunction,
 )
+from pddl.operators import pddl_not
 from pddl.pddl_types.base_pddl_types import AgentType
 from pddl.pddl_types.named_pddl_types import NamedBlockType, NamedItemType
 from pddl.pddl_types.special_pddl_types import CountType, PositionType
@@ -18,7 +19,10 @@ from pddl.predicates import (
     AtXLocationPredicate,
     AtYLocationPredicate,
     AtZLocationPredicate,
+    BlockPresentPredicate,
     GoalAchievedPredicate,
+    IsEmptyAtPositionPredicate,
+    ItemPresentPredicate,
 )
 
 """
@@ -58,12 +62,42 @@ class Problem:
         self.max_inventory_stack = max_inventory_stack
         self.use_propositional = use_propositional
 
+        # these are only going to be used for "position" objects (propositional pddl)
+        # and for setting the is-empty-at-position predicates (propositional pddl)
+        self.min_position: Optional[int] = None
+        self.max_position: Optional[int] = None
+
+    def set_position_bounds(
+        self, agent: AgentType, agent_position_override: Optional[Dict[str, int]] = None
+    ) -> None:
+        # see if there is a position override
+        if agent_position_override is None:
+            agent_position_override = {}
+            agent_position_override["x"] = agent.functions[XPositionFunction].value
+            agent_position_override["y"] = agent.functions[YPositionFunction].value
+            agent_position_override["z"] = agent.functions[ZPositionFunction].value
+
+        # we need to find the largest positive position and the smallest negative position
+        # this will be used to determine the range of positions to include in the problem
+        min_shifted_position = min(
+            agent_position_override["x"] - self.obs_range[0] // 2,
+            agent_position_override["y"] - self.obs_range[1] // 2,
+            agent_position_override["z"] - self.obs_range[2] // 2,
+        )
+        max_shifted_position = max(
+            agent_position_override["x"] + self.obs_range[0] // 2,
+            agent_position_override["y"] + self.obs_range[1] // 2,
+            agent_position_override["z"] + self.obs_range[2] // 2,
+        )
+
+        self.min_position = int(np.floor(min_shifted_position)) - 1
+        self.max_position = int(np.ceil(max_shifted_position)) + 1
+
     def construct_objects(
         self,
         agent: AgentType,
         items: Dict[str, List[NamedItemType]],
         blocks: Dict[str, List[NamedBlockType]],
-        agent_position_override: Optional[Dict[str, int]] = None,
     ):
         # agent_position_override is used when the starting position of the agent has been modified by yaml
         # in this case, we still want the world to be centred at the agent's spawn position, so we pass that through as an override,
@@ -110,30 +144,12 @@ class Problem:
             self.postition_objects = []
             self.count_objects = []
 
-            # see if there is a position override
-            if agent_position_override is None:
-                agent_position_override = {}
-                agent_position_override["x"] = agent.functions[XPositionFunction].value
-                agent_position_override["y"] = agent.functions[YPositionFunction].value
-                agent_position_override["z"] = agent.functions[ZPositionFunction].value
-
-            # we need to find the largest positive position and the smallest negative position
-            # this will be used to determine the range of positions to include in the problem
-            min_shifted_position = min(
-                agent_position_override["x"] - self.obs_range[0] // 2,
-                agent_position_override["y"] - self.obs_range[1] // 2,
-                agent_position_override["z"] - self.obs_range[2] // 2,
-            )
-            max_shifted_position = max(
-                agent_position_override["x"] + self.obs_range[0] // 2,
-                agent_position_override["y"] + self.obs_range[1] // 2,
-                agent_position_override["z"] + self.obs_range[2] // 2,
-            )
+            assert self.min_position is not None and self.max_position is not None
 
             output += "\t"
             for i in range(
-                int(np.floor(min_shifted_position)) - 1,
-                int(np.ceil(max_shifted_position)) + 1 + 1,
+                self.min_position,
+                self.max_position + 1,
             ):  # add a buffer of 1 to either side of the position range
                 output += f"{PositionType.construct_problem_object(i)} "
                 self.postition_objects.append(PositionType.construct_problem_object(i))
@@ -162,6 +178,24 @@ class Problem:
             # process int type objects
             output_list.extend(generate_initial_seq_predicates(self.postition_objects))
             output_list.extend(generate_initial_seq_predicates(self.count_objects))
+
+            # if we are using propositional pddl, we need to process the is-empty-at-position predicate
+            # so we create a 3D grid representing the emptiness of the positions
+            # and as we process the items and blocks, we will update the grid
+            assert self.min_position is not None and self.max_position is not None
+            extent = self.max_position - self.min_position + 1
+            occupancy_grid = np.zeros((extent, extent, extent))
+
+            # add the agent to the grid
+            position = (
+                int(np.floor(agent.functions[XPositionFunction].value))
+                - self.min_position,
+                int(np.floor(agent.functions[YPositionFunction].value))
+                - self.min_position,
+                int(np.floor(agent.functions[ZPositionFunction].value))
+                - self.min_position,
+            )
+            occupancy_grid[position] = 1
 
         # process agent
         for predicate in agent.predicates.values():
@@ -286,6 +320,61 @@ class Problem:
                         for function in entity.functions.values():
                             output_list.append(function.to_problem(f"{name}{j}"))
 
+                    # update the emptiness grid - this has "continue" statements, so keep at the end of the for loop
+                    if self.use_propositional:
+                        assert (
+                            self.min_position is not None
+                            and self.max_position is not None
+                        )
+
+                        # check if the entity is present in the world
+                        if isinstance(entity, NamedBlockType) and (
+                            entity.predicates[BlockPresentPredicate] is None
+                            or not entity.predicates[BlockPresentPredicate].value
+                        ):
+                            continue
+                        elif isinstance(entity, NamedItemType) and (
+                            entity.predicates[ItemPresentPredicate] is None
+                            or not entity.predicates[ItemPresentPredicate].value
+                        ):
+                            continue
+
+                        position = (
+                            int(np.floor(entity.functions[XPositionFunction].value))
+                            - self.min_position,
+                            int(np.floor(entity.functions[YPositionFunction].value))
+                            - self.min_position,
+                            int(np.floor(entity.functions[ZPositionFunction].value))
+                            - self.min_position,
+                        )
+                        occupancy_grid[position] = 1
+
+        # process the emptiness grid
+        if self.use_propositional:
+            assert self.min_position is not None and self.max_position is not None
+
+            # add the agent to the grid
+
+            for i in range(extent):
+                for j in range(extent):
+                    for k in range(extent):
+                        predicate_str = IsEmptyAtPositionPredicate.to_precondition(
+                            PositionType.construct_problem_object(
+                                i + self.min_position
+                            ),
+                            PositionType.construct_problem_object(
+                                j + self.min_position
+                            ),
+                            PositionType.construct_problem_object(
+                                k + self.min_position
+                            ),
+                        )
+                        output_list.append(
+                            predicate_str
+                            if occupancy_grid[i, j, k] == 0
+                            else pddl_not(predicate_str)
+                        )
+
         # TODO: fix fomatting
         output = "(:init\n\t"
         output += "\n\t".join(output_list)
@@ -309,11 +398,13 @@ class Problem:
             Dict[str, int]
         ] = None,  # see self.construct_objects comment for more info
     ):
+        # set the position bounds
+        if self.use_propositional:
+            self.set_position_bounds(agent, agent_position_override)
+
         pddl = f"(define (problem {self.name})\n"
         pddl += f"\t(:domain {self.domain.name})\n"
-        pddl += (
-            f"{self.construct_objects(agent, items, blocks, agent_position_override)}\n"
-        )
+        pddl += f"{self.construct_objects(agent, items, blocks)}\n"
         pddl += f"{self.construct_initial_state(agent, items, blocks)}\n"
         pddl += f"{self.construct_goal(agent)}\n"
         pddl += ")"

@@ -8,7 +8,7 @@ import pddl.pddl_types.base_pddl_types as base_pddl_types
 import pddl.pddl_types.named_pddl_types as named_pddl_types
 import pddl.pddl_types.special_pddl_types as special_pddl_types
 from pddl.functions import InventoryFunction
-from pddl.predicates import AgentHasNItemsPredicate
+from pddl.predicates import AgentHasNItemsPredicate, IsEmptyAtPositionPredicate
 
 
 class Domain:
@@ -140,6 +140,12 @@ class Domain:
                                 output.append(function.to_domain(label=block))
                         else:
                             output.append(function.to_domain())
+
+        if return_predicates:
+            # if we are processing propositional pddl, we need to add the is-empty-at-position predicates (which isn't attached to any type)
+            if self.use_propositional:
+                is_empty_position_predicate = IsEmptyAtPositionPredicate()
+                output.append(is_empty_position_predicate.to_domain())
 
         return output
 
