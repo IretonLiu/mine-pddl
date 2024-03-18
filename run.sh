@@ -2,6 +2,7 @@
 python src/main.py \
     --generate-pddl \
     --pddl-type propositional \
+    --for-lifted-planner \
     --world-config worlds/example.yaml \
     --domain-name test_domain \
     --problem-name test_problem \

@@ -1,3 +1,5 @@
+from typing import Optional
+
 import numpy as np
 from pddl.operators import pddl_and, pddl_exists, pddl_not, pddl_or
 from pddl.pddl_types.special_pddl_types import CountType, PositionType
@@ -21,9 +23,47 @@ class Action:
         self.parameters = []
         self.preconditions = []
         self.effects = []
+        self.lifted_representation = False
+
+        # sentinel values for the exists_builder function
+        self.PLACEHOLDER = "###"
+
+    def set_lifted_representation(self, lifted_representation: bool) -> None:
+        self.lifted_representation = lifted_representation
 
     def to_pddl(self) -> str:
         raise NotImplementedError
+
+    def exists_builder(
+        self,
+        exists_conditions_pddl: str,
+        is_block: bool,
+        var_name: str,
+        existential_object_key_override: Optional[str] = None,
+    ) -> str:
+        # optionally add in the existential conditions if we are not using a lifted representation
+        # var_name is the variable name that should be printed
+
+        # replace the placeholder with the variable name
+        exists_conditions_pddl = exists_conditions_pddl.replace(
+            self.PLACEHOLDER, var_name
+        )
+
+        if not self.lifted_representation:
+            if is_block:
+                key = TypeName.BLOCK_TYPE_NAME.value
+            else:
+                key = TypeName.ITEM_TYPE_NAME.value
+
+            if existential_object_key_override is not None:
+                key = existential_object_key_override
+
+            exists_conditions_pddl = pddl_exists(
+                {key: var_name},
+                exists_conditions_pddl,
+            )
+
+        return exists_conditions_pddl
 
 
 class Move(Action):
@@ -59,6 +99,15 @@ class Move(Action):
             "ZPositionStart": TypeName.POSITION_TYPE_NAME.value,
             "ZPositionEnd": TypeName.POSITION_TYPE_NAME.value,
         }
+
+    def set_lifted_representation(self, lifted_representation: bool) -> None:
+        super().set_lifted_representation(lifted_representation)
+
+        if self.lifted_representation:
+            # if we are generating a lifted representation, we need to remove existential statements
+            # so we need to use some extra parameters
+            self.param_name["Block1"] = "?b1"
+            self.param_types["Block1"] = TypeName.BLOCK_TYPE_NAME.value
 
     def construct_parameters(self):
         # need this generator since extra params have been added to the dicts in order to be more general
@@ -143,16 +192,17 @@ class Move(Action):
                 self.param_name["YPosition2Down"], self.param_name["YPositionDown"]
             ),
             # check there is a block to stand on
-            pddl_exists(
-                {TypeName.BLOCK_TYPE_NAME.value: block_var},
+            self.exists_builder(
                 pddl_and(
-                    f"({BlockPresentPredicate.var_name} {block_var})\n",
-                    AtXLocationPredicate.to_precondition(block_var, x_end),
+                    f"({BlockPresentPredicate.var_name} {self.PLACEHOLDER})\n",
+                    AtXLocationPredicate.to_precondition(self.PLACEHOLDER, x_end),
                     AtYLocationPredicate.to_precondition(
-                        block_var, self.param_name["YPosition2Down"]
+                        self.PLACEHOLDER, self.param_name["YPosition2Down"]
                     ),
-                    AtZLocationPredicate.to_precondition(block_var, z_end),
+                    AtZLocationPredicate.to_precondition(self.PLACEHOLDER, z_end),
                 ),
+                True,
+                self.param_name["Block1"] if self.lifted_representation else block_var,
             ),
             pddl_not(
                 pddl_exists(
@@ -257,6 +307,15 @@ class MoveAndPickup(Action):
             "NEnd": TypeName.COUNT_TYPE_NAME.value,
         }
 
+    def set_lifted_representation(self, lifted_representation: bool) -> None:
+        super().set_lifted_representation(lifted_representation)
+
+        if self.lifted_representation:
+            # if we are generating a lifted representation, we need to remove existential statements
+            # so we need to use some extra parameters
+            self.param_name["Block1"] = "?b1"
+            self.param_types["Block1"] = TypeName.BLOCK_TYPE_NAME.value
+
     def construct_parameters(self):
         # need this generator since extra params have been added to the dicts in order to be more general
         move_east_west = self.dir == "east" or self.dir == "west"
@@ -343,16 +402,17 @@ class MoveAndPickup(Action):
                 self.param_name["NStart"], self.param_name["NEnd"]
             ),  # start should be smaller since we are picking up
             # check there is a block to stand on
-            pddl_exists(
-                {TypeName.BLOCK_TYPE_NAME.value: block_var},
+            self.exists_builder(
                 pddl_and(
-                    f"({BlockPresentPredicate.var_name} {block_var})\n",
-                    AtXLocationPredicate.to_precondition(block_var, x_end),
+                    f"({BlockPresentPredicate.var_name} {self.PLACEHOLDER})\n",
+                    AtXLocationPredicate.to_precondition(self.PLACEHOLDER, x_end),
                     AtYLocationPredicate.to_precondition(
-                        block_var, self.param_name["YPosition2Down"]
+                        self.PLACEHOLDER, self.param_name["YPosition2Down"]
                     ),
-                    AtZLocationPredicate.to_precondition(block_var, z_end),
+                    AtZLocationPredicate.to_precondition(self.PLACEHOLDER, z_end),
                 ),
+                True,
+                self.param_name["Block1"] if self.lifted_representation else block_var,
             ),
             pddl_not(
                 pddl_exists(
@@ -656,6 +716,15 @@ class Place(Action):
             self.x_front = "XPosition"
             self.z_front = "ZPositionFront"
 
+    def set_lifted_representation(self, lifted_representation: bool) -> None:
+        super().set_lifted_representation(lifted_representation)
+
+        if self.lifted_representation:
+            # if we are generating a lifted representation, we need to remove existential statements
+            # so we need to use some extra parameters
+            self.param_names["Block1"] = "?b1"
+            self.param_types["Block1"] = TypeName.BLOCK_TYPE_NAME.value
+
     def construct_parameters(self):
         self.parameters = ""
         for key in self.param_names.keys():
@@ -692,22 +761,23 @@ class Place(Action):
             # check that the block we want to place does not exist
             pddl_not(f'({BlockPresentPredicate.var_name} {self.param_names["Block"]})'),
             # There must be a block one down and one in front of us, for support for the block we are placing
-            pddl_exists(
-                {TypeName.BLOCK_TYPE_NAME.value: block_var},
+            self.exists_builder(
                 pddl_and(
-                    f"({BlockPresentPredicate.var_name} {block_var})\n",
+                    f"({BlockPresentPredicate.var_name} {self.PLACEHOLDER})\n",
                     AtXLocationPredicate.to_precondition(
-                        block_var, self.param_names[self.x_front]
+                        self.PLACEHOLDER, self.param_names[self.x_front]
                     ),
                     # There must be a block underneath
                     AtYLocationPredicate.to_precondition(
-                        block_var, self.param_names["YPositionDown"]
+                        self.PLACEHOLDER, self.param_names["YPositionDown"]
                     ),
                     # The block must be in front of us
                     AtZLocationPredicate.to_precondition(
-                        block_var, self.param_names[self.z_front]
+                        self.PLACEHOLDER, self.param_names[self.z_front]
                     ),
                 ),
+                True,
+                self.param_names["Block1"] if self.lifted_representation else block_var,
             ),
             # There mustn't be a block at the same location we are placing the new block
             pddl_not(
@@ -839,6 +909,15 @@ class JumpUp(Action):
             "ZPositionEnd": TypeName.POSITION_TYPE_NAME.value,
         }
 
+    def set_lifted_representation(self, lifted_representation: bool) -> None:
+        super().set_lifted_representation(lifted_representation)
+
+        if self.lifted_representation:
+            # if we are generating a lifted representation, we need to remove existential statements
+            # so we need to use some extra parameters
+            self.param_name["Block1"] = "?b1"
+            self.param_types["Block1"] = TypeName.BLOCK_TYPE_NAME.value
+
     def construct_parameters(self):
         # need this generator since extra params have been added to the dicts in order to be more general
         move_east_west = self.dir == "east" or self.dir == "west"
@@ -955,17 +1034,18 @@ class JumpUp(Action):
                     ),
                 )
             ),
-            pddl_exists(
-                {TypeName.BLOCK_TYPE_NAME.value: block_var},
+            self.exists_builder(
                 pddl_and(
-                    f"({BlockPresentPredicate.var_name} {block_var})\n",
-                    AtXLocationPredicate.to_precondition(block_var, x_end),
+                    f"({BlockPresentPredicate.var_name} {self.PLACEHOLDER})\n",
+                    AtXLocationPredicate.to_precondition(self.PLACEHOLDER, x_end),
                     # here we check that there is no block at the level of the agent (bottom) or the agent's eyeline (top)
                     AtYLocationPredicate.to_precondition(
-                        block_var, self.param_name["YPositionDown"]
+                        self.PLACEHOLDER, self.param_name["YPositionDown"]
                     ),
-                    AtZLocationPredicate.to_precondition(block_var, z_end),
+                    AtZLocationPredicate.to_precondition(self.PLACEHOLDER, z_end),
                 ),
+                True,
+                self.param_name["Block1"] if self.lifted_representation else block_var,
             ),
             pddl_not(
                 pddl_exists(
@@ -1061,6 +1141,15 @@ class JumpUpAndPickup(Action):
             "NStart": TypeName.COUNT_TYPE_NAME.value,
             "NEnd": TypeName.COUNT_TYPE_NAME.value,
         }
+
+    def set_lifted_representation(self, lifted_representation: bool) -> None:
+        super().set_lifted_representation(lifted_representation)
+
+        if self.lifted_representation:
+            # if we are generating a lifted representation, we need to remove existential statements
+            # so we need to use some extra parameters
+            self.param_name["Block1"] = "?b1"
+            self.param_types["Block1"] = TypeName.BLOCK_TYPE_NAME.value
 
     def construct_parameters(self):
         # need this generator since extra params have been added to the dicts in order to be more general
@@ -1185,16 +1274,17 @@ class JumpUpAndPickup(Action):
                 )
             ),
             # check that there is a block to land on (target column)
-            pddl_exists(
-                {TypeName.BLOCK_TYPE_NAME.value: block_var},
+            self.exists_builder(
                 pddl_and(
-                    f"({BlockPresentPredicate.var_name} {block_var})\n",
-                    AtXLocationPredicate.to_precondition(block_var, x_end),
+                    f"({BlockPresentPredicate.var_name} {self.PLACEHOLDER})\n",
+                    AtXLocationPredicate.to_precondition(self.PLACEHOLDER, x_end),
                     AtYLocationPredicate.to_precondition(
-                        block_var, self.param_name["YPositionDown"]
+                        self.PLACEHOLDER, self.param_name["YPositionDown"]
                     ),
-                    AtZLocationPredicate.to_precondition(block_var, z_end),
+                    AtZLocationPredicate.to_precondition(self.PLACEHOLDER, z_end),
                 ),
+                True,
+                self.param_name["Block1"] if self.lifted_representation else block_var,
             ),
             # check that the required item can be picked up
             pddl_and(
@@ -1316,6 +1406,15 @@ class JumpDown(Action):
             "ZPositionEnd": TypeName.POSITION_TYPE_NAME.value,
         }
 
+    def set_lifted_representation(self, lifted_representation: bool) -> None:
+        super().set_lifted_representation(lifted_representation)
+
+        if self.lifted_representation:
+            # if we are generating a lifted representation, we need to remove existential statements
+            # so we need to use some extra parameters
+            self.param_name["Block1"] = "?b1"
+            self.param_types["Block1"] = TypeName.BLOCK_TYPE_NAME.value
+
     def construct_parameters(self):
         # need this generator since extra params have been added to the dicts in order to be more general
         move_east_west = self.dir == "east" or self.dir == "west"
@@ -1423,17 +1522,18 @@ class JumpDown(Action):
                     ),
                 )
             ),
-            pddl_exists(
-                {TypeName.BLOCK_TYPE_NAME.value: block_var},
+            self.exists_builder(
                 pddl_and(
-                    f"({BlockPresentPredicate.var_name} {block_var})\n",
-                    AtXLocationPredicate.to_precondition(block_var, x_end),
+                    f"({BlockPresentPredicate.var_name} {self.PLACEHOLDER})\n",
+                    AtXLocationPredicate.to_precondition(self.PLACEHOLDER, x_end),
                     # here we check that there is no block at the level of the agent (bottom) or the agent's eyeline (top)
                     AtYLocationPredicate.to_precondition(
-                        block_var, self.param_name["YPosition3Down"]
+                        self.PLACEHOLDER, self.param_name["YPosition3Down"]
                     ),
-                    AtZLocationPredicate.to_precondition(block_var, z_end),
+                    AtZLocationPredicate.to_precondition(self.PLACEHOLDER, z_end),
                 ),
+                True,
+                self.param_name["Block1"] if self.lifted_representation else block_var,
             ),
             pddl_not(
                 pddl_exists(
@@ -1533,6 +1633,15 @@ class JumpDownAndPickup(Action):
             "NStart": TypeName.COUNT_TYPE_NAME.value,
             "NEnd": TypeName.COUNT_TYPE_NAME.value,
         }
+
+    def set_lifted_representation(self, lifted_representation: bool) -> None:
+        super().set_lifted_representation(lifted_representation)
+
+        if self.lifted_representation:
+            # if we are generating a lifted representation, we need to remove existential statements
+            # so we need to use some extra parameters
+            self.param_name["Block1"] = "?b1"
+            self.param_types["Block1"] = TypeName.BLOCK_TYPE_NAME.value
 
     def construct_parameters(self):
         # need this generator since extra params have been added to the dicts in order to be more general
@@ -1647,16 +1756,17 @@ class JumpDownAndPickup(Action):
                 )
             ),
             # check that there is a block to land on
-            pddl_exists(
-                {TypeName.BLOCK_TYPE_NAME.value: block_var},
+            self.exists_builder(
                 pddl_and(
-                    f"({BlockPresentPredicate.var_name} {block_var})\n",
-                    AtXLocationPredicate.to_precondition(block_var, x_end),
+                    f"({BlockPresentPredicate.var_name} {self.PLACEHOLDER})\n",
+                    AtXLocationPredicate.to_precondition(self.PLACEHOLDER, x_end),
                     AtYLocationPredicate.to_precondition(
-                        block_var, self.param_name["YPosition3Down"]
+                        self.PLACEHOLDER, self.param_name["YPosition3Down"]
                     ),
-                    AtZLocationPredicate.to_precondition(block_var, z_end),
+                    AtZLocationPredicate.to_precondition(self.PLACEHOLDER, z_end),
                 ),
+                True,
+                self.param_name["Block1"] if self.lifted_representation else block_var,
             ),
             # check that the required item exists at the target location
             pddl_and(
@@ -1744,10 +1854,41 @@ class JumpDownAndPickup(Action):
 class CheckGoal(Action):
     # checks the goal achieved predicate of the agent
     def __init__(self, goal, max_inentory_stack: int) -> None:
+        super().__init__()
         self.action_name = "checkgoal"  # this is the only action name that doesn't follow the convention
-        self.parameters = {TypeName.AGENT_TYPE_NAME.value: "?ag"}
         self.goal = goal
         self.max_inventory_stack = max_inentory_stack
+
+        self.param_names = {
+            "Agent": "?ag",
+        }
+
+        self.param_types = {
+            "Agent": TypeName.AGENT_TYPE_NAME.value,
+        }
+
+    def set_lifted_representation(self, lifted_representation: bool) -> None:
+        super().set_lifted_representation(lifted_representation)
+
+        if self.lifted_representation:
+            # if we are generating a lifted representation, we need to remove existential statements
+            # so we need to use some extra parameters
+
+            blocks = self.goal["blocks"] if "blocks" in self.goal else []
+
+            for i in range(1, len(blocks) + 1):
+                self.param_names[f"Block{i}"] = f"?b{i}"
+                self.param_types[f"Block{i}"] = TypeName.BLOCK_TYPE_NAME.value
+
+    def construct_parameters(self):
+        # need this generator since extra params have been added to the dicts in order to be more general
+        self.parameters = ""
+
+        # loop through all the parameters and add them to the parameters dict if they are used
+        for key in self.param_names.keys():
+            self.parameters += f"{self.param_names[key]} - {self.param_types[key]} "
+
+        self.parameters = self.parameters.strip()
 
     def construct_preconditions(self):
         agents = self.goal["agent"] if "agent" in self.goal else []
@@ -1762,19 +1903,19 @@ class CheckGoal(Action):
             # add the agent's position
             agent_pddl += pddl_and(
                 AtXLocationPredicate.to_precondition(
-                    self.parameters[TypeName.AGENT_TYPE_NAME.value],
+                    self.param_names["Agent"],
                     PositionType.construct_problem_object(
                         int(np.floor(float(agent["position"]["x"])))
                     ),
                 ),
                 AtYLocationPredicate.to_precondition(
-                    self.parameters[TypeName.AGENT_TYPE_NAME.value],
+                    self.param_names["Agent"],
                     PositionType.construct_problem_object(
                         int(np.floor(float(agent["position"]["y"])))
                     ),
                 ),
                 AtZLocationPredicate.to_precondition(
-                    self.parameters[TypeName.AGENT_TYPE_NAME.value],
+                    self.param_names["Agent"],
                     PositionType.construct_problem_object(
                         int(np.floor(float(agent["position"]["z"])))
                     ),
@@ -1782,30 +1923,34 @@ class CheckGoal(Action):
             )
 
         block_var = "?b"
-        for block in blocks:
-            block_pddl += pddl_exists(
-                {block["type"] + "-block": block_var},
+        for i, block in enumerate(blocks):
+            block_pddl += self.exists_builder(
                 pddl_and(
-                    f"({BlockPresentPredicate.var_name} {block_var})\n",
+                    f"({BlockPresentPredicate.var_name} {self.PLACEHOLDER})\n",
                     AtXLocationPredicate.to_precondition(
-                        block_var,
+                        self.PLACEHOLDER,
                         PositionType.construct_problem_object(
                             int(np.floor(float(block["position"]["x"])))
                         ),
                     ),
                     AtYLocationPredicate.to_precondition(
-                        block_var,
+                        self.PLACEHOLDER,
                         PositionType.construct_problem_object(
                             int(np.floor(float(block["position"]["y"])))
                         ),
                     ),
                     AtZLocationPredicate.to_precondition(
-                        block_var,
+                        self.PLACEHOLDER,
                         PositionType.construct_problem_object(
                             int(np.floor(float(block["position"]["z"])))
                         ),
                     ),
                 ),
+                True,
+                self.param_names[f"Block{i + 1}"]
+                if self.lifted_representation
+                else block_var,
+                block["type"] + "-block",
             )
             block_pddl += "\n\t"
 
@@ -1815,7 +1960,7 @@ class CheckGoal(Action):
             for i in range(int(item["quantity"]), self.max_inventory_stack):
                 args.append(
                     AgentHasNItemsPredicate.to_precondition(
-                        self.parameters[TypeName.AGENT_TYPE_NAME.value],
+                        self.param_names["Agent"],
                         CountType.construct_problem_object(i),
                         item_type=item["type"],
                     )
@@ -1823,7 +1968,7 @@ class CheckGoal(Action):
             item_pddl += pddl_or(*args)
 
         self.preconditions = pddl_and(
-            f"({AgentAlivePredicate.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})\n",
+            f"({AgentAlivePredicate.var_name} {self.param_names['Agent']})\n",
             agent_pddl,
             block_pddl,
             item_pddl,
@@ -1831,14 +1976,15 @@ class CheckGoal(Action):
 
     def construct_effects(self):
         self.effects = pddl_and(
-            f"({GoalAchievedPredicate.var_name} {self.parameters[TypeName.AGENT_TYPE_NAME.value]})"
+            f"({GoalAchievedPredicate.var_name} {self.param_names['Agent']})"
         )
 
     def to_pddl(self):
+        self.construct_parameters()
         self.construct_preconditions()
         self.construct_effects()
         out = f"(:action {self.action_name}\n"
-        out += f"\t:parameters ({' '.join([f'{v} - {k}' for k, v in self.parameters.items()])})\n"
+        out += f"\t:parameters ({self.parameters})\n"
         out += f"\t:precondition {self.preconditions}\n"
         out += f"\t:effect {self.effects}\n"
         out += ")\n"

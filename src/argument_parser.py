@@ -197,7 +197,6 @@ def get_args_parser():
     )
     parser.add_argument(
         "--for-lifted-planner",
-        type=bool,
         action="store_true",
         help='Specify if the propositional pddl needs to include accommodations for the lifted planner (i.e. no existentials, and no "not" statements)',
     )

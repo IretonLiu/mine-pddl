@@ -233,6 +233,8 @@ class Domain:
 
         action_str = ""
         for action in self.actions:
+            if self.use_propositional:
+                action.set_lifted_representation(self.lifted_representation)
             action_str += "\n" + action.to_pddl() + "\n"
         return action_str
 
