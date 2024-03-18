@@ -195,6 +195,13 @@ def get_args_parser():
         choices=["propositional", "numerical"],
         help="specify if the PDDL files are propositional or numerical",
     )
+    parser.add_argument(
+        "--for-lifted-planner",
+        type=bool,
+        action="store_true",
+        help='Specify if the propositional pddl needs to include accommodations for the lifted planner (i.e. no existentials, and no "not" statements)',
+    )
+    parser.set_defaults(for_lifted_planner=False)
 
     # args to define variables pertinent to the world
     parser.add_argument(

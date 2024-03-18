@@ -50,6 +50,7 @@ class Problem:
         obs_range: Tuple[int, int, int],
         max_inventory_stack: int,
         use_propositional: bool,
+        lifted_representation: bool = False,
         objects: List = [],
         init: List = [],
         goal: List = [],
@@ -61,6 +62,7 @@ class Problem:
         self.obs_range = obs_range
         self.max_inventory_stack = max_inventory_stack
         self.use_propositional = use_propositional
+        self.lifted_representation = lifted_representation
 
         # these are only going to be used for "position" objects (propositional pddl)
         # and for setting the is-empty-at-position predicates (propositional pddl)
@@ -179,23 +181,24 @@ class Problem:
             output_list.extend(generate_initial_seq_predicates(self.postition_objects))
             output_list.extend(generate_initial_seq_predicates(self.count_objects))
 
-            # if we are using propositional pddl, we need to process the is-empty-at-position predicate
-            # so we create a 3D grid representing the emptiness of the positions
-            # and as we process the items and blocks, we will update the grid
-            assert self.min_position is not None and self.max_position is not None
-            extent = self.max_position - self.min_position + 1
-            occupancy_grid = np.zeros((extent, extent, extent))
+            if self.lifted_representation:
+                # if we are using propositional pddl, we need to process the is-empty-at-position predicate
+                # so we create a 3D grid representing the emptiness of the positions
+                # and as we process the items and blocks, we will update the grid
+                assert self.min_position is not None and self.max_position is not None
+                extent = self.max_position - self.min_position + 1
+                occupancy_grid = np.zeros((extent, extent, extent))
 
-            # add the agent to the grid
-            position = (
-                int(np.floor(agent.functions[XPositionFunction].value))
-                - self.min_position,
-                int(np.floor(agent.functions[YPositionFunction].value))
-                - self.min_position,
-                int(np.floor(agent.functions[ZPositionFunction].value))
-                - self.min_position,
-            )
-            occupancy_grid[position] = 1
+                # add the agent to the grid
+                position = (
+                    int(np.floor(agent.functions[XPositionFunction].value))
+                    - self.min_position,
+                    int(np.floor(agent.functions[YPositionFunction].value))
+                    - self.min_position,
+                    int(np.floor(agent.functions[ZPositionFunction].value))
+                    - self.min_position,
+                )
+                occupancy_grid[position] = 1
 
         # process agent
         for predicate in agent.predicates.values():
@@ -321,7 +324,7 @@ class Problem:
                             output_list.append(function.to_problem(f"{name}{j}"))
 
                     # update the emptiness grid - this has "continue" statements, so keep at the end of the for loop
-                    if self.use_propositional:
+                    if self.use_propositional and self.lifted_representation:
                         assert (
                             self.min_position is not None
                             and self.max_position is not None
@@ -350,10 +353,8 @@ class Problem:
                         occupancy_grid[position] = 1
 
         # process the emptiness grid
-        if self.use_propositional:
+        if self.use_propositional and self.lifted_representation:
             assert self.min_position is not None and self.max_position is not None
-
-            # add the agent to the grid
 
             for i in range(extent):
                 for j in range(extent):

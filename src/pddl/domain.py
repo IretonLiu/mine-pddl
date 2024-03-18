@@ -12,7 +12,13 @@ from pddl.predicates import AgentHasNItemsPredicate, IsEmptyAtPositionPredicate
 
 
 class Domain:
-    def __init__(self, name: str, max_inventory_stack: int, use_propositional: bool):
+    def __init__(
+        self,
+        name: str,
+        max_inventory_stack: int,
+        use_propositional: bool,
+        lifted_representation: bool = False,
+    ):
         self.name = name
         self.max_inventory_stack = max_inventory_stack
         self.types = None
@@ -22,6 +28,7 @@ class Domain:
         self.actions = []
         self.requirements = []
         self.use_propositional = use_propositional
+        self.lifted_representation = lifted_representation
 
     def construct_types(
         self,
@@ -143,7 +150,7 @@ class Domain:
 
         if return_predicates:
             # if we are processing propositional pddl, we need to add the is-empty-at-position predicates (which isn't attached to any type)
-            if self.use_propositional:
+            if self.use_propositional and self.lifted_representation:
                 is_empty_position_predicate = IsEmptyAtPositionPredicate()
                 output.append(is_empty_position_predicate.to_domain())
 

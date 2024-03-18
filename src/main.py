@@ -156,7 +156,10 @@ def generate_or_execute_pddl(args):
 
         # create the domain file
         domain = Domain(
-            args.domain_name, max_inventory_stack, use_propositional=use_propositional
+            args.domain_name,
+            max_inventory_stack,
+            use_propositional=use_propositional,
+            lifted_representation=args.for_lifted_planner,
         )
         domain.to_pddl(
             items,
@@ -172,6 +175,7 @@ def generate_or_execute_pddl(args):
             ranges,
             max_inventory_stack,
             use_propositional=use_propositional,
+            lifted_representation=args.for_lifted_planner,
         )
         problem.to_pddl(
             agent,
@@ -201,6 +205,9 @@ def generate_or_execute_pddl(args):
 
         action_sequence = execution_helper.read_plan(args.plan_file)
         for action_str in action_sequence:
+            # replace the word water with ice
+            action_str = action_str.replace("water", "ice")
+
             # get the action vector
             action, curr_dir = execution_helper.get_action_from_str(
                 action_str, agent=agent, env=env, inventory=inventory, curr_dir=curr_dir
