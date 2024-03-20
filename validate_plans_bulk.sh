@@ -3,7 +3,7 @@
 # The only restriction is that the plan name and parent dir must be the same the same for the plan and the yaml file
 
 # define the tasks to skip
-declare -a skip_task_array=("PDDL Files" "Farm_Wheat" "Craft_Item" "Grow_Tree")
+declare -a skip_task_array=("PDDL Files" "Farm_Wheat" "Craft_Item" "Grow_Tree" "Bridge" "Build_Cross" "Build_Shape" "Build_Wall" "Build_Well" "Climb_Place" "Collect_Build_Shape")
 
 # define the difficulty levels
 declare -a difficulty_array=("Easy" "Medium" "Hard")
@@ -28,14 +28,6 @@ for task in "${plan_base_path}"/*; do
         # define the yaml and plan files
         yaml_file="${yaml_base_path}/${task}/${task}_${difficulty}.yaml"
         plan_file="${plan_base_path}/${task}/${task}_${difficulty}.pddl"
-
-        # # define the observation range, and check if there is a task-specific override
-        # obsrange=${obsrange_array[$difficulty]}
-        # if [ $task = "Build_Log_Cabin" ]; then
-        #     obsrange=${logcabin_obsrange_array[$difficulty]}
-        # elif [ $task = "Cut_Tree" ]; then
-        #     obsrange=${cuttree_obsrange_array[$difficulty]}
-        # fi
         
         echo "Validating plan for ${task}_${difficulty}..."
 
@@ -53,7 +45,8 @@ for task in "${plan_base_path}"/*; do
             --world-config "${yaml_file}" \
             --plan-file "${plan_file}" \
             --video-save-path "Plans/human_solutions/${plan_name}" \
-            --video-name "${plan_name}" 
+            --video-name "${plan_name}" \
+            --observation-range "(81, 41, 81)" # this is larger than in any task, so it should be fine
 
         # kill the minecraft java process
         pkill -9 -f java
