@@ -13,6 +13,8 @@ from pddl.predicates import (
     AtZLocationPredicate,
     BlockPresentPredicate,
     GoalAchievedPredicate,
+    IsAnyBlockAtPositionPredicate,
+    IsAnyItemAtPositionPredicate,
     ItemPresentPredicate,
 )
 
@@ -64,6 +66,48 @@ class Action:
             )
 
         return exists_conditions_pddl
+
+    def not_exists_builder(
+        self,
+        var_name: str,
+        is_block: bool,
+        position_x: str,
+        position_y: str,
+        position_z: str,
+    ) -> str:
+        # optionally add in the is-empty-at-position predicate if we are using a lifted representation
+
+        output = ""
+
+        if self.lifted_representation:
+            occupied_predicate = (
+                IsAnyBlockAtPositionPredicate
+                if is_block
+                else IsAnyItemAtPositionPredicate
+            )
+            output += f"({occupied_predicate.to_precondition(position_x, position_y, position_z)})\n"
+        else:
+            key = (
+                TypeName.BLOCK_TYPE_NAME.value
+                if is_block
+                else TypeName.ITEM_TYPE_NAME.value
+            )
+            present_predicate = (
+                BlockPresentPredicate if is_block else ItemPresentPredicate
+            )
+            pddl_not(
+                pddl_exists(
+                    {key: var_name},
+                    pddl_and(
+                        f"({present_predicate.var_name} {var_name})\n",
+                        AtXLocationPredicate.to_precondition(var_name, position_x),
+                        AtYLocationPredicate.to_precondition(var_name, position_y),
+                        AtZLocationPredicate.to_precondition(var_name, position_z),
+                    ),
+                )
+            )
+
+        return ""
 
 
 class Move(Action):
@@ -204,39 +248,17 @@ class Move(Action):
                 True,
                 self.param_name["Block1"] if self.lifted_representation else block_var,
             ),
-            pddl_not(
-                pddl_exists(
-                    {TypeName.BLOCK_TYPE_NAME.value: block_var},
-                    pddl_and(
-                        f"({BlockPresentPredicate.var_name} {block_var})\n",
-                        AtXLocationPredicate.to_precondition(block_var, x_end),
-                        # here we check that there is no block at the level of the agent (bottom) or the agent's eyeline (top)
-                        pddl_or(
-                            AtYLocationPredicate.to_precondition(
-                                block_var, self.param_name["YPositionUp"]
-                            ),
-                            AtYLocationPredicate.to_precondition(
-                                block_var, self.param_name["YPositionDown"]
-                            ),
-                        ),
-                        AtZLocationPredicate.to_precondition(block_var, z_end),
-                    ),
-                )
+            # here we check that there is no block at the level of the agent (bottom) or the agent's eyeline (top)
+            self.not_exists_builder(
+                block_var, True, x_end, self.param_name["YPositionUp"], z_end
             ),
-            pddl_not(
-                pddl_exists(
-                    {TypeName.ITEM_TYPE_NAME.value: item_var},
-                    pddl_and(
-                        f"({ItemPresentPredicate.var_name} {item_var})\n",
-                        AtXLocationPredicate.to_precondition(item_var, x_end),
-                        # here we only check that there is no item at the level of the agent (bottom) since items cannot float
-                        # they would require a block to be placed beneath it, which is handled by the previous precondition
-                        AtYLocationPredicate.to_precondition(
-                            item_var, self.param_name["YPositionDown"]
-                        ),
-                        AtZLocationPredicate.to_precondition(item_var, z_end),
-                    ),
-                )
+            self.not_exists_builder(
+                block_var, True, x_end, self.param_name["YPositionDown"], z_end
+            ),
+            # here we only check that there is no item at the level of the agent (bottom) since items cannot float
+            # they would require a block to be placed beneath it, which is handled by the previous precondition
+            self.not_exists_builder(
+                item_var, False, x_end, self.param_name["YPositionDown"], z_end
             ),
         )
 
@@ -414,24 +436,12 @@ class MoveAndPickup(Action):
                 True,
                 self.param_name["Block1"] if self.lifted_representation else block_var,
             ),
-            pddl_not(
-                pddl_exists(
-                    {TypeName.BLOCK_TYPE_NAME.value: block_var},
-                    pddl_and(
-                        f"({BlockPresentPredicate.var_name} {block_var})\n",
-                        AtXLocationPredicate.to_precondition(block_var, x_end),
-                        # here we check that there is no block at the level of the agent (bottom) or the agent's eyeline (top)
-                        pddl_or(
-                            AtYLocationPredicate.to_precondition(
-                                block_var, self.param_name["YPositionUp"]
-                            ),
-                            AtYLocationPredicate.to_precondition(
-                                block_var, self.param_name["YPositionDown"]
-                            ),
-                        ),
-                        AtZLocationPredicate.to_precondition(block_var, z_end),
-                    ),
-                )
+            # here we check that there is no block at the level of the agent (bottom) or the agent's eyeline (top)
+            self.not_exists_builder(
+                block_var, True, x_end, self.param_name["YPositionUp"], z_end
+            ),
+            self.not_exists_builder(
+                block_var, True, x_end, self.param_name["YPositionDown"], z_end
             ),
             # check that the required item exists at the target location
             pddl_and(
@@ -601,22 +611,12 @@ class Break(Action):
             ),
             f'({BlockPresentPredicate.var_name} {self.param_names["Block"]})',
             # make sure that there is not an item on top of the block - if it exists, we would have to account for it falling
-            pddl_not(
-                pddl_exists(
-                    {TypeName.ITEM_TYPE_NAME.value: "?i"},
-                    pddl_and(
-                        f"({ItemPresentPredicate.var_name} ?i)\n",
-                        AtXLocationPredicate.to_precondition(
-                            "?i", self.param_names[self.x_front]
-                        ),
-                        AtYLocationPredicate.to_precondition(
-                            "?i", self.param_names["YPositionUp"]
-                        ),
-                        AtZLocationPredicate.to_precondition(
-                            "?i", self.param_names[self.z_front]
-                        ),
-                    ),
-                ),
+            self.not_exists_builder(
+                "?i",
+                False,
+                self.param_names[self.x_front],
+                self.param_names["YPositionUp"],
+                self.param_names[self.z_front],
             ),
             AreSequentialPredicate.to_precondition(
                 self.param_names["NStart"], self.param_names["NEnd"]
@@ -780,41 +780,20 @@ class Place(Action):
                 self.param_names["Block1"] if self.lifted_representation else block_var,
             ),
             # There mustn't be a block at the same location we are placing the new block
-            pddl_not(
-                pddl_exists(
-                    {TypeName.BLOCK_TYPE_NAME.value: block_var},
-                    pddl_and(
-                        f"({BlockPresentPredicate.var_name} {block_var})\n",
-                        AtXLocationPredicate.to_precondition(
-                            block_var, self.param_names[self.x_front]
-                        ),
-                        AtYLocationPredicate.to_precondition(
-                            block_var, self.param_names["YPosition"]
-                        ),
-                        AtZLocationPredicate.to_precondition(
-                            block_var,
-                            self.param_names[self.z_front],
-                        ),
-                    ),
-                )
+            self.not_exists_builder(
+                block_var,
+                True,
+                self.param_names[self.x_front],
+                self.param_names["YPosition"],
+                self.param_names[self.z_front],
             ),
             # There must not be an item at the location we are placing the new block
-            pddl_not(
-                pddl_exists(
-                    {TypeName.ITEM_TYPE_NAME.value: "?i"},
-                    pddl_and(
-                        f"({ItemPresentPredicate.var_name} ?i)\n",
-                        AtXLocationPredicate.to_precondition(
-                            "?i", self.param_names[self.x_front]
-                        ),
-                        AtYLocationPredicate.to_precondition(
-                            "?i", self.param_names["YPosition"]
-                        ),
-                        AtZLocationPredicate.to_precondition(
-                            "?i", self.param_names[self.z_front]
-                        ),
-                    ),
-                )
+            self.not_exists_builder(
+                "?i",
+                False,
+                self.param_names[self.x_front],
+                self.param_names["YPosition"],
+                self.param_names[self.z_front],
             ),
             # Housekeeping
             AreSequentialPredicate.to_precondition(
@@ -1001,38 +980,16 @@ class JumpUp(Action):
                 self.param_name["YPositionUp"], self.param_name["YPositionUpUp"]
             ),
             # check that we can jump in the current column (required before we can move forward)
-            pddl_not(
-                pddl_exists(
-                    {TypeName.BLOCK_TYPE_NAME.value: block_var},
-                    pddl_and(
-                        f"({BlockPresentPredicate.var_name} {block_var})\n",
-                        AtXLocationPredicate.to_precondition(block_var, x_start),
-                        # only check upup, since up is occupied by the agent
-                        AtYLocationPredicate.to_precondition(
-                            block_var, self.param_name["YPositionUpUp"]
-                        ),
-                        AtZLocationPredicate.to_precondition(block_var, z_start),
-                    ),
-                )
+            # only check upup, since up is occupied by the agent
+            self.not_exists_builder(
+                block_var, True, x_start, self.param_name["YPositionUpUp"], z_start
             ),
-            pddl_not(
-                pddl_exists(
-                    {TypeName.BLOCK_TYPE_NAME.value: block_var},
-                    pddl_and(
-                        f"({BlockPresentPredicate.var_name} {block_var})\n",
-                        AtXLocationPredicate.to_precondition(block_var, x_end),
-                        # check there is no block blocking the agent's "double height"
-                        pddl_or(
-                            AtYLocationPredicate.to_precondition(
-                                block_var, self.param_name["YPositionUp"]
-                            ),
-                            AtYLocationPredicate.to_precondition(
-                                block_var, self.param_name["YPositionUpUp"]
-                            ),
-                        ),
-                        AtZLocationPredicate.to_precondition(block_var, z_end),
-                    ),
-                )
+            # check there is no block blocking the agent's "double height"
+            self.not_exists_builder(
+                block_var, True, x_end, self.param_name["YPositionUp"], z_end
+            ),
+            self.not_exists_builder(
+                block_var, True, x_end, self.param_name["YPositionUpUp"], z_end
             ),
             self.exists_builder(
                 pddl_and(
@@ -1047,20 +1004,10 @@ class JumpUp(Action):
                 True,
                 self.param_name["Block1"] if self.lifted_representation else block_var,
             ),
-            pddl_not(
-                pddl_exists(
-                    {TypeName.ITEM_TYPE_NAME.value: item_var},
-                    pddl_and(
-                        f"({ItemPresentPredicate.var_name} {item_var})\n",
-                        AtXLocationPredicate.to_precondition(item_var, x_end),
-                        # here we only check that there is no item at the level of the agent (bottom) since items cannot float
-                        # they would require a block to be placed beneath it, which is handled by the previous precondition
-                        AtYLocationPredicate.to_precondition(
-                            item_var, self.param_name["YPositionUp"]
-                        ),
-                        AtZLocationPredicate.to_precondition(item_var, z_end),
-                    ),
-                )
+            # here we only check that there is no item at the level of the agent (bottom) since items cannot float
+            # they would require a block to be placed beneath it, which is handled by the previous precondition
+            self.not_exists_builder(
+                item_var, False, x_end, self.param_name["YPositionUp"], z_end
             ),
         )
 
@@ -1236,42 +1183,18 @@ class JumpUpAndPickup(Action):
                 self.param_name["NStart"], self.param_name["NEnd"]
             ),
             # check that there is no block blocking the agent's "double height" in the target column
-            pddl_not(
-                pddl_exists(
-                    {TypeName.BLOCK_TYPE_NAME.value: block_var},
-                    pddl_and(
-                        f"({BlockPresentPredicate.var_name} {block_var})\n",
-                        AtXLocationPredicate.to_precondition(block_var, x_end),
-                        pddl_or(
-                            AtYLocationPredicate.to_precondition(
-                                block_var, self.param_name["YPositionUp"]
-                            ),
-                            AtYLocationPredicate.to_precondition(
-                                block_var, self.param_name["YPositionUpUp"]
-                            ),
-                        ),
-                        AtZLocationPredicate.to_precondition(block_var, z_end),
-                    ),
-                )
+            self.not_exists_builder(
+                block_var, True, x_end, self.param_name["YPositionUp"], z_end
+            ),
+            self.not_exists_builder(
+                block_var, True, x_end, self.param_name["YPositionUpUp"], z_end
             ),
             # check that there is no block blocking the agent's "double height" in the current column
-            pddl_not(
-                pddl_exists(
-                    {TypeName.BLOCK_TYPE_NAME.value: block_var},
-                    pddl_and(
-                        f"({BlockPresentPredicate.var_name} {block_var})\n",
-                        AtXLocationPredicate.to_precondition(block_var, x_start),
-                        pddl_or(
-                            AtYLocationPredicate.to_precondition(
-                                block_var, self.param_name["YPositionUp"]
-                            ),
-                            AtYLocationPredicate.to_precondition(
-                                block_var, self.param_name["YPositionUpUp"]
-                            ),
-                        ),
-                        AtZLocationPredicate.to_precondition(block_var, z_start),
-                    ),
-                )
+            self.not_exists_builder(
+                block_var, True, x_start, self.param_name["YPositionUp"], z_start
+            ),
+            self.not_exists_builder(
+                block_var, True, x_start, self.param_name["YPositionUpUp"], z_start
             ),
             # check that there is a block to land on (target column)
             self.exists_builder(
@@ -1500,27 +1423,15 @@ class JumpDown(Action):
             AreSequentialPredicate.to_precondition(
                 self.param_name["YPositionDown"], self.param_name["YPositionUp"]
             ),
-            pddl_not(
-                pddl_exists(
-                    {TypeName.BLOCK_TYPE_NAME.value: block_var},
-                    pddl_and(
-                        f"({BlockPresentPredicate.var_name} {block_var})\n",
-                        AtXLocationPredicate.to_precondition(block_var, x_end),
-                        # here we check that there is no block at the level of the agent (bottom) or the agent's eyeline (top)
-                        pddl_or(
-                            AtYLocationPredicate.to_precondition(
-                                block_var, self.param_name["YPositionUp"]
-                            ),
-                            AtYLocationPredicate.to_precondition(
-                                block_var, self.param_name["YPositionDown"]
-                            ),
-                            AtYLocationPredicate.to_precondition(
-                                block_var, self.param_name["YPosition2Down"]
-                            ),
-                        ),
-                        AtZLocationPredicate.to_precondition(block_var, z_end),
-                    ),
-                )
+            # here we check that there is no block at the level of the agent (bottom) or the agent's eyeline (top)
+            self.not_exists_builder(
+                block_var, True, x_end, self.param_name["YPositionUp"], z_end
+            ),
+            self.not_exists_builder(
+                block_var, True, x_end, self.param_name["YPositionDown"], z_end
+            ),
+            self.not_exists_builder(
+                block_var, True, x_end, self.param_name["YPosition2Down"], z_end
             ),
             self.exists_builder(
                 pddl_and(
@@ -1535,22 +1446,10 @@ class JumpDown(Action):
                 True,
                 self.param_name["Block1"] if self.lifted_representation else block_var,
             ),
-            pddl_not(
-                pddl_exists(
-                    {TypeName.ITEM_TYPE_NAME.value: item_var},
-                    pddl_and(
-                        f"({ItemPresentPredicate.var_name} {item_var})\n",
-                        AtXLocationPredicate.to_precondition(item_var, x_end),
-                        # here we only check that there is no item at the level of the agent (bottom) since items cannot float
-                        # they would require a block to be placed beneath it, which is handled by the previous precondition
-                        pddl_or(
-                            AtYLocationPredicate.to_precondition(
-                                item_var, self.param_name["YPosition2Down"]
-                            ),
-                        ),
-                        AtZLocationPredicate.to_precondition(item_var, z_end),
-                    ),
-                )
+            # here we only check that there is no item at the level of the agent (bottom) since items cannot float
+            # they would require a block to be placed beneath it, which is handled by the previous precondition
+            self.not_exists_builder(
+                item_var, False, x_end, self.param_name["YPosition2Down"], z_end
             ),
         )
 
@@ -1731,29 +1630,14 @@ class JumpDownAndPickup(Action):
                 self.param_name["NStart"], self.param_name["NEnd"]
             ),
             # check that there is no block at the level of the agent (bottom) or the agent's eyeline (top)
-            pddl_not(
-                pddl_exists(
-                    {TypeName.BLOCK_TYPE_NAME.value: block_var},
-                    pddl_and(
-                        f"({BlockPresentPredicate.var_name} {block_var})\n",
-                        AtXLocationPredicate.to_precondition(block_var, x_end),
-                        pddl_or(
-                            # eyeline
-                            AtYLocationPredicate.to_precondition(
-                                block_var, self.param_name["YPositionUp"]
-                            ),
-                            # legs
-                            AtYLocationPredicate.to_precondition(
-                                block_var, self.param_name["YPositionDown"]
-                            ),
-                            # target location
-                            AtYLocationPredicate.to_precondition(
-                                block_var, self.param_name["YPosition2Down"]
-                            ),
-                        ),
-                        AtZLocationPredicate.to_precondition(block_var, z_end),
-                    ),
-                )
+            self.not_exists_builder(
+                block_var, True, x_end, self.param_name["YPositionUp"], z_end
+            ),
+            self.not_exists_builder(
+                block_var, True, x_end, self.param_name["YPositionDown"], z_end
+            ),
+            self.not_exists_builder(
+                block_var, True, x_end, self.param_name["YPosition2Down"], z_end
             ),
             # check that there is a block to land on
             self.exists_builder(

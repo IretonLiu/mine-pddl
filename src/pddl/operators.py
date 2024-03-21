@@ -4,7 +4,11 @@ from typing import Dict
 
 
 def pddl_and(*args):
-    return f"(and \n{' '.join(args)})"
+    args_filtered = []
+    for a in args:
+        if a is not None and a != "":
+            args_filtered.append(a)
+    return f"(and \n{' '.join(args_filtered)})"
 
 
 def pddl_add_wrapper(first: str, second: int) -> str:
