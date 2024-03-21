@@ -77,15 +77,15 @@ class Action:
     ) -> str:
         # optionally add in the is-empty-at-position predicate if we are using a lifted representation
 
-        output = ""
-
         if self.lifted_representation:
             occupied_predicate = (
                 IsAnyBlockAtPositionPredicate
                 if is_block
                 else IsAnyItemAtPositionPredicate
             )
-            output += f"({occupied_predicate.to_precondition(position_x, position_y, position_z)})\n"
+            output = pddl_not(
+                occupied_predicate.to_precondition(position_x, position_y, position_z)
+            )
         else:
             key = (
                 TypeName.BLOCK_TYPE_NAME.value
@@ -95,7 +95,7 @@ class Action:
             present_predicate = (
                 BlockPresentPredicate if is_block else ItemPresentPredicate
             )
-            pddl_not(
+            output = pddl_not(
                 pddl_exists(
                     {key: var_name},
                     pddl_and(
@@ -107,7 +107,7 @@ class Action:
                 )
             )
 
-        return ""
+        return output
 
 
 class Move(Action):

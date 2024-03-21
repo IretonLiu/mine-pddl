@@ -21,7 +21,8 @@ from pddl.predicates import (
     AtZLocationPredicate,
     BlockPresentPredicate,
     GoalAchievedPredicate,
-    IsEmptyAtPositionPredicate,
+    IsAnyBlockAtPositionPredicate,
+    IsAnyItemAtPositionPredicate,
     ItemPresentPredicate,
 )
 
@@ -187,18 +188,9 @@ class Problem:
                 # and as we process the items and blocks, we will update the grid
                 assert self.min_position is not None and self.max_position is not None
                 extent = self.max_position - self.min_position + 1
+                ITEM_VALUE = 1
+                BLOCK_VALUE = 2
                 occupancy_grid = np.zeros((extent, extent, extent))
-
-                # add the agent to the grid
-                position = (
-                    int(np.floor(agent.functions[XPositionFunction].value))
-                    - self.min_position,
-                    int(np.floor(agent.functions[YPositionFunction].value))
-                    - self.min_position,
-                    int(np.floor(agent.functions[ZPositionFunction].value))
-                    - self.min_position,
-                )
-                occupancy_grid[position] = 1
 
         # process agent
         for predicate in agent.predicates.values():
@@ -350,7 +342,7 @@ class Problem:
                             int(np.floor(entity.functions[ZPositionFunction].value))
                             - self.min_position,
                         )
-                        occupancy_grid[position] = 1
+                        occupancy_grid[position] = BLOCK_VALUE if i == 0 else ITEM_VALUE
 
         # process the emptiness grid
         if self.use_propositional and self.lifted_representation:
@@ -359,22 +351,42 @@ class Problem:
             for i in range(extent):
                 for j in range(extent):
                     for k in range(extent):
-                        predicate_str = IsEmptyAtPositionPredicate.to_precondition(
-                            PositionType.construct_problem_object(
-                                i + self.min_position
-                            ),
-                            PositionType.construct_problem_object(
-                                j + self.min_position
-                            ),
-                            PositionType.construct_problem_object(
-                                k + self.min_position
-                            ),
+                        block_predicate_str = (
+                            IsAnyBlockAtPositionPredicate.to_precondition(
+                                PositionType.construct_problem_object(
+                                    i + self.min_position
+                                ),
+                                PositionType.construct_problem_object(
+                                    j + self.min_position
+                                ),
+                                PositionType.construct_problem_object(
+                                    k + self.min_position
+                                ),
+                            )
                         )
-                        output_list.append(
-                            predicate_str
-                            if occupancy_grid[i, j, k] == 0
-                            else pddl_not(predicate_str)
+                        item_predicate_str = (
+                            IsAnyItemAtPositionPredicate.to_precondition(
+                                PositionType.construct_problem_object(
+                                    i + self.min_position
+                                ),
+                                PositionType.construct_problem_object(
+                                    j + self.min_position
+                                ),
+                                PositionType.construct_problem_object(
+                                    k + self.min_position
+                                ),
+                            )
                         )
+
+                        if occupancy_grid[i, j, k] == 0:
+                            output_list.append(pddl_not(block_predicate_str))
+                            output_list.append(pddl_not(item_predicate_str))
+                        elif occupancy_grid[i, j, k] == BLOCK_VALUE:
+                            output_list.append(block_predicate_str)
+                            output_list.append(pddl_not(item_predicate_str))
+                        elif occupancy_grid[i, j, k] == ITEM_VALUE:
+                            output_list.append(item_predicate_str)
+                            output_list.append(pddl_not(block_predicate_str))
 
         # TODO: fix fomatting
         output = "(:init\n\t"

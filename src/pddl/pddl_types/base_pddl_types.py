@@ -64,9 +64,6 @@ class AgentType(LocatableType):
         if self.use_propositional:
             self.predicates[AgentHasNItemsPredicate] = AgentHasNItemsPredicate()
 
-            # keep this as a reference - use this pred is a global context, so doesn't make sense to bind to a particular object type
-            # self.predicates[IsEmptyAtPositionPredicate] = IsEmptyAtPositionPredicate()
-
 
 class ItemType(LocatableType):
     type_name = TypeName.ITEM_TYPE_NAME.value
