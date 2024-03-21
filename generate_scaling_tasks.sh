@@ -9,6 +9,7 @@
 # define the min and max number of blocks
 min_blocks=2
 max_blocks=5
+step_size=1 # default = 1
 
 # define the base path to store the task YAML files and the generated PDDL
 base_yaml_folder="./task-worlds/Scaled_Move_to_Location"
@@ -53,7 +54,7 @@ else
 fi
 
 # loop through the blocks and create the task YAML files
-for num_blocks in $(seq $min_blocks $max_blocks); do
+for num_blocks in $(seq $min_blocks $step_size $max_blocks); do
     # define the yaml file
     yaml_file="${base_yaml_folder}/Scaled_Move_to_Location_${num_blocks}.yaml"
 
@@ -105,7 +106,7 @@ echo
 declare -a pddl_types=("numerical" "propositional")
 for pddl_type in ${pddl_types[@]}; do 
     echo "========== Processing ${pddl_type} pddl =========="
-    for num_blocks in $(seq $min_blocks $max_blocks); do
+    for num_blocks in $(seq $min_blocks $step_size $max_blocks); do
         echo "Generating PDDL for ${num_blocks} blocks..."
 
         # generate the pddl
