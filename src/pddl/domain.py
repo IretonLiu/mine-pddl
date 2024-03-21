@@ -211,7 +211,7 @@ class Domain:
         ):
             output += f"{PositionType.construct_problem_object(i)} "
 
-        output += f"- {PositionType.type_name}\n"
+        output += f"- {PositionType.type_name})\n"
 
         return output
 
