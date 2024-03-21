@@ -154,21 +154,13 @@ def generate_or_execute_pddl(args):
             # get the directory path, excluding the file name
             os.makedirs(os.path.dirname(filepath), exist_ok=True)
 
-        # create the domain file
+        # create the domain and problem files
         domain = Domain(
             args.domain_name,
             max_inventory_stack,
             use_propositional=use_propositional,
             lifted_representation=args.for_lifted_planner,
         )
-        domain.to_pddl(
-            items,
-            blocks,
-            file_path=args.domain_file,
-            goal=world_config["goal"],
-        )
-
-        # create the problem file
         problem = Problem(
             args.problem_name,
             domain,
@@ -177,12 +169,23 @@ def generate_or_execute_pddl(args):
             use_propositional=use_propositional,
             lifted_representation=args.for_lifted_planner,
         )
+
         problem.to_pddl(
             agent,
             items,
             blocks,
             file_path=args.problem_file,
             agent_position_override=agent_original_position,
+        )
+
+        # the position bounds would be set in the problem.to_pddl method (if necessary)
+        domain.set_position_bounds(problem.min_position, problem.max_position)
+
+        domain.to_pddl(
+            items,
+            blocks,
+            file_path=args.domain_file,
+            goal=world_config["goal"],
         )
 
     if args.execute_plan:

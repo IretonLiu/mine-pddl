@@ -8,6 +8,7 @@ import pddl.pddl_types.base_pddl_types as base_pddl_types
 import pddl.pddl_types.named_pddl_types as named_pddl_types
 import pddl.pddl_types.special_pddl_types as special_pddl_types
 from pddl.functions import InventoryFunction
+from pddl.pddl_types.special_pddl_types import PositionType
 from pddl.predicates import (
     AgentHasNItemsPredicate,
     IsAnyBlockAtPositionPredicate,
@@ -33,6 +34,15 @@ class Domain:
         self.requirements = []
         self.use_propositional = use_propositional
         self.lifted_representation = lifted_representation
+
+        self.min_position: Optional[int] = None
+        self.max_position: Optional[int] = None
+
+    def set_position_bounds(
+        self, min_position: Optional[int], max_position: Optional[int]
+    ):
+        self.min_position = min_position
+        self.max_position = max_position
 
     def construct_types(
         self,
@@ -191,6 +201,20 @@ class Domain:
 
         return output
 
+    def construct_constants(self) -> str:
+        assert self.min_position is not None and self.max_position is not None
+
+        output = "(:constants "
+        for i in range(
+            self.min_position,
+            self.max_position + 1,
+        ):
+            output += f"{PositionType.construct_problem_object(i)} "
+
+        output += f"- {PositionType.type_name}\n"
+
+        return output
+
     def construct_predicates(
         self,
         items: Dict[str, List[named_pddl_types.NamedItemType]],
@@ -252,6 +276,9 @@ class Domain:
         pddl = f"(define (domain {self.name})\n"
         pddl += "(:requirements :typing {}:negative-preconditions :universal-preconditions :existential-preconditions)\n".format(
             "" if self.use_propositional else ":fluents "
+        )
+        pddl += (
+            (self.construct_constants() + "\n") if self.lifted_representation else ""
         )
         pddl += self.construct_types(items, blocks) + "\n"
         pddl += self.construct_predicates(items, blocks) + "\n"

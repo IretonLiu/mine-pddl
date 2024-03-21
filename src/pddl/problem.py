@@ -9,7 +9,6 @@ from pddl.functions import (
     YPositionFunction,
     ZPositionFunction,
 )
-from pddl.operators import pddl_not
 from pddl.pddl_types.base_pddl_types import AgentType
 from pddl.pddl_types.named_pddl_types import NamedBlockType, NamedItemType
 from pddl.pddl_types.special_pddl_types import CountType, PositionType
@@ -242,7 +241,11 @@ class Problem:
                 )
             else:
                 # this is general to both propositional and numerical pddl
-                output_list.append(predicate.to_problem(agent.name))
+                temp = predicate.to_problem(agent.name)
+                if not self.lifted_representation or (
+                    self.lifted_representation and ("(not" not in temp)
+                ):
+                    output_list.append(temp)
 
         if not self.use_propositional:
             for function in agent.functions.values():
@@ -308,7 +311,11 @@ class Problem:
                             )
                         else:
                             # this is general to both propositional and numerical pddl
-                            output_list.append(predicate.to_problem(f"{name}{j}"))
+                            temp = predicate.to_problem(f"{name}{j}")
+                            if not self.lifted_representation or (
+                                self.lifted_representation and ("(not" not in temp)
+                            ):
+                                output_list.append(temp)
 
                     # process the functions - for numerical
                     if not self.use_propositional:
@@ -379,14 +386,15 @@ class Problem:
                         )
 
                         if occupancy_grid[i, j, k] == 0:
-                            output_list.append(pddl_not(block_predicate_str))
-                            output_list.append(pddl_not(item_predicate_str))
+                            # output_list.append(pddl_not(block_predicate_str))
+                            # output_list.append(pddl_not(item_predicate_str))
+                            pass  # we don't want (not pred)
                         elif occupancy_grid[i, j, k] == BLOCK_VALUE:
                             output_list.append(block_predicate_str)
-                            output_list.append(pddl_not(item_predicate_str))
+                            # output_list.append(pddl_not(item_predicate_str))
                         elif occupancy_grid[i, j, k] == ITEM_VALUE:
                             output_list.append(item_predicate_str)
-                            output_list.append(pddl_not(block_predicate_str))
+                            # output_list.append(pddl_not(block_predicate_str))
 
         # TODO: fix fomatting
         output = "(:init\n\t"
