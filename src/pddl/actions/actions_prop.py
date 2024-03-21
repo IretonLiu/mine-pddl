@@ -278,6 +278,10 @@ class Move(Action):
             predicate_to_use.to_precondition(self.param_name["Agent"], end),
         )
 
+        if self.lifted_representation:
+            # update the IsAnyBlockAtPositionPredicate and IsAnyItemAtPositionPredicate predicates (if necessary)
+            pass
+
     def to_pddl(self):
         self.construct_parameters()
         self.construct_preconditions()
@@ -473,6 +477,15 @@ class MoveAndPickup(Action):
             item_location_x = self.param_name["XPositionEnd"]
             item_location_z = self.param_name["ZPosition"]
 
+        lifted_representation_predicates = ""
+        if self.lifted_representation:
+            # update the IsAnyBlockAtPositionPredicate and IsAnyItemAtPositionPredicate predicates (if necessary)
+            lifted_representation_predicates = pddl_not(
+                IsAnyItemAtPositionPredicate.to_precondition(
+                    item_location_x, self.param_name["YPositionDown"], item_location_z
+                )
+            )
+
         self.effects = pddl_and(
             pddl_not(predicate_to_use.to_precondition(self.param_name["Agent"], start)),
             predicate_to_use.to_precondition(self.param_name["Agent"], end),
@@ -502,6 +515,7 @@ class MoveAndPickup(Action):
                 self.param_name["Agent"], self.param_name["NEnd"], item_type=self.item
             ),
             pddl_not(ItemPresentPredicate.to_precondition()),
+            lifted_representation_predicates,
         )
 
     def to_pddl(self):
@@ -630,6 +644,17 @@ class Break(Action):
         )
 
     def construct_effects(self):
+        lifted_representation_predicates = ""
+        if self.lifted_representation:
+            # update the IsAnyBlockAtPositionPredicate and IsAnyItemAtPositionPredicate predicates (if necessary)
+            lifted_representation_predicates = pddl_not(
+                IsAnyBlockAtPositionPredicate.to_precondition(
+                    self.param_names[self.x_front],
+                    self.param_names["YPosition"],
+                    self.param_names[self.z_front],
+                )
+            )
+
         self.effects = pddl_and(
             # set NOT block present, block location, previous inventory count
             # set TRUE current inventory count
@@ -659,6 +684,7 @@ class Break(Action):
             AgentHasNItemsPredicate.to_precondition(
                 self.param_names["Agent"], self.param_names["NEnd"], item_type=self.item
             ),
+            lifted_representation_predicates,
         )
 
     def to_pddl(self):
@@ -818,6 +844,17 @@ class Place(Action):
         )
 
     def construct_effects(self):
+        lifted_representation_predicates = ""
+        if self.lifted_representation:
+            # update the IsAnyBlockAtPositionPredicate and IsAnyItemAtPositionPredicate predicates (if necessary)
+            lifted_representation_predicates = (
+                IsAnyBlockAtPositionPredicate.to_precondition(
+                    self.param_names[self.x_front],
+                    self.param_names["YPosition"],
+                    self.param_names[self.z_front],
+                )
+            )
+
         self.effects = pddl_and(
             f'({BlockPresentPredicate.var_name} {self.param_names["Block"]})',
             AtXLocationPredicate.to_precondition(
@@ -839,6 +876,7 @@ class Place(Action):
             AgentHasNItemsPredicate.to_precondition(
                 self.param_names["Agent"], self.param_names["NEnd"], item_type=self.item
             ),
+            lifted_representation_predicates,
         )
 
     def to_pddl(self):
@@ -1034,6 +1072,10 @@ class JumpUp(Action):
                 self.param_name["Agent"], self.param_name["YPositionUp"]
             ),
         )
+
+        if self.lifted_representation:
+            # update the IsAnyBlockAtPositionPredicate and IsAnyItemAtPositionPredicate predicates (if necessary)
+            pass
 
     def to_pddl(self):
         self.construct_parameters()
@@ -1241,6 +1283,17 @@ class JumpUpAndPickup(Action):
             x_end = self.param_name["XPositionEnd"]
             z_end = self.param_name["ZPosition"]
 
+        lifted_representation_predicates = ""
+        if self.lifted_representation:
+            # update the IsAnyBlockAtPositionPredicate and IsAnyItemAtPositionPredicate predicates (if necessary)
+            lifted_representation_predicates = pddl_not(
+                IsAnyItemAtPositionPredicate.to_precondition(
+                    x_end,
+                    self.param_name["YPositionUp"],
+                    z_end,
+                )
+            )
+
         self.effects = pddl_and(
             # agent is not at the start location
             pddl_not(predicate_to_use.to_precondition(self.param_name["Agent"], start)),
@@ -1278,6 +1331,7 @@ class JumpUpAndPickup(Action):
             pddl_not(
                 AtZLocationPredicate.to_precondition(self.param_name["Item"], z_end)
             ),
+            lifted_representation_predicates,
         )
 
     def to_pddl(self):
@@ -1476,6 +1530,10 @@ class JumpDown(Action):
                 self.param_name["Agent"], self.param_name["YPosition2Down"]
             ),
         )
+
+        if self.lifted_representation:
+            # update the IsAnyBlockAtPositionPredicate and IsAnyItemAtPositionPredicate predicates (if necessary)
+            pass
 
     def to_pddl(self):
         self.construct_parameters()
@@ -1684,6 +1742,17 @@ class JumpDownAndPickup(Action):
             x_end = self.param_name["XPositionEnd"]
             z_end = self.param_name["ZPosition"]
 
+        lifted_representation_predicates = ""
+        if self.lifted_representation:
+            # update the IsAnyBlockAtPositionPredicate and IsAnyItemAtPositionPredicate predicates (if necessary)
+            lifted_representation_predicates = pddl_not(
+                IsAnyItemAtPositionPredicate.to_precondition(
+                    x_end,
+                    self.param_name["YPositionUp"],
+                    z_end,
+                )
+            )
+
         self.effects = pddl_and(
             # agent is not at the start location
             pddl_not(predicate_to_use.to_precondition(self.param_name["Agent"], start)),
@@ -1721,6 +1790,7 @@ class JumpDownAndPickup(Action):
             pddl_not(
                 AtZLocationPredicate.to_precondition(self.param_name["Item"], z_end)
             ),
+            lifted_representation_predicates,
         )
 
     def to_pddl(self):
@@ -1789,7 +1859,7 @@ class CheckGoal(Action):
                 AtXLocationPredicate.to_precondition(
                     self.param_names["Agent"],
                     PositionType.construct_problem_object(
-                        int(np.floor(float(agent["position"]["x"])))
+                        int(np.floor(float(agent["position"]["x"])))  # type: ignore
                     ),
                 ),
                 AtYLocationPredicate.to_precondition(
