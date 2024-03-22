@@ -153,10 +153,13 @@ class Problem:
                 self.min_position,
                 self.max_position + 1,
             ):  # add a buffer of 1 to either side of the position range
-                output += f"{PositionType.construct_problem_object(i)} "
+                if not self.lifted_representation:
+                    # do not add the position object definition if we are using lifted representation - they are constants in the domain
+                    output += f"{PositionType.construct_problem_object(i)} "
                 self.postition_objects.append(PositionType.construct_problem_object(i))
 
-            output += f"- {PositionType.type_name}\n"
+            if not self.lifted_representation:
+                output += f"- {PositionType.type_name}\n"
 
             # add the count objects
             output += "\t"
