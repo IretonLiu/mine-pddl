@@ -1,7 +1,7 @@
 #!/bin/zsh
 
 # define the tasks to skip
-declare -a skip_task_array=("PDDL Files" "Farm_Wheat" "Craft_Item" "Grow_Tree", "Scaled_Move_to_Location")
+declare -a skip_task_array=("PDDL Files" "Farm_Wheat" "Craft_Item" "Grow_Tree", "Scaled_Move_to_Location" "Scaled_Move_to_Location_extended")
 
 # define the difficulty levels
 declare -a difficulty_array=("Easy" "Medium" "Hard")
@@ -33,8 +33,14 @@ for task in ./task-worlds/*; do
     task=$(basename $task)
 
     # check if the task is in the skip array
-    if [[ "${skip_task_array[@]}" =~ "${task}" ]]; then
-        echo "========== Skipping task ${task}... =========="
+    skip=false
+    for element in "${skip_task_array[@]}"; do
+        if [[ "${element}" == "${task}" ]]; then
+            echo "========== Skipping task ${task}... =========="
+            skip=true
+        fi
+    done
+    if [ $skip = true ]; then
         continue
     fi
 

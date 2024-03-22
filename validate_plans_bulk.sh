@@ -3,7 +3,7 @@
 # The only restriction is that the plan name and parent dir must be the same the same for the plan and the yaml file
 
 # define the tasks to skip
-declare -a skip_task_array=("PDDL Files" "Farm_Wheat" "Craft_Item" "Grow_Tree" "Bridge" "Build_Cross" "Build_Shape" "Build_Wall" "Build_Well" "Climb_Place" "Collect_Build_Shape")
+declare -a skip_task_array=("PDDL Files" "Farm_Wheat" "Craft_Item" "Grow_Tree")
 
 # define the difficulty levels
 declare -a difficulty_array=("Easy" "Medium" "Hard")
@@ -24,19 +24,19 @@ for task in "${plan_base_path}"/*; do
     fi
 
     echo "========== Processing task ${task} =========="
-    for difficulty in ${difficulty_array[@]}; do 
+    for difficulty in ${difficulty_array[@]}; do
         # define the yaml and plan files
         yaml_file="${yaml_base_path}/${task}/${task}_${difficulty}.yaml"
         plan_file="${plan_base_path}/${task}/${task}_${difficulty}.pddl"
-        
+
         echo "Validating plan for ${task}_${difficulty}..."
 
         # check if the yaml file exists - there may be special cases where it does not
         if [ ! -f $yaml_file ]; then
             echo "YAML file ${yaml_file} does not exist! Skipping..."
             continue
-        fi 
-        
+        fi
+
         # validate the plan
         plan_name=$(basename $plan_file ".pddl")
         python src/main.py \
@@ -52,5 +52,3 @@ for task in "${plan_base_path}"/*; do
         pkill -9 -f java
     done
 done
-
-
