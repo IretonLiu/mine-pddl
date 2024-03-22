@@ -8,7 +8,7 @@ import pddl.pddl_types.base_pddl_types as base_pddl_types
 import pddl.pddl_types.named_pddl_types as named_pddl_types
 import pddl.pddl_types.special_pddl_types as special_pddl_types
 from pddl.functions import InventoryFunction
-from pddl.pddl_types.special_pddl_types import PositionType
+from pddl.pddl_types.special_pddl_types import CountType, PositionType
 from pddl.predicates import (
     AgentHasNItemsPredicate,
     IsAnyBlockAtPositionPredicate,
@@ -204,16 +204,24 @@ class Domain:
     def construct_constants(self) -> str:
         assert self.min_position is not None and self.max_position is not None
 
-        output = "(:constants "
+        output = "(:constants\n\t"
+
+        # add position objects
         for i in range(
             self.min_position,
             self.max_position + 1,
         ):
             output += f"{PositionType.construct_problem_object(i)} "
 
-        output += f"- {PositionType.type_name})\n"
+        output += f"- {PositionType.type_name}\n\t"
 
-        return output
+        # add count objects
+        for i in range(self.max_inventory_stack + 1):
+            output += f"{CountType.construct_problem_object(i)} "
+
+        output += f"- {CountType.type_name}\n"
+
+        return output + ")"
 
     def construct_predicates(
         self,

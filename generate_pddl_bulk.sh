@@ -1,7 +1,7 @@
 #!/bin/zsh
 
 # define the tasks to skip
-declare -a skip_task_array=("PDDL Files" "Farm_Wheat" "Craft_Item" "Grow_Tree", "Scaled_Move_to_Location")
+declare -a skip_task_array=("PDDL Files" "Farm_Wheat" "Craft_Item" "Grow_Tree", "Scaled_Move_to_Location" "Scaled_Move_to_Location_extended")
 
 # define the difficulty levels
 declare -a difficulty_array=("Easy" "Medium" "Hard")
@@ -9,18 +9,18 @@ declare -a difficulty_array=("Easy" "Medium" "Hard")
 # define the default observation ranges, as well as any task-specific overrides
 # note that the overrides will have to specially handled later on
 declare -A obsrange_array=(
-    [Easy]="(13, 9, 13)" 
-    [Medium]="(21, 15, 21)" 
+    [Easy]="(13, 9, 13)"
+    [Medium]="(21, 15, 21)"
     [Hard]="(71, 31, 71)"
 )
 declare -A logcabin_obsrange_array=(
-    [Easy]="(21, 11, 21)" 
-    [Medium]="(41, 11, 41)" 
+    [Easy]="(21, 11, 21)"
+    [Medium]="(41, 11, 41)"
     [Hard]="(65, 11, 65)"
 )
 declare -A cuttree_obsrange_array=(
-    [Easy]="(21, 31, 21)" 
-    [Medium]="(41, 31, 41)" 
+    [Easy]="(21, 31, 21)"
+    [Medium]="(41, 31, 41)"
     [Hard]="(65, 31, 65)"
 )
 
@@ -33,14 +33,20 @@ for task in ./task-worlds/*; do
     task=$(basename $task)
 
     # check if the task is in the skip array
-    if [[ "${skip_task_array[@]}" =~ "${task}" ]]; then
-        echo "========== Skipping task ${task}... =========="
+    skip=false
+    for element in "${skip_task_array[@]}"; do
+        if [[ "${element}" == "${task}" ]]; then
+            echo "========== Skipping task ${task}... =========="
+            skip=true
+        fi
+    done
+    if [ $skip = true ]; then
         continue
     fi
 
     echo "========== Processing task ${task} =========="
-    for difficulty in ${difficulty_array[@]}; do 
-        for pddl_type in ${pddl_types[@]}; do 
+    for difficulty in ${difficulty_array[@]}; do
+        for pddl_type in ${pddl_types[@]}; do
             # define the task folder and yaml file
             task_folder="./task-worlds/${task}/${task}_${difficulty}"
             yaml_file="${task_folder}.yaml"
@@ -52,15 +58,15 @@ for task in ./task-worlds/*; do
             elif [ $task = "Cut_Tree" ]; then
                 obsrange=${cuttree_obsrange_array[$difficulty]}
             fi
-            
+
             echo "Generating PDDL for ${task}_${difficulty} for ${pddl_type} pddl..."
 
             # check if the yaml file exists - there may be special cases where it does not
             if [ ! -f $yaml_file ]; then
                 echo "YAML file ${yaml_file} does not exist! Skipping..."
                 continue
-            fi 
-            
+            fi
+
             # generate the pddl
             output_path="problems/tasks/${task}/${difficulty}/${pddl_type}/${task}_${difficulty}"
             python src/main.py \
@@ -72,8 +78,8 @@ for task in ./task-worlds/*; do
                 --domain-file "${output_path}_domain.pddl" \
                 --problem-file "${output_path}_problem.pddl" \
                 --max-inventory-stack 64 \
-                --observation-range "${obsrange}" 
-            
+                --observation-range "${obsrange}"
+
             # kill the minecraft java process
             pkill -9 -f java
         done

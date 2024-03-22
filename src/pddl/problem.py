@@ -148,13 +148,14 @@ class Problem:
 
             assert self.min_position is not None and self.max_position is not None
 
-            output += "\t"
+            if not self.lifted_representation:
+                # do not add the position object definition if we are using lifted representation - they are constants in the domain
+                output += "\t"
             for i in range(
                 self.min_position,
                 self.max_position + 1,
             ):  # add a buffer of 1 to either side of the position range
                 if not self.lifted_representation:
-                    # do not add the position object definition if we are using lifted representation - they are constants in the domain
                     output += f"{PositionType.construct_problem_object(i)} "
                 self.postition_objects.append(PositionType.construct_problem_object(i))
 
@@ -162,11 +163,16 @@ class Problem:
                 output += f"- {PositionType.type_name}\n"
 
             # add the count objects
-            output += "\t"
+            if not self.lifted_representation:
+                # do not add the count object definition if we are using lifted representation - they are constants in the domain
+                output += "\t"
             for i in range(self.max_inventory_stack + 1):
-                output += f"{CountType.construct_problem_object(i)} "
+                if not self.lifted_representation:
+                    output += f"{CountType.construct_problem_object(i)} "
                 self.count_objects.append(CountType.construct_problem_object(i))
-            output += f"- {CountType.type_name}\n"
+
+            if not self.lifted_representation:
+                output += f"- {CountType.type_name}\n"
 
         return output + ")"
 
