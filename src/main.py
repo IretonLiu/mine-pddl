@@ -1,4 +1,5 @@
 import os
+from typing import Dict, List, Union
 
 import handlers.entities as handlers
 import minedojo  # type: ignore
@@ -37,6 +38,44 @@ GREEN = "\033[32m"
 RESET = "\033[0m"
 
 
+def replace_block_names(
+    obj: Union[str, List[Dict[str, str]]],
+) -> Union[str, List[Dict[str, str]]]:
+    replace_dict = {
+        "water": "ice",
+        "oak_stairs": "quartz_block",
+        "oak stairs": "quartz_block",
+    }
+
+    for key, value in replace_dict.items():
+        if isinstance(obj, str):
+            obj = obj.replace(key, value)
+        else:
+            # must be a dict for the inventory/goal
+            # so check if "type" needs to be replaced
+
+            # if blocks/inv is a key, process
+            # this is for the goal
+            keys_to_loop = []
+            if "blocks" in obj:
+                keys_to_loop.append("blocks")
+            if "inventory" in obj:
+                keys_to_loop.append("inventory")
+
+            for obj_key in keys_to_loop:
+                for item in obj[obj_key]:
+                    if "type" in item and item["type"] == key:
+                        item["type"] = value
+
+            if keys_to_loop == []:
+                # this is just the initial inventory
+                for item in obj:
+                    if "type" in item and item["type"] == key:
+                        item["type"] = value
+
+    return obj
+
+
 def generate_or_execute_pddl(args):
     world_config = yaml_helper.load_yaml(args.world_config)
 
@@ -56,10 +95,8 @@ def generate_or_execute_pddl(args):
         if "blocks" in world_config
         else None
     )
-    initial_inventory = (
-        yaml_helper.yaml_inventory_to_inventory_item(world_config["inventory"])
-        if "inventory" in world_config
-        else None
+    world_config_inv = (
+        world_config["inventory"] if "inventory" in world_config else None
     )
 
     # special case: agent sinks in water
@@ -67,8 +104,21 @@ def generate_or_execute_pddl(args):
     # ergo - ice
     if args.execute_plan:
         drawing_str = (
-            drawing_str.replace("water", "ice") if drawing_str is not None else None
+            replace_block_names(drawing_str) if drawing_str is not None else None
         )
+
+        # edit the initial inventory
+        world_config_inv = (
+            replace_block_names(world_config_inv)
+            if world_config_inv is not None
+            else None
+        )
+
+    initial_inventory = (
+        yaml_helper.yaml_inventory_to_inventory_item(world_config_inv)  # type: ignore
+        if world_config_inv is not None
+        else None
+    )
 
     env = minedojo.make(
         args.world_name,
@@ -206,11 +256,15 @@ def generate_or_execute_pddl(args):
         action_sequence = execution_helper.read_plan(args.plan_file)
         for action_str in action_sequence:
             # replace the word water with ice
-            action_str = action_str.replace("water", "ice")
+            action_str = replace_block_names(action_str)
 
             # get the action vector
             action, curr_dir = execution_helper.get_action_from_str(
-                action_str, agent=agent, env=env, inventory=inventory, curr_dir=curr_dir
+                str(action_str),
+                agent=agent,
+                env=env,
+                inventory=inventory,
+                curr_dir=curr_dir,
             )
             obs, reward, done, info = env.step(action)
             for i in range(5):
@@ -226,7 +280,7 @@ def generate_or_execute_pddl(args):
 
         # check if the goal state has been reached BEFORE switch to birds eye view - since obs is relative to agent
         plan_successful = execution_helper.check_goal_state(
-            obs, voxel_size, world_config["goal"]
+            obs, voxel_size, replace_block_names(world_config["goal"])
         )
 
         execution_helper.set_birds_eye_view(env)

@@ -267,6 +267,7 @@ def check_goal_state(obs, voxel_size, goal):
             ]
         )
         if not np.all(agent_pos == agent_goal_position):
+            print("Agent position is not correct")
             return False
 
     # loop over all the blocks in the goal and check if they are present
@@ -301,6 +302,7 @@ def check_goal_state(obs, voxel_size, goal):
             actual = rename[actual]
 
         if actual != block["type"]:
+            print(f"Block {block['type']} is not present - {actual} is present instead")
             return False
 
     # loop over all the inventory items in the goal and check if they are present
@@ -315,6 +317,9 @@ def check_goal_state(obs, voxel_size, goal):
             if name == inv_item["type"]:
                 item_in_true_inventory = True
                 if float(obs["inventory"]["quantity"][i]) < float(inv_item["quantity"]):
+                    print(
+                        f"Item {inv_item['type']} is not present in the correct quantity - {obs['inventory']['quantity'][i]} is present instead of {inv_item['quantity']}"
+                    )
                     return False
 
                 # break if we have found the item we are looking for
@@ -324,6 +329,7 @@ def check_goal_state(obs, voxel_size, goal):
         # 1) found the item in the inventory and checked the quantity is correct
         # 2) not found the item in the inventory
         if not item_in_true_inventory:
+            print(f"Item {inv_item['type']} is not present")
             return False
 
     return True
