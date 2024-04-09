@@ -1,0 +1,77 @@
+[
+    {
+        "action": "move",
+        "direction" : "south"
+    },
+    {
+        "action": "move",
+        "direction" : "south"
+    },
+    {
+        "action": "move",
+        "direction" : "south"
+    },
+    {
+        "action": "move",
+        "direction" : "south"
+    },
+
+    {
+        "action": "break",
+        "direction" : "west",
+        "block" : "planks"
+    },
+
+    {
+        "action": "move",
+        "direction" : "north"
+    },
+    {
+        "action": "move",
+        "direction" : "north"
+    },
+    {
+        "action": "move",
+        "direction" : "north"
+    },
+    {
+        "action": "move",
+        "direction" : "north"
+    },
+    {
+        "action": "move",
+        "direction" : "north"
+    },
+    {
+        "action": "move",
+        "direction" : "north"
+    },
+    {
+        "action": "move",
+        "direction" : "north"
+    },
+    {
+        "action": "move",
+        "direction" : "north"
+    },
+
+    {
+        "action": "move",
+        "direction" : "east"
+    },
+    {
+        "action": "move",
+        "direction" : "east"
+    },
+
+    {
+        "action": "place",
+        "direction" : "east",
+        "block" : "planks"
+    },
+
+
+    {
+		"action": "checkgoal"
+	}
+]

@@ -1,0 +1,1 @@
+Requires the agent to climb (and build in some cases) a staircase in order to place a wooden plank at various y levels.

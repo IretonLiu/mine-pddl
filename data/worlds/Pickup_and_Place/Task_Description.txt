@@ -1,0 +1,1 @@
+Requires the agent to pick up a wooden planks block and place it at a specified location somewhere in the map

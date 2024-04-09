@@ -1,0 +1,58 @@
+# This YAML file will only be used to specify the initial state of the world, and the goal state of the world
+# Block and item variants are not currently supported
+
+# the task name
+name: "Climb Place Medium"
+
+# intialise all block positions
+blocks:
+  - position:
+      x: '-2'
+      y: '4'
+      z: '-5'
+    type: oak_stairs
+  - position:
+      x: '1'
+      y: '4'
+      z: '3'
+    type: oak_stairs
+
+  - position:
+      x: '1'
+      y: '4'
+      z: '-3'
+    type: cobblestone
+  - position:
+      x: '-2'
+      y: '4'
+      z: '-4'
+    type: cobblestone
+  - position:
+      x: '-3'
+      y: '4'
+      z: '-2'
+    type: cobblestone
+  - position:
+      x: '-2'
+      y: '4'
+      z: '2'
+    type: cobblestone
+  - position:
+      x: '-1'
+      y: '4'
+      z: '3'
+    type: cobblestone
+
+#Need to have atleast one thing in the inventory
+inventory:
+  - type: planks
+    quantity: '1'
+
+# specify the goal: can be specific blocks placed at specific locations or agent having specific items in the inventory
+goal:
+  blocks:
+    - position:
+        x: '5'
+        y: '6'
+        z: '0'
+      type: planks

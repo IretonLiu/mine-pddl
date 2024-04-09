@@ -1,0 +1,20 @@
+[
+    {
+        "action": "move",
+        "direction" : "south"
+    },
+    {
+        "action": "move",
+        "direction" : "south"
+    },
+    
+    {
+        "action": "place",
+        "direction" : "west",
+        "block" : "planks"
+    },
+
+    {
+		"action": "checkgoal"
+	}
+]

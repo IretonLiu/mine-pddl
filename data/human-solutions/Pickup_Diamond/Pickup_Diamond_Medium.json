@@ -1,0 +1,37 @@
+[
+    {
+        "action": "move",
+        "direction" : "south"
+    },
+
+    {
+        "action": "move",
+        "direction" : "west"
+    },
+    {
+        "action": "move",
+        "direction" : "west"
+    },
+    {
+        "action": "move",
+        "direction" : "west"
+    },
+    {
+        "action": "move",
+        "direction" : "west"
+    },
+    {
+        "action": "move",
+        "direction" : "west"
+    },
+   
+    {
+        "action": "move_and_pickup",
+        "direction" : "north",
+        "item" : "diamond"
+    },
+
+    {
+		"action": "checkgoal"
+	}
+]

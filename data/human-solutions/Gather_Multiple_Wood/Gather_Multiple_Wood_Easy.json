@@ -1,0 +1,36 @@
+[
+    {
+        "action": "move",
+        "direction": "west"
+    },
+    {
+        "action": "break",
+        "direction": "south",
+        "block": "log"
+    },
+    {
+        "action": "break",
+        "direction": "north",
+        "block": "log"
+    },
+    {
+        "action": "move",
+        "direction": "north"
+    },
+    {
+        "action": "move",
+        "direction": "north"
+    },
+    {
+        "action": "move",
+        "direction": "east"
+    },
+    {
+        "action": "break",
+        "direction": "east",
+        "block": "log"
+    },
+    {
+        "action": "checkgoal"
+    }
+]

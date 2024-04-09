@@ -1,0 +1,35 @@
+[
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "place",
+        "direction": "south",
+        "block": "planks"
+    },
+    {
+        "action": "jumpup",
+        "direction": "south"
+    },
+    {
+        "action": "jumpdown",
+        "direction": "south"
+    },
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "place",
+        "direction": "south",
+        "block": "cobblestone"
+    },
+    {
+        "action": "checkgoal"
+    }
+]

@@ -1,0 +1,22 @@
+# This YAML file has been automatically generated. Any modifications will be overwritten if it is generated again.
+
+# This YAML file will only be used to specify the initial state of the world, and the goal state of the world
+# Block and item variants are not currently supported
+
+# the task name
+name: "Scaled Move to Location - 240 blocks"
+
+# Specify the agent's starting position
+agent:
+    - position:
+        x: '-120'
+        y: '4'
+        z: '0'
+
+# specify the goal: can be specific blocks placed at specific locations or agent having specific items in the inventory
+goal:
+    agent:
+        - position:
+            x: '119'
+            y: '4'
+            z: '0'

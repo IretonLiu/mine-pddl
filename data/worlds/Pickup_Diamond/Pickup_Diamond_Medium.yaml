@@ -1,0 +1,60 @@
+# This YAML file will only be used to specify the initial state of the world, and the goal state of the world
+# Block and item variants are not currently supported
+
+# the task name
+name: "Pickup Diamond Medium"
+
+# Need a blank block 
+blocks:
+  - position:
+      x: '-1'
+      y: '4'
+      z: '0'
+    type: planks
+  - position:
+      x: '-1'
+      y: '4'
+      z: '-1'
+    type: stone
+  - position:
+      x: '-3'
+      y: '4'
+      z: '-1'
+    type: cobblestone
+  - position:
+      x: '-4'
+      y: '4'
+      z: '-1'
+    type: stone
+  - position:
+      x: '-5'
+      y: '4'
+      z: '-1'
+    type: planks
+  - position:
+      x: '-3'
+      y: '4'
+      z: '2'
+    type: cobblestone
+  - position:
+      x: '-4'
+      y: '4'
+      z: '2'
+    type: cobblestone
+
+
+# initialise all floating items in the world
+items:
+  - position:
+      x: '-5'
+      y: '4'
+      z: '0'
+    quantity: 1
+    type: diamond
+    persist: 1
+
+# specify the goal: can be specific blocks placed at specific locations or agent having specific items in the inventory
+goal:
+  inventory:
+    - type: diamond
+      quantity: '1'

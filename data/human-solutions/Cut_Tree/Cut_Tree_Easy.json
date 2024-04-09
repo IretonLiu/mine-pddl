@@ -1,0 +1,339 @@
+[
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "break",
+        "direction": "south",
+        "block": "log"
+    },
+    {
+        "action": "move",
+        "direction": "north"
+    },
+    {
+        "action": "move",
+        "direction": "north"
+    },
+    {
+        "action": "move",
+        "direction": "north"
+    },
+    {
+        "action": "move",
+        "direction": "north"
+    },
+    {
+        "action": "move",
+        "direction": "north"
+    },
+    {
+        "action": "place",
+        "direction": "south",
+        "block": "stone"
+    },
+    {
+        "action": "move",
+        "direction": "east"
+    },
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "place",
+        "direction": "west",
+        "block": "stone"
+    },
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "place",
+        "direction": "west",
+        "block": "stone"
+    },
+    {
+        "action": "move",
+        "direction": "north"
+    },
+    {
+        "action": "move",
+        "direction": "north"
+    },
+    {
+        "action": "move",
+        "direction": "north"
+    },
+    {
+        "action": "move",
+        "direction": "west"
+    },
+    {
+        "action": "jumpup",
+        "direction": "south"
+    },
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "place",
+        "direction": "south",
+        "block": "stone"
+    },
+    {
+        "action": "move",
+        "direction": "north"
+    },
+    {
+        "action": "place",
+        "direction": "south",
+        "block": "stone"
+    },
+    {
+        "action": "jumpup",
+        "direction": "south"
+    },
+    {
+        "action": "place",
+        "direction": "south",
+        "block": "stone"
+    },
+    {
+        "action": "jumpup",
+        "direction": "south"
+    },
+    {
+        "action": "break",
+        "direction": "south",
+        "block": "leaves"
+    },
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "break",
+        "direction": "south",
+        "block": "leaves"
+    },
+    {
+        "action": "jumpup",
+        "direction": "east"
+    },
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "break",
+        "direction": "west",
+        "block": "leaves"
+    },
+    {
+        "action": "jumpdown",
+        "direction": "west"
+    },
+    {
+        "action": "break",
+        "direction": "south",
+        "block": "log"
+    },
+    {
+        "action": "move",
+        "direction": "north"
+    },
+    {
+        "action": "place",
+        "direction": "south",
+        "block": "stone"
+    },
+    {
+        "action": "jumpup",
+        "direction": "south"
+    },
+    {
+        "action": "break",
+        "direction": "south",
+        "block": "log"
+    },
+    {
+        "action": "jumpdown",
+        "direction": "north"
+    },
+    {
+        "action": "break",
+        "direction": "south",
+        "block": "stone"
+    },
+    {
+        "action": "move",
+        "direction": "north"
+    },
+    {
+        "action": "jumpdown",
+        "direction": "north"
+    },
+    {
+        "action": "break",
+        "direction": "south",
+        "block": "stone"
+    },
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "break",
+        "direction": "south",
+        "block": "leaves"
+    },
+    {
+        "action": "move",
+        "direction": "north"
+    },
+    {
+        "action": "jumpdown",
+        "direction": "north"
+    },
+    {
+        "action": "break",
+        "direction": "south",
+        "block": "stone"
+    },
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "break",
+        "direction": "south",
+        "block": "stone"
+    },
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "jumpdown",
+        "direction": "east"
+    },
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "place",
+        "direction": "west",
+        "block": "stone"
+    },
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "place",
+        "direction": "west",
+        "block": "stone"
+    },
+    {
+        "action": "move",
+        "direction": "north"
+    },
+    {
+        "action": "move",
+        "direction": "north"
+    },
+    {
+        "action": "move",
+        "direction": "north"
+    },
+    {
+        "action": "jumpup",
+        "direction": "west"
+    },
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "move",
+        "direction": "north"
+    },
+    {
+        "action": "place",
+        "direction": "south",
+        "block": "stone"
+    },
+    {
+        "action": "jumpup",
+        "direction": "south"
+    },
+    {
+        "action": "break",
+        "direction": "south",
+        "block": "leaves"
+    },
+    {
+        "action": "jumpdown",
+        "direction": "north"
+    },
+    {
+        "action": "break",
+        "direction": "south",
+        "block": "stone"
+    },
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "break",
+        "direction": "south",
+        "block": "log"
+    },
+    {
+        "action": "move",
+        "direction": "north"
+    },
+    {
+        "action": "place",
+        "direction": "south",
+        "block": "stone"
+    },
+    {
+        "action": "jumpup",
+        "direction": "south"
+    },
+    {
+        "action": "break",
+        "direction": "south",
+        "block": "log"
+    },
+    {
+        "action": "checkgoal"
+    }
+]

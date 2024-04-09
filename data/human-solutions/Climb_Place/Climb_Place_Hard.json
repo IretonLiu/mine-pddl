@@ -1,0 +1,454 @@
+[
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "break",
+        "direction": "south",
+        "block": "cobblestone"
+    },
+    {
+        "action": "break",
+        "direction": "west",
+        "block": "cobblestone"
+    },
+    {
+        "action": "move",
+        "direction": "west"
+    },
+    {
+        "action": "move",
+        "direction": "west"
+    },
+    {
+        "action": "break",
+        "direction": "north",
+        "block": "cobblestone"
+    },
+    {
+        "action": "move",
+        "direction": "west"
+    },
+    {
+        "action": "move",
+        "direction": "west"
+    },
+    {
+        "action": "move",
+        "direction": "west"
+    },
+    {
+        "action": "break",
+        "direction": "west",
+        "block": "cobblestone"
+    },
+    {
+        "action": "move",
+        "direction": "west"
+    },
+    {
+        "action": "move",
+        "direction": "north"
+    },
+    {
+        "action": "move",
+        "direction": "north"
+    },
+    {
+        "action": "break",
+        "direction": "north",
+        "block": "cobblestone"
+    },
+    {
+        "action": "move",
+        "direction": "north"
+    },
+    {
+        "action": "move",
+        "direction": "north"
+    },
+    {
+        "action": "move",
+        "direction": "north"
+    },
+    {
+        "action": "break",
+        "direction": "north",
+        "block": "cobblestone"
+    },
+    {
+        "action": "move",
+        "direction": "north"
+    },
+    {
+        "action": "move",
+        "direction": "east"
+    },
+    {
+        "action": "move",
+        "direction": "east"
+    },
+    {
+        "action": "move",
+        "direction": "east"
+    },
+    {
+        "action": "break",
+        "direction": "south",
+        "block": "cobblestone"
+    },
+    {
+        "action": "move",
+        "direction": "west"
+    },
+    {
+        "action": "move",
+        "direction": "north"
+    },
+    {
+        "action": "break",
+        "direction": "north",
+        "block": "cobblestone"
+    },
+    {
+        "action": "move",
+        "direction": "east"
+    },
+    {
+        "action": "break",
+        "direction": "east",
+        "block": "cobblestone"
+    },
+    {
+        "action": "move",
+        "direction": "east"
+    },
+    {
+        "action": "move",
+        "direction": "east"
+    },
+    {
+        "action": "move",
+        "direction": "east"
+    },
+    {
+        "action": "move",
+        "direction": "east"
+    },
+    {
+        "action": "break",
+        "direction": "south",
+        "block": "cobblestone"
+    },
+    {
+        "action": "move",
+        "direction": "north"
+    },
+    {
+        "action": "move",
+        "direction": "north"
+    },
+    {
+        "action": "break",
+        "direction": "west",
+        "block": "cobblestone"
+    },
+    {
+        "action": "move",
+        "direction": "west"
+    },
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "break",
+        "direction": "west",
+        "block": "cobblestone"
+    },
+    {
+        "action": "move",
+        "direction": "east"
+    },
+    {
+        "action": "move",
+        "direction": "east"
+    },
+    {
+        "action": "move",
+        "direction": "east"
+    },
+    {
+        "action": "move",
+        "direction": "east"
+    },
+    {
+        "action": "move",
+        "direction": "north"
+    },
+    {
+        "action": "move",
+        "direction": "north"
+    },
+    {
+        "action": "break",
+        "direction": "north",
+        "block": "cobblestone"
+    },
+    {
+        "action": "move",
+        "direction": "north"
+    },
+    {
+        "action": "move",
+        "direction": "east"
+    },
+    {
+        "action": "move",
+        "direction": "east"
+    },
+    {
+        "action": "break",
+        "direction": "east",
+        "block": "cobblestone"
+    },
+    {
+        "action": "move",
+        "direction": "west"
+    },
+    {
+        "action": "move",
+        "direction": "west"
+    },
+    {
+        "action": "move",
+        "direction": "west"
+    },
+    {
+        "action": "move",
+        "direction": "west"
+    },
+    {
+        "action": "move",
+        "direction": "west"
+    },
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "move",
+        "direction": "south"
+    },
+    {
+        "action": "move",
+        "direction": "east"
+    },
+    {
+        "action": "move",
+        "direction": "east"
+    },
+    {
+        "action": "move",
+        "direction": "east"
+    },
+    {
+        "action": "move",
+        "direction": "east"
+    },
+    {
+        "action": "move",
+        "direction": "east"
+    },
+    {
+        "action": "place",
+        "direction": "east",
+        "block": "cobblestone"
+    },
+    {
+        "action": "move",
+        "direction": "west"
+    },
+    {
+        "action": "place",
+        "direction": "east",
+        "block": "cobblestone"
+    },
+    {
+        "action": "move",
+        "direction": "west"
+    },
+    {
+        "action": "place",
+        "direction": "east",
+        "block": "cobblestone"
+    },
+    {
+        "action": "move",
+        "direction": "west"
+    },
+    {
+        "action": "place",
+        "direction": "east",
+        "block": "cobblestone"
+    },
+    {
+        "action": "move",
+        "direction": "west"
+    },
+    {
+        "action": "place",
+        "direction": "east",
+        "block": "cobblestone"
+    },
+    {
+        "action": "jumpup",
+        "direction": "east"
+    },
+    {
+        "action": "move",
+        "direction": "east"
+    },
+    {
+        "action": "move",
+        "direction": "east"
+    },
+    {
+        "action": "move",
+        "direction": "east"
+    },
+    {
+        "action": "place",
+        "direction": "east",
+        "block": "cobblestone"
+    },
+    {
+        "action": "move",
+        "direction": "west"
+    },
+    {
+        "action": "place",
+        "direction": "east",
+        "block": "cobblestone"
+    },
+    {
+        "action": "move",
+        "direction": "west"
+    },
+    {
+        "action": "place",
+        "direction": "east",
+        "block": "cobblestone"
+    },
+    {
+        "action": "move",
+        "direction": "west"
+    },
+    {
+        "action": "place",
+        "direction": "east",
+        "block": "cobblestone"
+    },
+    {
+        "action": "jumpup",
+        "direction": "east"
+    },
+    {
+        "action": "move",
+        "direction": "east"
+    },
+    {
+        "action": "move",
+        "direction": "east"
+    },
+    {
+        "action": "place",
+        "direction": "east",
+        "block": "cobblestone"
+    },
+    {
+        "action": "move",
+        "direction": "west"
+    },
+    {
+        "action": "place",
+        "direction": "east",
+        "block": "cobblestone"
+    },
+    {
+        "action": "move",
+        "direction": "west"
+    },
+    {
+        "action": "place",
+        "direction": "east",
+        "block": "cobblestone"
+    },
+    {
+        "action": "jumpup",
+        "direction": "east"
+    },
+    {
+        "action": "move",
+        "direction": "east"
+    },
+    {
+        "action": "place",
+        "direction": "east",
+        "block": "cobblestone"
+    },
+    {
+        "action": "move",
+        "direction": "west"
+    },
+    {
+        "action": "place",
+        "direction": "east",
+        "block": "cobblestone"
+    },
+    {
+        "action": "jumpup",
+        "direction": "east"
+    },
+    {
+        "action": "place",
+        "direction": "east",
+        "block": "planks"
+    },
+    {
+        "action": "checkgoal"
+    }
+]

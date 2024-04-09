@@ -1,0 +1,58 @@
+[
+    {
+        "action": "break",
+        "direction" : "south",
+        "block" : "cobblestone"
+    },
+
+    {
+        "action": "move",
+        "direction" : "east"
+    },
+    {
+        "action": "move",
+        "direction" : "east"
+    },
+    {
+        "action": "move",
+        "direction" : "east"
+    },
+    {
+        "action": "move",
+        "direction" : "east"
+    },
+
+    {
+        "action": "move",
+        "direction" : "north"
+    },
+    {
+        "action": "move",
+        "direction" : "north"
+    },
+    {
+        "action": "move",
+        "direction" : "north"
+    },
+
+    {
+        "action": "place",
+        "direction" : "north",
+        "block" : "cobblestone"
+    },
+    
+    {
+        "action": "jumpup",
+        "direction" : "north"
+    },
+
+    {
+        "action": "place",
+        "direction" : "north",
+        "block" : "planks"
+    },
+
+    {
+		"action": "checkgoal"
+	}
+]

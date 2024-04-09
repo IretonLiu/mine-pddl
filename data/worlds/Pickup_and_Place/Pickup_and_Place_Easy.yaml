@@ -1,0 +1,22 @@
+# This YAML file will only be used to specify the initial state of the world, and the goal state of the world
+# Block and item variants are not currently supported
+
+# the task name
+name: "Pickup and Place Easy"
+
+# intialise all block positions
+blocks:
+  - position:
+      x: '-1'
+      y: '4'
+      z: '4'
+    type: planks
+
+# specify the goal: can be specific blocks placed at specific locations or agent having specific items in the inventory
+goal:
+  blocks:
+    - position:
+        x: '3'
+        y: '4'
+        z: '-4'
+      type: planks

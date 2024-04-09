@@ -1,0 +1,89 @@
+# This YAML file will only be used to specify the initial state of the world, and the goal state of the world
+# Block and item variants are not currently supported
+
+# the task name
+name: "Build Cross Medium"
+
+# intialise all block positions
+blocks:
+  - position:
+      x: '6'
+      y: '5'
+      z: '-3'
+    type: stone
+  - position:
+      x: '6'
+      y: '4'
+      z: '0'
+    type: stone
+  - position:
+      x: '-4'
+      y: '4'
+      z: '-1'
+    type: stone
+
+  - position:
+      x: '2'
+      y: '4'
+      z: '0'
+    type: wool
+  - position:
+      x: '-3'
+      y: '5'
+      z: '0'
+    type: wool
+
+  - position:
+      x: '-2'
+      y: '4'
+      z: '-4'
+    type: planks
+  - position:
+      x: '-3'
+      y: '4'
+      z: '0'
+    type: planks
+  - position:
+      x: '6'
+      y: '4'
+      z: '-3'
+    type: planks
+  - position:
+      x: '2'
+      y: '4'
+      z: '1'
+    type: planks
+  - position:
+      x: '0'
+      y: '4'
+      z: '5'
+    type: planks
+
+# specify the goal: can be specific blocks placed at specific locations or agent having specific items in the inventory
+goal:
+  blocks:
+    - position:
+        x: '5'
+        y: '4'
+        z: '3'
+      type: planks
+    - position:
+        x: '5'
+        y: '5'
+        z: '3'
+      type: planks
+    - position:
+        x: '5'
+        y: '6'
+        z: '3'
+      type: planks
+    - position:
+        x: '6'
+        y: '5'
+        z: '3'
+      type: planks
+    - position:
+        x: '4'
+        y: '5'
+        z: '3'
+      type: planks

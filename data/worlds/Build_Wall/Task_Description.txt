@@ -1,0 +1,1 @@
+Requires the agent to collect blocks and build a wall.

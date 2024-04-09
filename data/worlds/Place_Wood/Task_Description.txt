@@ -1,0 +1,1 @@
+Requires the agent to place the 1 wooden plank at a given coordinate. The agent starts with a wooden plank in the inventory.

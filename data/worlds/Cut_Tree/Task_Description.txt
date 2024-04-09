@@ -1,0 +1,1 @@
+Requires the agent to cut down the tree. A tree is considered cut down when all log blocks are broken. Leaves do not need to be broken by the player as they decay over time.

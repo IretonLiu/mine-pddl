@@ -1,5 +1,6 @@
 logs/
 __pycache__/
+.vscode
 env/
 py2pddl*/
 pyrightconfig.json
@@ -14,3 +15,4 @@ human-solutions*
 old-pddl-files
 diff
 problems
+!data/**/*

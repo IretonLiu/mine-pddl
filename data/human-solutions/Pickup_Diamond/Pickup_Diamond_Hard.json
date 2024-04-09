@@ -1,0 +1,101 @@
+[
+    {
+        "action": "move",
+        "direction" : "north"
+    },
+    {
+        "action": "move",
+        "direction" : "north"
+    },
+    {
+        "action": "move",
+        "direction" : "north"
+    },
+    {
+        "action": "move",
+        "direction" : "north"
+    },
+    {
+        "action": "move",
+        "direction" : "north"
+    },
+    {
+        "action": "move",
+        "direction" : "north"
+    },
+    {
+        "action": "move",
+        "direction" : "north"
+    },
+    {
+        "action": "move",
+        "direction" : "north"
+    },
+    {
+        "action": "move",
+        "direction" : "north"
+    },
+    {
+        "action": "move",
+        "direction" : "north"
+    },
+    {
+        "action": "move",
+        "direction" : "north"
+    },
+    {
+        "action": "move",
+        "direction" : "north"
+    },
+    {
+        "action": "move",
+        "direction" : "north"
+    },
+    {
+        "action": "move",
+        "direction" : "north"
+    },
+
+    {
+        "action": "move",
+        "direction" : "west"
+    },
+    {
+        "action": "move",
+        "direction" : "west"
+    },
+    {
+        "action": "move",
+        "direction" : "west"
+    },
+    {
+        "action": "move",
+        "direction" : "west"
+    },
+    {
+        "action": "move",
+        "direction" : "west"
+    },
+    {
+        "action": "move",
+        "direction" : "west"
+    },
+    {
+        "action": "move",
+        "direction" : "west"
+    },
+    {
+        "action": "move",
+        "direction" : "west"
+    },
+
+    {
+        "action": "move_and_pickup",
+        "direction" : "west",
+        "item" : "diamond"
+    },
+
+    {
+		"action": "checkgoal"
+	}
+]

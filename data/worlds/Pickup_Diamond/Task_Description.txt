@@ -1,0 +1,1 @@
+Requires the agent to pickup the diamond item in the environment. The item is persistent and wont dissapear overtime. No blocks needed to be broken.
