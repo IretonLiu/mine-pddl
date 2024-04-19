@@ -148,22 +148,15 @@ class Problem:
 
             assert self.min_position is not None and self.max_position is not None
 
-            output += "\t"
             for i in range(
                 self.min_position,
                 self.max_position + 1,
             ):  # add a buffer of 1 to either side of the position range
-                output += f"{PositionType.construct_problem_object(i)} "
                 self.postition_objects.append(PositionType.construct_problem_object(i))
 
-            output += f"- {PositionType.type_name}\n"
-
             # add the count objects
-            output += "\t"
             for i in range(self.max_inventory_stack + 1):
-                output += f"{CountType.construct_problem_object(i)} "
                 self.count_objects.append(CountType.construct_problem_object(i))
-            output += f"- {CountType.type_name}\n"
 
         return output + ")"
 
