@@ -210,6 +210,7 @@ def generate_or_execute_pddl(args):
             max_inventory_stack,
             use_propositional=use_propositional,
             lifted_representation=args.for_lifted_planner,
+            is_grounded=args.grounded_actions,
         )
 
         problem = Problem(
@@ -237,6 +238,7 @@ def generate_or_execute_pddl(args):
             blocks,
             file_path=args.domain_file,
             goal=world_config["goal"],
+            pddl_objects=problem.pddl_objects_dict,
         )
 
     if args.execute_plan:

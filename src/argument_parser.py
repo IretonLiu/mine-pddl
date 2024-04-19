@@ -201,6 +201,12 @@ def get_args_parser():
         help='Specify if the propositional pddl needs to include accommodations for the lifted planner (i.e. no existentials, and no "not" statements)',
     )
     parser.set_defaults(for_lifted_planner=False)
+    parser.add_argument(
+        "--grounded-actions",
+        action="store_true",
+        default=False,
+        help="Generate grounded actions for the domain",
+    )
 
     # args to define variables pertinent to the world
     parser.add_argument(

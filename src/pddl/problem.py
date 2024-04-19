@@ -64,6 +64,9 @@ class Problem:
         self.use_propositional = use_propositional
         self.lifted_representation = lifted_representation
 
+        # have a dictionary of objects, where the key is the type of object, and the value is a list of objects of that type
+        self.pddl_objects_dict: Dict[str, List[str]] = {}
+
         # these are only going to be used for "position" objects (propositional pddl)
         # and for setting the is-empty-at-position predicates (propositional pddl)
         self.min_position: Optional[int] = None
@@ -109,6 +112,9 @@ class Problem:
 
         output += f"\t{agent.name} - {agent.type_name}\n"
 
+        # add the agent to the object dict
+        self.pddl_objects_dict[agent.type_name] = [agent.name]
+
         # loop through the keys of items and blocks
         for key in blocks.keys() | items.keys():
             # construct the object string for both the item and block version of this type
@@ -132,6 +138,10 @@ class Problem:
             block_objects = [
                 f"{key}-block{i}" for i in range(total_occurances + inventory_quantity)
             ]
+
+            # add the objects to the pddl obj dict
+            self.pddl_objects_dict[key] = item_objects
+            self.pddl_objects_dict[f"{key}-block"] = block_objects
 
             # add in the object type
             item_objects.extend(["-", key])
@@ -157,6 +167,10 @@ class Problem:
             # add the count objects
             for i in range(self.max_inventory_stack + 1):
                 self.count_objects.append(CountType.construct_problem_object(i))
+
+            # add the position and count objects to the object dict
+            self.pddl_objects_dict[PositionType.type_name] = self.postition_objects
+            self.pddl_objects_dict[CountType.type_name] = self.count_objects
 
         return output + ")"
 

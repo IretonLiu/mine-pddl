@@ -2,13 +2,14 @@
 python src/main.py \
     --generate-pddl \
     --pddl-type propositional \
-    --world-config "./data/worlds/Build_Cabin/Build_Cabin_Hard.yaml" \
-    --domain-name Bulid_Cabin_Hard_domain \
-    --problem-name Build_Cabin_Hard_problem \
-    --domain-file "./data/pddl/Build_Cabin/Hard/propositional/Build_Cabin_Hard_domain.pddl" \
-    --problem-file "./data/pddl/Build_Cabin/Hard/propositional/Build_Cabin_Hard_problem.pddl" \
+    --grounded-actions \
+    --world-config "./data/worlds/Place_Wood/Place_Wood_Easy.yaml" \
+    --domain-name domain \
+    --problem-name problem \
+    --domain-file "./data/domain.pddl" \
+    --problem-file "./data/problem.pddl" \
     --max-inventory-stack 64 \
-    --observation-range "(65, 11, 65)"
+    --observation-range "(13, 9, 13)"
 
 exit
 

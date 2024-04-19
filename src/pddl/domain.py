@@ -19,6 +19,7 @@ class Domain:
         max_inventory_stack: int,
         use_propositional: bool,
         lifted_representation: bool = False,
+        is_grounded: bool = False,
     ):
         self.name = name
         self.max_inventory_stack = max_inventory_stack
@@ -30,6 +31,7 @@ class Domain:
         self.requirements = []
         self.use_propositional = use_propositional
         self.lifted_representation = lifted_representation
+        self.is_grounded = is_grounded
 
         self.min_position: Optional[int] = None
         self.max_position: Optional[int] = None
@@ -238,6 +240,7 @@ class Domain:
         items: Dict[str, List[named_pddl_types.NamedItemType]],
         blocks: Dict[str, List[named_pddl_types.NamedBlockType]],
         goal: Dict[str, List[Dict[str, Any]]],
+        pddl_objects: Optional[Dict[str, List[str]]] = None,
     ):
         if self.use_propositional:
             module = actions_prop
@@ -267,7 +270,12 @@ class Domain:
         for action in self.actions:
             if self.use_propositional:
                 action.set_lifted_representation(self.lifted_representation)
-            action_str += "\n" + action.to_pddl() + "\n"
+                action.is_grounded = self.is_grounded
+
+            if self.use_propositional:
+                action_str += "\n" + action.to_pddl(pddl_objects) + "\n"
+            else:
+                action_str += "\n" + action.to_pddl() + "\n"
         return action_str
 
     def to_pddl(
@@ -276,6 +284,7 @@ class Domain:
         blocks: Dict[str, List[named_pddl_types.NamedBlockType]],
         goal: Dict[str, List[Dict[str, Any]]],
         file_path: str,
+        pddl_objects: Optional[Dict[str, List[str]]] = None,
     ):
         pddl = f"(define (domain {self.name})\n"
         pddl += "(:requirements :typing {}:negative-preconditions :universal-preconditions :existential-preconditions)\n".format(
@@ -286,7 +295,7 @@ class Domain:
         pddl += self.construct_predicates(items, blocks) + "\n"
         if not self.use_propositional:
             pddl += self.construct_functions(items, blocks) + "\n"
-        pddl += self.construct_actions(items, blocks, goal) + "\n"
+        pddl += self.construct_actions(items, blocks, goal, pddl_objects) + "\n"
         pddl += ")"
 
         with open(file_path, "w") as f:
