@@ -3,6 +3,36 @@ from typing import Dict
 # TODO: catch invalid arguments
 
 
+def add_pddl_prefix(*args, prefix: str = "not") -> str:
+    # create the output string as normal
+    output = " ".join(args)
+
+    # remove whitespace
+    output = output.strip()
+
+    # check whether brackets already exist - if so, remove them
+    remove_first = False
+    remove_last = False
+    if output.startswith("("):
+        remove_first = True
+
+    if output.endswith(")"):
+        remove_last = True
+
+    if remove_first != remove_last:
+        print(output)
+        raise ValueError("Mismatched brackets in NOT predicate")
+
+    # remove brackets if necessary
+    if remove_first:
+        output = output[1:]
+    if remove_last:
+        output = output[:-1]
+
+    # add the "not-" prefix
+    return f"({prefix}-{output})\n"
+
+
 def pddl_and(*args):
     args_filtered = []
     for a in args:
@@ -32,8 +62,13 @@ def pddl_exists(arguments: Dict, *args):
     return out
 
 
-def pddl_not(*args):
-    return f"(not {' '.join(args)})"
+def pddl_not(*args, lifted_representation: bool = False):
+    # if we are generating pddl for a lifted planner, then we cannot have NOT preconditions
+    # so we will have a standard predicate name that is just "not-" + the original predicate name
+    if lifted_representation:
+        return add_pddl_prefix(*args, prefix="not")
+    else:
+        return f"(not {' '.join(args)})"
 
 
 def pddl_equal(*args):

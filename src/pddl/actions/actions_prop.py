@@ -1,7 +1,7 @@
 from typing import Optional
 
 import numpy as np
-from pddl.operators import pddl_and, pddl_exists, pddl_not, pddl_or
+from pddl.operators import add_pddl_prefix, pddl_and, pddl_exists, pddl_not, pddl_or
 from pddl.pddl_types.special_pddl_types import CountType, PositionType
 from pddl.pddl_types.types_names import TypeName
 from pddl.predicates import (
@@ -17,6 +17,40 @@ from pddl.predicates import (
     IsAnyItemAtPositionPredicate,
     ItemPresentPredicate,
 )
+
+
+def get_effects_negated_predicates(effects: list[str]) -> list[str]:
+    negated_effects = []
+
+    # if we are using the lifted representation, we need to consider the presence of the "not-" prefix
+    for effect in effects:
+        # loop through all the effects we currently have
+
+        # strip it and remove erroneous newlines
+        effect = effect.strip()
+        effect = effect.replace("\n", "")
+
+        # check whether this is setting a predicate or unsetting it (i.e. is "(not ") present
+        if effect.startswith("(not "):
+            # if we are unsetting the predicate, we also need to set the negation of the predicate (i.e. version with the not- prefix)
+
+            # remove the "(not " prefix and the trailing ")"
+            prefixed_predicate = effect.replace("(not ", "")
+            prefixed_predicate = prefixed_predicate[::-1]
+            prefixed_predicate = prefixed_predicate.replace(")", "", 1)
+            prefixed_predicate = prefixed_predicate[::-1]
+
+            # get the prefixed version of the predicate
+            prefixed_predicate = add_pddl_prefix(prefixed_predicate)
+            negated_effects.append(prefixed_predicate)
+        else:
+            # if we are setting the predicate, we also need to unset the negation of the predicate (i.e. version with the not- prefix)
+
+            # get the prefixed version of the predicate
+            prefixed_predicate = add_pddl_prefix(effect)
+            negated_effects.append(pddl_not(prefixed_predicate))
+
+    return negated_effects
 
 
 class Action:
@@ -84,7 +118,8 @@ class Action:
                 else IsAnyItemAtPositionPredicate
             )
             output = pddl_not(
-                occupied_predicate.to_precondition(position_x, position_y, position_z)
+                occupied_predicate.to_precondition(position_x, position_y, position_z),
+                lifted_representation=self.lifted_representation,
             )
         else:
             key = (
@@ -104,7 +139,8 @@ class Action:
                         AtYLocationPredicate.to_precondition(var_name, position_y),
                         AtZLocationPredicate.to_precondition(var_name, position_z),
                     ),
-                )
+                ),
+                lifted_representation=self.lifted_representation,
             )
 
         return output
@@ -273,14 +309,23 @@ class Move(Action):
             end = self.param_name["XPositionEnd"]
             predicate_to_use = AtXLocationPredicate
 
-        self.effects = pddl_and(
-            pddl_not(predicate_to_use.to_precondition(self.param_name["Agent"], start)),
-            predicate_to_use.to_precondition(self.param_name["Agent"], end),
-        )
+        effects_list = [
+            pddl_not(
+                predicate_to_use.to_precondition(self.param_name["Agent"], start)
+            ),  # unset start position
+            predicate_to_use.to_precondition(
+                self.param_name["Agent"], end
+            ),  # set end position
+        ]
 
         if self.lifted_representation:
             # update the IsAnyBlockAtPositionPredicate and IsAnyItemAtPositionPredicate predicates (if necessary)
-            pass
+
+            # add in the negated predicates
+            negated_effects = get_effects_negated_predicates(effects_list)
+            effects_list.extend(negated_effects)
+
+        self.effects = pddl_and(*effects_list)
 
     def to_pddl(self):
         self.construct_parameters()
@@ -477,46 +522,58 @@ class MoveAndPickup(Action):
             item_location_x = self.param_name["XPositionEnd"]
             item_location_z = self.param_name["ZPosition"]
 
-        lifted_representation_predicates = ""
-        if self.lifted_representation:
-            # update the IsAnyBlockAtPositionPredicate and IsAnyItemAtPositionPredicate predicates (if necessary)
-            lifted_representation_predicates = pddl_not(
-                IsAnyItemAtPositionPredicate.to_precondition(
-                    item_location_x, self.param_name["YPositionDown"], item_location_z
-                )
-            )
-
-        self.effects = pddl_and(
-            pddl_not(predicate_to_use.to_precondition(self.param_name["Agent"], start)),
+        effects_list = [
+            pddl_not(
+                predicate_to_use.to_precondition(self.param_name["Agent"], start),
+            ),
             predicate_to_use.to_precondition(self.param_name["Agent"], end),
             pddl_not(
                 AgentHasNItemsPredicate.to_precondition(
                     self.param_name["Agent"],
                     self.param_name["NStart"],
                     item_type=self.item,
-                )
+                ),
             ),
             pddl_not(
                 AtXLocationPredicate.to_precondition(
                     self.param_name["Item"], item_location_x
-                )
+                ),
             ),
             pddl_not(
                 AtYLocationPredicate.to_precondition(
                     self.param_name["Item"], self.param_name["YPositionDown"]
-                )
+                ),
             ),
             pddl_not(
                 AtZLocationPredicate.to_precondition(
                     self.param_name["Item"], item_location_z
-                )
+                ),
             ),
             AgentHasNItemsPredicate.to_precondition(
                 self.param_name["Agent"], self.param_name["NEnd"], item_type=self.item
             ),
-            pddl_not(ItemPresentPredicate.to_precondition()),
-            lifted_representation_predicates,
-        )
+            pddl_not(
+                ItemPresentPredicate.to_precondition(),
+            ),
+        ]
+
+        if self.lifted_representation:
+            # update the IsAnyBlockAtPositionPredicate and IsAnyItemAtPositionPredicate predicates (if necessary)
+            effects_list.append(
+                pddl_not(
+                    IsAnyItemAtPositionPredicate.to_precondition(
+                        item_location_x,
+                        self.param_name["YPositionDown"],
+                        item_location_z,
+                    )
+                )
+            )
+
+            # add in the negated predicates
+            negated_effects = get_effects_negated_predicates(effects_list)
+            effects_list.extend(negated_effects)
+
+        self.effects = pddl_and(*effects_list)
 
     def to_pddl(self):
         self.construct_parameters()
@@ -644,48 +701,56 @@ class Break(Action):
         )
 
     def construct_effects(self):
-        lifted_representation_predicates = ""
-        if self.lifted_representation:
-            # update the IsAnyBlockAtPositionPredicate and IsAnyItemAtPositionPredicate predicates (if necessary)
-            lifted_representation_predicates = pddl_not(
-                IsAnyBlockAtPositionPredicate.to_precondition(
-                    self.param_names[self.x_front],
-                    self.param_names["YPosition"],
-                    self.param_names[self.z_front],
-                )
-            )
-
-        self.effects = pddl_and(
+        effects_list = [
             # set NOT block present, block location, previous inventory count
             # set TRUE current inventory count
-            pddl_not(f'({BlockPresentPredicate.var_name} {self.param_names["Block"]})'),
+            pddl_not(
+                f'({BlockPresentPredicate.var_name} {self.param_names["Block"]})',
+            ),
             pddl_not(
                 AtXLocationPredicate.to_precondition(
                     self.param_names["Block"], self.param_names[self.x_front]
-                )
+                ),
             ),
             pddl_not(
                 AtYLocationPredicate.to_precondition(
                     self.param_names["Block"], self.param_names["YPosition"]
-                )
+                ),
             ),
             pddl_not(
                 AtZLocationPredicate.to_precondition(
                     self.param_names["Block"], self.param_names[self.z_front]
-                )
+                ),
             ),
             pddl_not(
                 AgentHasNItemsPredicate.to_precondition(
                     self.param_names["Agent"],
                     self.param_names["NStart"],
                     item_type=self.item,
-                )
+                ),
             ),
             AgentHasNItemsPredicate.to_precondition(
                 self.param_names["Agent"], self.param_names["NEnd"], item_type=self.item
             ),
-            lifted_representation_predicates,
-        )
+        ]
+
+        if self.lifted_representation:
+            # update the IsAnyBlockAtPositionPredicate and IsAnyItemAtPositionPredicate predicates (if necessary)
+            effects_list.append(
+                pddl_not(
+                    IsAnyBlockAtPositionPredicate.to_precondition(
+                        self.param_names[self.x_front],
+                        self.param_names["YPosition"],
+                        self.param_names[self.z_front],
+                    ),
+                )
+            )
+
+            # add in the negated predicates
+            negated_effects = get_effects_negated_predicates(effects_list)
+            effects_list.extend(negated_effects)
+
+        self.effects = pddl_and(*effects_list)
 
     def to_pddl(self):
         self.construct_parameters()
@@ -785,7 +850,10 @@ class Place(Action):
                 self.param_names["Agent"], self.param_names["ZPosition"]
             ),
             # check that the block we want to place does not exist
-            pddl_not(f'({BlockPresentPredicate.var_name} {self.param_names["Block"]})'),
+            pddl_not(
+                f'({BlockPresentPredicate.var_name} {self.param_names["Block"]})',
+                lifted_representation=self.lifted_representation,
+            ),
             # There must be a block one down and one in front of us, for support for the block we are placing
             self.exists_builder(
                 pddl_and(
@@ -844,18 +912,7 @@ class Place(Action):
         )
 
     def construct_effects(self):
-        lifted_representation_predicates = ""
-        if self.lifted_representation:
-            # update the IsAnyBlockAtPositionPredicate and IsAnyItemAtPositionPredicate predicates (if necessary)
-            lifted_representation_predicates = (
-                IsAnyBlockAtPositionPredicate.to_precondition(
-                    self.param_names[self.x_front],
-                    self.param_names["YPosition"],
-                    self.param_names[self.z_front],
-                )
-            )
-
-        self.effects = pddl_and(
+        effects_list = [
             f'({BlockPresentPredicate.var_name} {self.param_names["Block"]})',
             AtXLocationPredicate.to_precondition(
                 self.param_names["Block"], self.param_names[self.x_front]
@@ -871,13 +928,28 @@ class Place(Action):
                     self.param_names["Agent"],
                     self.param_names["NStart"],
                     item_type=self.item,
-                )
+                ),
             ),
             AgentHasNItemsPredicate.to_precondition(
                 self.param_names["Agent"], self.param_names["NEnd"], item_type=self.item
             ),
-            lifted_representation_predicates,
-        )
+        ]
+
+        if self.lifted_representation:
+            # update the IsAnyBlockAtPositionPredicate and IsAnyItemAtPositionPredicate predicates (if necessary)
+            effects_list.append(
+                IsAnyBlockAtPositionPredicate.to_precondition(
+                    self.param_names[self.x_front],
+                    self.param_names["YPosition"],
+                    self.param_names[self.z_front],
+                )
+            )
+
+            # add in the negated predicates
+            negated_effects = get_effects_negated_predicates(effects_list)
+            effects_list.extend(negated_effects)
+
+        self.effects = pddl_and(*effects_list)
 
     def to_pddl(self):
         self.construct_parameters()
@@ -1060,22 +1132,29 @@ class JumpUp(Action):
             end = self.param_name["XPositionEnd"]
             predicate_to_use = AtXLocationPredicate
 
-        self.effects = pddl_and(
-            pddl_not(predicate_to_use.to_precondition(self.param_name["Agent"], start)),
+        effects_list = [
+            pddl_not(
+                predicate_to_use.to_precondition(self.param_name["Agent"], start),
+            ),
             predicate_to_use.to_precondition(self.param_name["Agent"], end),
             pddl_not(
                 AtYLocationPredicate.to_precondition(
                     self.param_name["Agent"], self.param_name["YPositionDown"]
-                )
+                ),
             ),
             AtYLocationPredicate.to_precondition(
                 self.param_name["Agent"], self.param_name["YPositionUp"]
             ),
-        )
+        ]
 
         if self.lifted_representation:
             # update the IsAnyBlockAtPositionPredicate and IsAnyItemAtPositionPredicate predicates (if necessary)
-            pass
+
+            # add in the negated predicates
+            negated_effects = get_effects_negated_predicates(effects_list)
+            effects_list.extend(negated_effects)
+
+        self.effects = pddl_and(*effects_list)
 
     def to_pddl(self):
         self.construct_parameters()
@@ -1283,24 +1362,15 @@ class JumpUpAndPickup(Action):
             x_end = self.param_name["XPositionEnd"]
             z_end = self.param_name["ZPosition"]
 
-        lifted_representation_predicates = ""
-        if self.lifted_representation:
-            # update the IsAnyBlockAtPositionPredicate and IsAnyItemAtPositionPredicate predicates (if necessary)
-            lifted_representation_predicates = pddl_not(
-                IsAnyItemAtPositionPredicate.to_precondition(
-                    x_end,
-                    self.param_name["YPositionUp"],
-                    z_end,
-                )
-            )
-
-        self.effects = pddl_and(
+        effects_list = [
             # agent is not at the start location
-            pddl_not(predicate_to_use.to_precondition(self.param_name["Agent"], start)),
+            pddl_not(
+                predicate_to_use.to_precondition(self.param_name["Agent"], start),
+            ),
             pddl_not(
                 AtYLocationPredicate.to_precondition(
                     self.param_name["Agent"], self.param_name["YPositionDown"]
-                )
+                ),
             ),
             # agent is at the end location
             predicate_to_use.to_precondition(self.param_name["Agent"], end),
@@ -1313,26 +1383,45 @@ class JumpUpAndPickup(Action):
                     self.param_name["Agent"],
                     self.param_name["NStart"],
                     item_type=self.item,
-                )
+                ),
             ),
             AgentHasNItemsPredicate.to_precondition(
                 self.param_name["Agent"], self.param_name["NEnd"], item_type=self.item
             ),
             # remove the item from the world
-            pddl_not(f"({ItemPresentPredicate.var_name} {self.param_name['Item']})"),
             pddl_not(
-                AtXLocationPredicate.to_precondition(self.param_name["Item"], x_end)
+                f"({ItemPresentPredicate.var_name} {self.param_name['Item']})",
+            ),
+            pddl_not(
+                AtXLocationPredicate.to_precondition(self.param_name["Item"], x_end),
             ),
             pddl_not(
                 AtYLocationPredicate.to_precondition(
                     self.param_name["Item"], self.param_name["YPositionUp"]
-                )
+                ),
             ),
             pddl_not(
-                AtZLocationPredicate.to_precondition(self.param_name["Item"], z_end)
+                AtZLocationPredicate.to_precondition(self.param_name["Item"], z_end),
             ),
-            lifted_representation_predicates,
-        )
+        ]
+
+        if self.lifted_representation:
+            # update the IsAnyBlockAtPositionPredicate and IsAnyItemAtPositionPredicate predicates (if necessary)
+            effects_list.append(
+                pddl_not(
+                    IsAnyItemAtPositionPredicate.to_precondition(
+                        x_end,
+                        self.param_name["YPositionUp"],
+                        z_end,
+                    ),
+                )
+            )
+
+            # add in the negated predicates
+            negated_effects = get_effects_negated_predicates(effects_list)
+            effects_list.extend(negated_effects)
+
+        self.effects = pddl_and(*effects_list)
 
     def to_pddl(self):
         self.construct_parameters()
@@ -1518,22 +1607,29 @@ class JumpDown(Action):
             end = self.param_name["XPositionEnd"]
             predicate_to_use = AtXLocationPredicate
 
-        self.effects = pddl_and(
-            pddl_not(predicate_to_use.to_precondition(self.param_name["Agent"], start)),
+        effects_list = [
+            pddl_not(
+                predicate_to_use.to_precondition(self.param_name["Agent"], start),
+            ),
             predicate_to_use.to_precondition(self.param_name["Agent"], end),
             pddl_not(
                 AtYLocationPredicate.to_precondition(
                     self.param_name["Agent"], self.param_name["YPositionDown"]
-                )
+                ),
             ),
             AtYLocationPredicate.to_precondition(
                 self.param_name["Agent"], self.param_name["YPosition2Down"]
             ),
-        )
+        ]
 
         if self.lifted_representation:
             # update the IsAnyBlockAtPositionPredicate and IsAnyItemAtPositionPredicate predicates (if necessary)
-            pass
+
+            # add in the negated predicates
+            negated_effects = get_effects_negated_predicates(effects_list)
+            effects_list.extend(negated_effects)
+
+        self.effects = pddl_and(*effects_list)
 
     def to_pddl(self):
         self.construct_parameters()
@@ -1742,24 +1838,15 @@ class JumpDownAndPickup(Action):
             x_end = self.param_name["XPositionEnd"]
             z_end = self.param_name["ZPosition"]
 
-        lifted_representation_predicates = ""
-        if self.lifted_representation:
-            # update the IsAnyBlockAtPositionPredicate and IsAnyItemAtPositionPredicate predicates (if necessary)
-            lifted_representation_predicates = pddl_not(
-                IsAnyItemAtPositionPredicate.to_precondition(
-                    x_end,
-                    self.param_name["YPositionUp"],
-                    z_end,
-                )
-            )
-
-        self.effects = pddl_and(
+        effects_list = [
             # agent is not at the start location
-            pddl_not(predicate_to_use.to_precondition(self.param_name["Agent"], start)),
+            pddl_not(
+                predicate_to_use.to_precondition(self.param_name["Agent"], start),
+            ),
             pddl_not(
                 AtYLocationPredicate.to_precondition(
                     self.param_name["Agent"], self.param_name["YPositionDown"]
-                )
+                ),
             ),
             # agent is present at the end location
             predicate_to_use.to_precondition(self.param_name["Agent"], end),
@@ -1772,26 +1859,45 @@ class JumpDownAndPickup(Action):
                     self.param_name["Agent"],
                     self.param_name["NStart"],
                     item_type=self.item,
-                )
+                ),
             ),
             AgentHasNItemsPredicate.to_precondition(
                 self.param_name["Agent"], self.param_name["NEnd"], item_type=self.item
             ),
             # remove the item from the world
-            pddl_not(f"({ItemPresentPredicate.var_name} {self.param_name['Item']})"),
             pddl_not(
-                AtXLocationPredicate.to_precondition(self.param_name["Item"], x_end)
+                f"({ItemPresentPredicate.var_name} {self.param_name['Item']})",
+            ),
+            pddl_not(
+                AtXLocationPredicate.to_precondition(self.param_name["Item"], x_end),
             ),
             pddl_not(
                 AtYLocationPredicate.to_precondition(
                     self.param_name["Item"], self.param_name["YPositionUp"]
-                )
+                ),
             ),
             pddl_not(
-                AtZLocationPredicate.to_precondition(self.param_name["Item"], z_end)
+                AtZLocationPredicate.to_precondition(self.param_name["Item"], z_end),
             ),
-            lifted_representation_predicates,
-        )
+        ]
+
+        if self.lifted_representation:
+            # update the IsAnyBlockAtPositionPredicate and IsAnyItemAtPositionPredicate predicates (if necessary)
+            effects_list.append(
+                pddl_not(
+                    IsAnyItemAtPositionPredicate.to_precondition(
+                        x_end,
+                        self.param_name["YPositionUp"],
+                        z_end,
+                    ),
+                )
+            )
+
+            # add in the negated predicates
+            negated_effects = get_effects_negated_predicates(effects_list)
+            effects_list.extend(negated_effects)
+
+        self.effects = pddl_and(*effects_list)
 
     def to_pddl(self):
         self.construct_parameters()
@@ -1929,9 +2035,16 @@ class CheckGoal(Action):
         )
 
     def construct_effects(self):
-        self.effects = pddl_and(
+        effects_list = [
             f"({GoalAchievedPredicate.var_name} {self.param_names['Agent']})"
-        )
+        ]
+
+        if self.lifted_representation:
+            # add in the negated predicates
+            negated_effects = get_effects_negated_predicates(effects_list)
+            effects_list.extend(negated_effects)
+
+        self.effects = pddl_and(*effects_list)
 
     def to_pddl(self):
         self.construct_parameters()

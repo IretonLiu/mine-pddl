@@ -8,6 +8,7 @@ import pddl.pddl_types.base_pddl_types as base_pddl_types
 import pddl.pddl_types.named_pddl_types as named_pddl_types
 import pddl.pddl_types.special_pddl_types as special_pddl_types
 from pddl.functions import InventoryFunction
+from pddl.operators import add_pddl_prefix
 from pddl.pddl_types.special_pddl_types import CountType, PositionType
 from pddl.predicates import (
     AgentHasNItemsPredicate,
@@ -193,6 +194,15 @@ class Domain:
 
         # use a set to remove duplicate occurrences (e.g. if there is a common parent)
         pddl_string_set = set(pddl_strings)
+
+        # if we are produced lifted propositional pddl, we need to handle the negation of predicates
+        if self.use_propositional and self.lifted_representation:
+            negated_set = set()
+            for pddl_string in pddl_string_set:
+                negated_str = add_pddl_prefix(pddl_string)
+                negated_set.add(negated_str.replace("\n", ""))
+
+            pddl_string_set.update(negated_set)
 
         # build the string of predicates/functions
         output = "(:{}\n\t".format("predicates" if process_predicates else "functions")
